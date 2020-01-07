@@ -13,7 +13,6 @@ public class Drivetrain extends SubsystemBase {
 
 
    public Drivetrain() {
-
         leftMaster = new CANTalonFX(Constants.LEFT_MASTER_CAN_ID);
         leftSlave = new CANTalonFX(Constants.LEFT_SLAVE_CAN_ID);
         rightMaster = new CANTalonFX(Constants.RIGHT_MASTER_CAN_ID);
@@ -40,10 +39,10 @@ public class Drivetrain extends SubsystemBase {
    }
 
    public void setCurrentLimit(int amps) {
-       leftMaster.setInputCurrentLimit(amps);
-       leftSlave.setInputCurrentLimit(amps);
-       rightMaster.setInputCurrentLimit(amps);
-       rightSlave.setInputCurrentLimit(amps);
+       leftMaster.limitInputCurrent(amps);
+       leftSlave.limitInputCurrent(amps);
+       rightMaster.limitInputCurrent(amps);
+       rightSlave.limitInputCurrent(amps);
    }
 
 }
