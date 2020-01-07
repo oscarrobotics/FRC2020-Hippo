@@ -14,14 +14,36 @@ public class Drivetrain extends SubsystemBase {
 
    public Drivetrain() {
 
-        rightMaster = new CANTalonFX(Constants.RIGHT_MASTER_CAN_ID);
         leftMaster = new CANTalonFX(Constants.LEFT_MASTER_CAN_ID);
-        rightSlave = new CANTalonFX(Constants.RIGHT_SLAVE_CAN_ID);
         leftSlave = new CANTalonFX(Constants.LEFT_SLAVE_CAN_ID);
+        rightMaster = new CANTalonFX(Constants.RIGHT_MASTER_CAN_ID);
+        rightSlave = new CANTalonFX(Constants.RIGHT_SLAVE_CAN_ID);
+
+        leftMaster.wipeSettings();
+        leftSlave.wipeSettings();
+        rightMaster.wipeSettings();
+        rightSlave.wipeSettings();
+
+        leftSlave.follow(leftMaster);
+        rightSlave.follow(rightMaster);
+
+        leftMaster.setInverted(false);
+        leftSlave.setInverted(false);
+        rightMaster.setInverted(false);
+        leftSlave.setInverted(false);
+
+        setCurrentLimit(40);
 
         setDefaultCommand(new TemplateCommand(this));
 
         initSuccessful = true;
+   }
+
+   public void setCurrentLimit(int amps) {
+       leftMaster.setInputCurrentLimit(amps);
+       leftSlave.setInputCurrentLimit(amps);
+       rightMaster.setInputCurrentLimit(amps);
+       rightSlave.setInputCurrentLimit(amps);
    }
 
 }
