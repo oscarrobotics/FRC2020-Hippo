@@ -1,13 +1,13 @@
 package frc.team832.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.*;
-import frc.team832.robot.subsystems.TemplateSubsystem;
+import frc.team832.robot.subsystems.Drivetrain;
 
 public class TemplateCommand extends CommandBase {
 
-    private final TemplateSubsystem subsystem;
+    private final SubsystemBase subsystem;
 
-    public TemplateCommand(final TemplateSubsystem subsystem) {
+    public TemplateCommand(final SubsystemBase subsystem) {
         this.subsystem = subsystem;
         addRequirements(subsystem);
     }
