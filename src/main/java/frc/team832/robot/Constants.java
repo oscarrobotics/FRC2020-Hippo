@@ -11,7 +11,7 @@ public class Constants {
 
     }
 
-    public static class ShooterVaules {
+    public static class ShooterValues {
         public static final int SHOOTER_ID_PRIMARY = 6;
         public static final int SHOOTER_ID_SECONDARY = 7;
 

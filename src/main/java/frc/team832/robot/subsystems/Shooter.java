@@ -1,9 +1,7 @@
 package frc.team832.robot.subsystems;
 
-import com.revrobotics.CANPIDController;
 import com.revrobotics.CANSparkMaxLowLevel;
 import edu.wpi.first.wpilibj.controller.PIDController;
-import edu.wpi.first.wpilibj.controller.ProfiledPIDController;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.team832.lib.motorcontrol2.vendor.CANSparkMax;
 import frc.team832.robot.Constants;
@@ -15,13 +13,13 @@ public class Shooter extends SubsystemBase {
 
     private CANSparkMax ShooterMotorPrimary, ShooterMotorFollower; //if needed add hood motor
 
-    PIDController pid = new PIDController(Constants.ShooterVaules.SHOOTER_SPIN_UP_kP,0,Constants.ShooterVaules.SHOOTER_SPIN_UP_kD);
+    PIDController pid = new PIDController(Constants.ShooterValues.SHOOTER_SPIN_UP_kP,0, Constants.ShooterValues.SHOOTER_SPIN_UP_kD);
 
     private SHOOTER_MODE mode = SHOOTER_MODE.IDLE, lastMode = SHOOTER_MODE.IDLE;
 
     public Shooter(){
-        ShooterMotorPrimary = new CANSparkMax(Constants.ShooterVaules.SHOOTER_ID_PRIMARY, CANSparkMaxLowLevel.MotorType.kBrushless);
-        ShooterMotorFollower = new CANSparkMax(Constants.ShooterVaules.SHOOTER_ID_SECONDARY, CANSparkMaxLowLevel.MotorType.kBrushless);
+        ShooterMotorPrimary = new CANSparkMax(Constants.ShooterValues.SHOOTER_ID_PRIMARY, CANSparkMaxLowLevel.MotorType.kBrushless);
+        ShooterMotorFollower = new CANSparkMax(Constants.ShooterValues.SHOOTER_ID_SECONDARY, CANSparkMaxLowLevel.MotorType.kBrushless);
 
         ShooterMotorPrimary.wipeSettings();
         ShooterMotorFollower.wipeSettings();
@@ -38,11 +36,11 @@ public class Shooter extends SubsystemBase {
 
         if(lastMode != mode){
             if (mode == SHOOTER_MODE.SHOOTING){
-                pid.setPID(Constants.ShooterVaules.SHOOTING_kP, 0, Constants.ShooterVaules.SHOOTING_kD);
+                pid.setPID(Constants.ShooterValues.SHOOTING_kP, 0, Constants.ShooterValues.SHOOTING_kD);
             } else if (mode == SHOOTER_MODE.SPINNING_UP) {
-                pid.setPID(Constants.ShooterVaules.SHOOTER_SPIN_UP_kP, 0, Constants.ShooterVaules.SHOOTER_SPIN_UP_kD);
+                pid.setPID(Constants.ShooterValues.SHOOTER_SPIN_UP_kP, 0, Constants.ShooterValues.SHOOTER_SPIN_UP_kD);
             } else if (mode == SHOOTER_MODE.SPINNING_DOWN) {
-                pid.setPID(Constants.ShooterVaules.SHOOTER_SPIN_DOWN_kP, 0, Constants.ShooterVaules.SHOOTER_SPIN_DOWN_kD);
+                pid.setPID(Constants.ShooterValues.SHOOTER_SPIN_DOWN_kP, 0, Constants.ShooterValues.SHOOTER_SPIN_DOWN_kD);
             } else {
                 pid.setPID(0,0,0);
             }
@@ -60,9 +58,9 @@ public class Shooter extends SubsystemBase {
 
     private void updatePIDMode () {
         if (mode == SHOOTER_MODE.SHOOTING){
-            pid.setPID(Constants.ShooterVaules.SHOOTING_kP, 0, Constants.ShooterVaules.SHOOTING_kD);
+            pid.setPID(Constants.ShooterValues.SHOOTING_kP, 0, Constants.ShooterValues.SHOOTING_kD);
         } else if (mode == SHOOTER_MODE.SPINNING_UP) {
-            pid.setPID(Constants.ShooterVaules.SHOOTER_SPIN_UP_kP, 0, Constants.ShooterVaules.SHOOTER_SPIN_UP_kD);
+            pid.setPID(Constants.ShooterValues.SHOOTER_SPIN_UP_kP, 0, Constants.ShooterValues.SHOOTER_SPIN_UP_kD);
         }
     }
 

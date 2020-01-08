@@ -24,10 +24,10 @@ public class Drivetrain extends SubsystemBase {
     private final double stickRotateMultiplier = 0.85;
 
     public Drivetrain() {
-        leftMaster = new CANTalonFX(Constants.LEFT_MASTER_CAN_ID);
-        leftSlave = new CANTalonFX(Constants.LEFT_SLAVE_CAN_ID);
-        rightMaster = new CANTalonFX(Constants.RIGHT_MASTER_CAN_ID);
-        rightSlave = new CANTalonFX(Constants.RIGHT_SLAVE_CAN_ID);
+        leftMaster = new CANTalonFX(Constants.DrivetrainValues.LEFT_MASTER_CAN_ID);
+        leftSlave = new CANTalonFX(Constants.DrivetrainValues.LEFT_SLAVE_CAN_ID);
+        rightMaster = new CANTalonFX(Constants.DrivetrainValues.RIGHT_MASTER_CAN_ID);
+        rightSlave = new CANTalonFX(Constants.DrivetrainValues.RIGHT_SLAVE_CAN_ID);
 
         leftMaster.wipeSettings();
         leftSlave.wipeSettings();
@@ -44,7 +44,7 @@ public class Drivetrain extends SubsystemBase {
 
         setCurrentLimit(40);
 
-        diffDrive = new SmartDiffDrive(leftMaster, rightMaster, Constants.MAX_RPM);
+        diffDrive = new SmartDiffDrive(leftMaster, rightMaster, Constants.DrivetrainValues.MAX_RPM);
 
         setDefaultCommand(new TemplateCommand(this));
 
