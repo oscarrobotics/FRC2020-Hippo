@@ -1,5 +1,6 @@
 package frc.team832.robot.subsystems;
 
+<<<<<<< HEAD
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.team832.lib.drive.SmartDiffDrive;
@@ -7,6 +8,11 @@ import frc.team832.lib.motorcontrol2.vendor.CANTalonFX;
 import frc.team832.lib.util.OscarMath;
 import frc.team832.robot.Constants;
 import frc.team832.robot.OI;
+=======
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.team832.robot.Constants;
+import frc.team832.lib.motorcontrol2.vendor.CANTalonFX;
+>>>>>>> 3db0ed476ec669339c722948c569cf0efd5eff3b
 import frc.team832.robot.commands.TemplateCommand;
 
 public class Drivetrain extends SubsystemBase {
@@ -14,6 +20,10 @@ public class Drivetrain extends SubsystemBase {
     private CANTalonFX rightMaster, rightSlave, leftMaster, leftSlave;
     private SmartDiffDrive diffDrive;
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> 3db0ed476ec669339c722948c569cf0efd5eff3b
     public Drivetrain() {
         leftMaster = new CANTalonFX(Constants.LEFT_MASTER_CAN_ID);
         leftSlave = new CANTalonFX(Constants.LEFT_SLAVE_CAN_ID);
@@ -42,16 +52,20 @@ public class Drivetrain extends SubsystemBase {
         initSuccessful = true;
     }
 
+<<<<<<< HEAD
     public boolean isInitSuccessful() {
         return initSuccessful;
     }
 
+=======
+>>>>>>> 3db0ed476ec669339c722948c569cf0efd5eff3b
     public void setCurrentLimit(int amps) {
         leftMaster.limitInputCurrent(amps);
         leftSlave.limitInputCurrent(amps);
         rightMaster.limitInputCurrent(amps);
         rightSlave.limitInputCurrent(amps);
     }
+<<<<<<< HEAD
 
     public void arcadeDrive() {
         double moveStick = -OI.drivePad.getY(GenericHID.Hand.kLeft);
@@ -99,6 +113,8 @@ public class Drivetrain extends SubsystemBase {
 
         leftPow = Math.pow(leftAdjusted, 1.5) * (OI.leftDriveStick.getTrigger() ? Constants.PRECISE_TANK_MULTIPLIER : Constants.DEFAULT_TANK_MULTIPLIER);
         rightPow = Math.pow(rightAdjusted, 1.5) * (OI.rightDriveStick.getTrigger() ? Constants.PRECISE_TANK_MULTIPLIER : Constants.DEFAULT_TANK_MULTIPLIER);
+=======
+>>>>>>> 3db0ed476ec669339c722948c569cf0efd5eff3b
 
         if (!isTwistTurn) {
             rightMaster.set(rightPow);
