@@ -4,27 +4,25 @@ import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import frc.team832.lib.driverinput.controllers.*;
+import frc.team832.lib.driverinput.oi.DriverOI;
+import frc.team832.lib.driverinput.oi.SticksDriverOI;
 
 public class OI {
 
-	//Creates the drivePad object of XboxController360 class
-	public static final Xbox360Controller drivePad = new Xbox360Controller(0);
-	//Creates the stratComInterface of the StratComInterface Class
-	public static final StratComInterface stratComInterface = new StratComInterface(1);
+	public final DriverOI driverOI;
 
-	public static final Joystick leftDriveStick = new Attack3(2);
-	public static final Joystick rightDriveStick = new Extreme3DPro(3);
+	public final Attack3 leftStick;
+	public final Extreme3DPro rightStick;
 
-	//Commands: drivePad
-//        drivePad.rightStickPress.whenPressed(new InstantCommand(() -> vision.setDriverMode(false))).whenReleased(new InstantCommand(() -> vision.setDriverMode(true)));
+	public OI() {
+//        driverOI = new XboxDriverOI();
+		driverOI = new SticksDriverOI();
 
-	//Commands: stratComInterface
+		leftStick = ((SticksDriverOI)driverOI).leftStick;
+		rightStick = ((SticksDriverOI)driverOI).rightStick;
 
-//	var keySwitchCommand = new RunCommand(superStructure::moveManual, fourbar, elevator, superStructure);
-//        stratComInterface.getKeySwitch().whileActiveContinuous(keySwitchCommand);
+		// do commands here
 
-//        drivePad.aButton.whenPressed(new AutonomousHatchScore(Paths.RightHab_RightFrontRocket, SuperStructure.SuperStructurePosition.CARGOSHIP_HATCH, drivetrain, superStructure, elevator, fourbar, intake));
-//        drivePad.aButton.whenPressed(new RamseteCommand(Paths.Test_Three_Meters_Forward, drivetrain::getLatestPose2d, new RamseteController(2, 0.7), DRIVE_KINEMATICS, drivetrain::consumeWheelSpeeds, drivetrain));
-
+	}
 
 }

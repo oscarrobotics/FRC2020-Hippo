@@ -1,22 +1,27 @@
 package frc.team832.robot.subsystems;
 
-import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.team832.lib.drive.SmartDiffDrive;
+import frc.team832.lib.driverinput.oi.DriveAxesSupplier;
+import frc.team832.lib.driverinput.oi.SticksDriverOI;
 import frc.team832.lib.motorcontrol2.vendor.CANTalonFX;
 import frc.team832.lib.util.OscarMath;
 import frc.team832.robot.Constants;
-import frc.team832.robot.OI;
 
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.team832.robot.Constants;
-import frc.team832.lib.motorcontrol2.vendor.CANTalonFX;
+import frc.team832.robot.accesories.ArcadeDriveProfile;
+import frc.team832.robot.accesories.TankDriveProfile;
 import frc.team832.robot.commands.TemplateCommand;
+
+import static frc.team832.robot.Robot.oi;
 
 public class Drivetrain extends SubsystemBase {
     private boolean initSuccessful = false;
     private CANTalonFX rightMaster, rightSlave, leftMaster, leftSlave;
     private SmartDiffDrive diffDrive;
+
+    private final double stickDriveMultiplier = 1.0;
+    private final double stickRotateOnCenterMultiplier = 0.6;
+    private final double stickRotateMultiplier = 0.85;
 
     public Drivetrain() {
         leftMaster = new CANTalonFX(Constants.LEFT_MASTER_CAN_ID);
@@ -58,55 +63,135 @@ public class Drivetrain extends SubsystemBase {
     }
 
     public void arcadeDrive() {
-        double moveStick = -OI.drivePad.getY(GenericHID.Hand.kLeft);
-        double rotStick = OI.drivePad.getX(GenericHID.Hand.kRight);
+        double rightPower = 0;
+        double leftPower = 0;
+        DriveAxesSupplier axes = oi.driverOI.getArcadeDriveAxes();
+        rightPower = OscarMath.signumPow(-axes.getRight() * stickDriveMultiplier, 3);
+        leftPower = OscarMath.signumPow(axes.getLeft() * stickDriveMultiplier, 3);
+        diffDrive.arcadeDrive(rightPower, leftPower, SmartDiffDrive.LoopMode.PERCENTAGE);
+    }
 
-        boolean preciseRot = OI.drivePad.rightBumper.get();
-        boolean preciseMove = OI.drivePad.leftBumper.get();
+    public TankDriveProfile calculateTankSpeeds() {
+        DriveAxesSupplier axes = oi.driverOI.getTankDriveAxes();
+        boolean isRotate = ((SticksDriverOI) oi.driverOI).rightStick.two.get();
+        boolean driveStraight = ((SticksDriverOI) oi.driverOI).leftStick.trigger.get() || ((SticksDriverOI) oi.driverOI).rightStick.trigger.get();
 
-//        boolean visionRot = OI.drivePad.rightStickPress.get();
+        if (driveStraight) {
+            TankDriveProfile straight = getTankStraightProfile();
+            if (isRotate) {
+                TankDriveProfile rotate = getTankRotateProfile();
+                return new TankDriveProfile(straight.leftPow + rotate.leftPow, straight.rightPow + rotate.rightPow, SmartDiffDrive.LoopMode.PERCENTAGE);
+            } else {
+                return straight;
+            }
+        } else {
+            if (isRotate) {
+                return getTankRotateOnCenterProfile();
 
-        moveStick = OscarMath.signumPow(moveStick, 2);
-        rotStick = OscarMath.signumPow(rotStick, 4);
+            } else {
+                return getTankNormalProfile();
+            }
+        }
+    }
 
-        double rotPow = preciseRot ? rotStick * Constants.PRECISE_ROT_MULTIPLIER : rotStick * Constants.DEFAULT_ROT_MULTIPLIER;
-        double movePow = preciseMove ? moveStick * Constants.PRECISE_MOVE_MULTIPLIER : moveStick * Constants.DEFAULT_MOVE_MULTIPLIER;
+    public TankDriveProfile getTankStraightProfile() {
+        DriveAxesSupplier axes = oi.driverOI.getTankDriveAxes();
+        double rightStick = axes.getRight();
+        double leftStick = axes.getLeft();
+        double power;
+        if (((SticksDriverOI) oi.driverOI).leftStick.trigger.get() && ((SticksDriverOI) oi.driverOI).rightStick.trigger.get()) {
+            power = (OscarMath.signumPow(rightStick * stickDriveMultiplier, 2) + OscarMath.signumPow(leftStick * stickDriveMultiplier, 2)) / 2;
+        } else if (((SticksDriverOI) oi.driverOI).rightStick.trigger.get()) {
+            power = OscarMath.signumPow(rightStick * stickDriveMultiplier, 2);
+        } else {
+            power = (OscarMath.signumPow(leftStick * stickDriveMultiplier, 2));
+        }
 
-//        OI.vision.setDriverMode(!visionRot);
-//        if (visionRot) {
-//            rotPow = OI.vision.getYaw() * OI.vision.getYawKp();
-//        }
+        return new TankDriveProfile(power, power, SmartDiffDrive.LoopMode.PERCENTAGE);
+    }
 
-        diffDrive.curvatureDrive(movePow, rotPow, true, SmartDiffDrive.LoopMode.PERCENTAGE);
+    public TankDriveProfile getTankNormalProfile() {
+        double rightPower = 0;
+        double leftPower = 0;
+        DriveAxesSupplier axes = oi.driverOI.getTankDriveAxes();
+        double rightStick = axes.getRight();
+        double leftStick = axes.getLeft();
+
+        rightPower = OscarMath.signumPow(rightStick * stickDriveMultiplier, 2);
+        leftPower = OscarMath.signumPow(leftStick * stickDriveMultiplier, 2);
+
+        return new TankDriveProfile(leftPower, rightPower, SmartDiffDrive.LoopMode.PERCENTAGE);
+    }
+
+    public TankDriveProfile getTankRotateProfile() {
+        double rightPower = 0;
+        double leftPower = 0;
+        DriveAxesSupplier axes = oi.driverOI.getTankDriveAxes();
+        rightPower = -OscarMath.signumPow(axes.getRotation() * stickRotateMultiplier, 2);
+        leftPower = OscarMath.signumPow(axes.getRotation() * stickRotateMultiplier, 2);
+
+        return new TankDriveProfile(leftPower, rightPower, SmartDiffDrive.LoopMode.PERCENTAGE);
+    }
+
+    public TankDriveProfile getTankRotateOnCenterProfile() {
+        DriveAxesSupplier axes = oi.driverOI.getTankDriveAxes();
+        double rotation = OscarMath.signumPow(axes.getRotation() * stickRotateOnCenterMultiplier, 3);
+
+        return new TankDriveProfile(-rotation, rotation, SmartDiffDrive.LoopMode.PERCENTAGE);
+    }
+
+    public ArcadeDriveProfile calculateArcadeSpeeds() {
+        double xPower = 0;
+        double rotPower = 0;
+        DriveAxesSupplier axes = oi.driverOI.getArcadeDriveAxes();
+        xPower = OscarMath.signumPow(-axes.getRight() * stickDriveMultiplier, 3);
+        rotPower = OscarMath.signumPow(axes.getLeft() * stickDriveMultiplier, 3);
+
+        return new ArcadeDriveProfile(xPower, rotPower, SmartDiffDrive.LoopMode.PERCENTAGE);
     }
 
     public void tankDrive() {
-        double leftStick = Math.abs(OI.leftDriveStick.getY()) > 0.025 ? OI.leftDriveStick.getY() : 0;
-        double rightStick =  Math.abs(OI.rightDriveStick.getY()) > 0.025 ? OI.rightDriveStick.getY() : 0;
-        double leftPow, leftAdjusted;
-        double rightPow, rightAdjusted;
-        boolean isTwistTurn = false;
+        TankDriveProfile profile = calculateTankSpeeds();
+        diffDrive.tankDrive(profile.leftPow, profile.rightPow, profile.loopMode);
+//        double rightPower = 0;
+//        double leftPower = 0;
+//        DriveAxesSupplier axes = oi.driverOI.getTankDriveAxes();
+//        double rightStick = axes.getRight();
+//        double leftStick = axes.getLeft();
+//        boolean isRotate = ((SticksDriverOI) oi.driverOI).rightStick.two.get();
+//        boolean driveStraight = ((SticksDriverOI) oi.driverOI).leftStick.trigger.get() || ((SticksDriverOI) oi.driverOI).rightStick.trigger.get();
+//
+//        if (driveStraight) {
+//            double power;
+//            if (((SticksDriverOI) oi.driverOI).leftStick.trigger.get() && ((SticksDriverOI) oi.driverOI).rightStick.trigger.get()) {
+//                power = (OscarMath.signumPow(rightStick * stickDriveMultiplier, 2) + OscarMath.signumPow(leftStick * stickDriveMultiplier, 2)) / 2;
+//            } else if (((SticksDriverOI) oi.driverOI).rightStick.trigger.get()) {
+//                power = OscarMath.signumPow(rightStick * stickDriveMultiplier, 2);
+//            } else {
+//                power = (OscarMath.signumPow(leftStick * stickDriveMultiplier, 2));
+//            }
+//            if (isRotate) {
+//                rightPower = power - OscarMath.signumPow(axes.getRotation() * stickRotateMultiplier, 2);
+//                leftPower = power + OscarMath.signumPow(axes.getRotation() * stickRotateMultiplier, 2);
+//            } else {
+//                rightPower = power;
+//                leftPower = power;
+//            }
+//            diffDrive.tankDrive(leftPower, rightPower, SmartDiffDrive.LoopMode.PERCENTAGE);
+//        } else {
+//            if (isRotate) {
+//                double rotation = OscarMath.signumPow(axes.getRotation() * stickRotateOnCenterMultiplier, 3);
+//                diffDrive.arcadeDrive(rotation, 0.0, SmartDiffDrive.LoopMode.PERCENTAGE);
+//            } else {
+//                rightPower = OscarMath.signumPow(rightStick * stickDriveMultiplier, 2);
+//                leftPower = OscarMath.signumPow(leftStick * stickDriveMultiplier, 2);
+//                diffDrive.tankDrive(leftPower, rightPower, SmartDiffDrive.LoopMode.PERCENTAGE);
+//            }
+//        }
+    }
 
-        if (Math.abs(leftStick - rightStick) < 0.075 && (Math.abs(leftStick) > 0.1 && Math.abs(rightStick) > 0.1)) {
-            leftAdjusted = (leftStick + rightStick) / 2;
-            rightAdjusted = (leftStick + rightStick) / 2;
-        } else if (Math.abs(leftStick) < 0.1 && Math.abs(rightStick) < 0.1) {
-            leftAdjusted = 0;
-            rightAdjusted = 0;
-            isTwistTurn = true;
-            double rot = Math.pow(OI.rightDriveStick.getTwist(), 2.1);//.1 is to preserve sign
-            diffDrive.curvatureDrive(0, rot, true, SmartDiffDrive.LoopMode.PERCENTAGE);
-        } else {
-            leftAdjusted = leftStick;
-            rightAdjusted = rightStick;
-        }
-
-        leftPow = Math.pow(leftAdjusted, 1.5) * (OI.leftDriveStick.getTrigger() ? Constants.PRECISE_TANK_MULTIPLIER : Constants.DEFAULT_TANK_MULTIPLIER);
-        rightPow = Math.pow(rightAdjusted, 1.5) * (OI.rightDriveStick.getTrigger() ? Constants.PRECISE_TANK_MULTIPLIER : Constants.DEFAULT_TANK_MULTIPLIER);
-
-        if (!isTwistTurn) {
-            rightMaster.set(rightPow);
-            leftMaster.set(-leftPow);
-        }
+    public void xBoxDrive() {
+        ArcadeDriveProfile profile = calculateArcadeSpeeds();
+        diffDrive.arcadeDrive(profile.xPow, profile.rotPow, profile.loopMode);
     }
 }
