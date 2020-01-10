@@ -4,6 +4,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.team832.lib.drive.SmartDiffDrive;
 import frc.team832.lib.driverinput.oi.DriveAxesSupplier;
 import frc.team832.lib.driverinput.oi.SticksDriverOI;
+import frc.team832.lib.driverstation.dashboard.DashboardUpdatable;
 import frc.team832.lib.motorcontrol2.vendor.CANTalonFX;
 import frc.team832.lib.util.OscarMath;
 import frc.team832.robot.Constants;
@@ -14,7 +15,7 @@ import frc.team832.robot.commands.TemplateCommand;
 
 import static frc.team832.robot.Robot.oi;
 
-public class Drivetrain extends SubsystemBase {
+public class Drivetrain extends SubsystemBase implements DashboardUpdatable {
     private boolean initSuccessful = false;
     private CANTalonFX rightMaster, rightSlave, leftMaster, leftSlave;
     private SmartDiffDrive diffDrive;
@@ -193,5 +194,15 @@ public class Drivetrain extends SubsystemBase {
     public void xBoxDrive() {
         ArcadeDriveProfile profile = calculateArcadeSpeeds();
         diffDrive.arcadeDrive(profile.xPow, profile.rotPow, profile.loopMode);
+    }
+
+    @Override
+    public String getDashboardTabName () {
+        return "Drivetrain";
+    }
+
+    @Override
+    public void updateDashboardData () {
+
     }
 }

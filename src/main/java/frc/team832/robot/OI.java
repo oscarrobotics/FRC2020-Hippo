@@ -10,6 +10,7 @@ import frc.team832.lib.driverinput.oi.SticksDriverOI;
 public class OI {
 
 	public final DriverOI driverOI;
+	public static final StratComInterface stratComInterface = new StratComInterface(1);
 
 	public final Attack3 leftStick;
 	public final Extreme3DPro rightStick;

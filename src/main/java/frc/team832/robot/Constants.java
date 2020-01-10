@@ -15,21 +15,25 @@ public class Constants {
         public static final int SHOOTER_ID_PRIMARY = 6;
         public static final int SHOOTER_ID_SECONDARY = 7;
 
-        public static double SHOOTER_SPIN_UP_kP = 0;
-        public static double SHOOTER_SPIN_UP_kD = 0;
-        public static double SHOOTER_SPIN_UP_kF = 0;
+        public static double SPIN_UP_kP = 0;
+        public static double SPIN_UP_kD = 0;
+        public static double SPIN_UP_kF = 0;
 
         public static double SHOOTING_kP = 0;
         public static double SHOOTING_kD = 0;
         public static double SHOOTING_kF = 0;
 
-        public static double SHOOTER_SPIN_DOWN_kP = 0;
-        public static double SHOOTER_SPIN_DOWN_kD = 0;
-        public static double SHOOTER_SPIN_DOWN_kF = 0;
+        public static double SPIN_DOWN_kP = 0;
+        public static double SPIN_DOWN_kD = 0;
+        public static double SPIN_DOWN_kF = 0;
+
+        public static double IDLE_kP = 0;
+        public static double IDLE_kD = 0;
+        public static double IDLE_kF = 0;
 
     }
 
-    public static class IntakeValuse {
+    public static class IntakeValues {
         public static final int INTAKE_MOTOR_CAN_ID = 5;
 
     }
