@@ -7,6 +7,10 @@ public class Constants {
         public static final int RIGHT_SLAVE_CAN_ID = 3;
         public static final int LEFT_SLAVE_CAN_ID = 4;
 
+        public static final double stickDriveMultiplier = 1.0;
+        public static final double stickRotateOnCenterMultiplier = 0.6;
+        public static final double stickRotateMultiplier = 0.85;
+
         public static final int MAX_RPM = 5000;
 
     }

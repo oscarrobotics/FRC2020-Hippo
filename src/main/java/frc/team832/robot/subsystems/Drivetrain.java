@@ -3,7 +3,6 @@ package frc.team832.robot.subsystems;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.team832.lib.drive.SmartDiffDrive;
 import frc.team832.lib.driverinput.oi.DriveAxesSupplier;
-import frc.team832.lib.driverinput.oi.SticksDriverOI;
 import frc.team832.lib.driverstation.dashboard.DashboardUpdatable;
 import frc.team832.lib.motorcontrol2.vendor.CANTalonFX;
 import frc.team832.lib.util.OscarMath;
@@ -20,9 +19,7 @@ public class Drivetrain extends SubsystemBase implements DashboardUpdatable {
     private CANTalonFX rightMaster, rightSlave, leftMaster, leftSlave;
     private SmartDiffDrive diffDrive;
 
-    private final double stickDriveMultiplier = 1.0;
-    private final double stickRotateOnCenterMultiplier = 0.6;
-    private final double stickRotateMultiplier = 0.85;
+    private TankDriveProfile tankProfile = new TankDriveProfile();
 
     public Drivetrain() {
         leftMaster = new CANTalonFX(Constants.DrivetrainValues.LEFT_MASTER_CAN_ID);
@@ -67,93 +64,24 @@ public class Drivetrain extends SubsystemBase implements DashboardUpdatable {
         double rightPower = 0;
         double leftPower = 0;
         DriveAxesSupplier axes = oi.driverOI.getArcadeDriveAxes();
-        rightPower = OscarMath.signumPow(-axes.getRight() * stickDriveMultiplier, 3);
-        leftPower = OscarMath.signumPow(axes.getLeft() * stickDriveMultiplier, 3);
+        rightPower = OscarMath.signumPow(-axes.getRight() * Constants.DrivetrainValues.stickDriveMultiplier, 3);
+        leftPower = OscarMath.signumPow(axes.getLeft() * Constants.DrivetrainValues.stickDriveMultiplier, 3);
         diffDrive.arcadeDrive(rightPower, leftPower, SmartDiffDrive.LoopMode.PERCENTAGE);
-    }
-
-    public TankDriveProfile calculateTankSpeeds() {
-        DriveAxesSupplier axes = oi.driverOI.getTankDriveAxes();
-        boolean isRotate = ((SticksDriverOI) oi.driverOI).rightStick.two.get();
-        boolean driveStraight = ((SticksDriverOI) oi.driverOI).leftStick.trigger.get() || ((SticksDriverOI) oi.driverOI).rightStick.trigger.get();
-
-        if (driveStraight) {
-            TankDriveProfile straight = getTankStraightProfile();
-            if (isRotate) {
-                TankDriveProfile rotate = getTankRotateProfile();
-                return new TankDriveProfile(straight.leftPow + rotate.leftPow, straight.rightPow + rotate.rightPow, SmartDiffDrive.LoopMode.PERCENTAGE);
-            } else {
-                return straight;
-            }
-        } else {
-            if (isRotate) {
-                return getTankRotateOnCenterProfile();
-
-            } else {
-                return getTankNormalProfile();
-            }
-        }
-    }
-
-    public TankDriveProfile getTankStraightProfile() {
-        DriveAxesSupplier axes = oi.driverOI.getTankDriveAxes();
-        double rightStick = axes.getRight();
-        double leftStick = axes.getLeft();
-        double power;
-        if (((SticksDriverOI) oi.driverOI).leftStick.trigger.get() && ((SticksDriverOI) oi.driverOI).rightStick.trigger.get()) {
-            power = (OscarMath.signumPow(rightStick * stickDriveMultiplier, 2) + OscarMath.signumPow(leftStick * stickDriveMultiplier, 2)) / 2;
-        } else if (((SticksDriverOI) oi.driverOI).rightStick.trigger.get()) {
-            power = OscarMath.signumPow(rightStick * stickDriveMultiplier, 2);
-        } else {
-            power = (OscarMath.signumPow(leftStick * stickDriveMultiplier, 2));
-        }
-
-        return new TankDriveProfile(power, power, SmartDiffDrive.LoopMode.PERCENTAGE);
-    }
-
-    public TankDriveProfile getTankNormalProfile() {
-        double rightPower = 0;
-        double leftPower = 0;
-        DriveAxesSupplier axes = oi.driverOI.getTankDriveAxes();
-        double rightStick = axes.getRight();
-        double leftStick = axes.getLeft();
-
-        rightPower = OscarMath.signumPow(rightStick * stickDriveMultiplier, 2);
-        leftPower = OscarMath.signumPow(leftStick * stickDriveMultiplier, 2);
-
-        return new TankDriveProfile(leftPower, rightPower, SmartDiffDrive.LoopMode.PERCENTAGE);
-    }
-
-    public TankDriveProfile getTankRotateProfile() {
-        double rightPower = 0;
-        double leftPower = 0;
-        DriveAxesSupplier axes = oi.driverOI.getTankDriveAxes();
-        rightPower = -OscarMath.signumPow(axes.getRotation() * stickRotateMultiplier, 2);
-        leftPower = OscarMath.signumPow(axes.getRotation() * stickRotateMultiplier, 2);
-
-        return new TankDriveProfile(leftPower, rightPower, SmartDiffDrive.LoopMode.PERCENTAGE);
-    }
-
-    public TankDriveProfile getTankRotateOnCenterProfile() {
-        DriveAxesSupplier axes = oi.driverOI.getTankDriveAxes();
-        double rotation = OscarMath.signumPow(axes.getRotation() * stickRotateOnCenterMultiplier, 3);
-
-        return new TankDriveProfile(-rotation, rotation, SmartDiffDrive.LoopMode.PERCENTAGE);
     }
 
     public ArcadeDriveProfile calculateArcadeSpeeds() {
         double xPower = 0;
         double rotPower = 0;
         DriveAxesSupplier axes = oi.driverOI.getArcadeDriveAxes();
-        xPower = OscarMath.signumPow(-axes.getRight() * stickDriveMultiplier, 3);
-        rotPower = OscarMath.signumPow(axes.getLeft() * stickDriveMultiplier, 3);
+        xPower = OscarMath.signumPow(-axes.getRight() * Constants.DrivetrainValues.stickDriveMultiplier, 3);
+        rotPower = OscarMath.signumPow(axes.getLeft() * Constants.DrivetrainValues.stickDriveMultiplier, 3);
 
         return new ArcadeDriveProfile(xPower, rotPower, SmartDiffDrive.LoopMode.PERCENTAGE);
     }
 
     public void tankDrive() {
-        TankDriveProfile profile = calculateTankSpeeds();
-        diffDrive.tankDrive(profile.leftPow, profile.rightPow, profile.loopMode);
+        tankProfile.calculateTankSpeeds();
+        diffDrive.tankDrive(tankProfile.leftPow, tankProfile.rightPow, tankProfile.loopMode);
 //        double rightPower = 0;
 //        double leftPower = 0;
 //        DriveAxesSupplier axes = oi.driverOI.getTankDriveAxes();
