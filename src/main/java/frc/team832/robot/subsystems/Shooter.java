@@ -10,32 +10,34 @@ import frc.team832.lib.motorcontrol2.vendor.CANSparkMax;
 import frc.team832.robot.Constants;
 import frc.team832.robot.commands.TemplateCommand;
 
-import static frc.team832.robot.Robot.oi;
-
 public class Shooter extends SubsystemBase implements DashboardUpdatable {
 
     private boolean initSuccessful = false;
 
-    private CANSparkMax primaryMotor, followerMotor; //if needed add hood motor
-    private NetworkTableEntry dashboard_wheelRPM;
+    private CANSparkMax primaryMotor, secondaryMotor; //if needed add hood motor
+    private NetworkTableEntry dashboard_primaryWheelRPM, dashboard_secondaryWheelRPM, dashboard_primaryPID, dashboard_secondaryPID;
 
-    PIDController pid = new PIDController(Constants.ShooterValues.SPIN_UP_kP,0, Constants.ShooterValues.SPIN_UP_kD);
+    PIDController primaryPid = new PIDController(Constants.ShooterValues.IDLE_kP,0, Constants.ShooterValues.IDLE_kD);
+    PIDController secondaryPid = new PIDController(Constants.ShooterValues.IDLE_kP,0, Constants.ShooterValues.IDLE_kD);
 
-    private SHOOTER_MODE mode = SHOOTER_MODE.IDLE, lastMode = SHOOTER_MODE.IDLE;
+    private SHOOTER_MODE primaryMode = SHOOTER_MODE.IDLE, primaryLast = SHOOTER_MODE.IDLE, secondaryMode = SHOOTER_MODE.IDLE, secondaryLast = SHOOTER_MODE.IDLE;
 
     public Shooter(){
         DashboardManager.addTab(this);
         DashboardManager.getTab(this).add(this);
 
         primaryMotor = new CANSparkMax(Constants.ShooterValues.SHOOTER_ID_PRIMARY, CANSparkMaxLowLevel.MotorType.kBrushless);
-        followerMotor = new CANSparkMax(Constants.ShooterValues.SHOOTER_ID_SECONDARY, CANSparkMaxLowLevel.MotorType.kBrushless);
+        secondaryMotor = new CANSparkMax(Constants.ShooterValues.SHOOTER_ID_SECONDARY, CANSparkMaxLowLevel.MotorType.kBrushless);
 
         primaryMotor.wipeSettings();
-        followerMotor.wipeSettings();
+        secondaryMotor.wipeSettings();
 
-        followerMotor.follow(primaryMotor);
+//        secondaryMotor.follow(primaryMotor);
 
-        dashboard_wheelRPM = DashboardManager.addTabItem(this, "RPM", 0.0);
+        dashboard_primaryWheelRPM = DashboardManager.addTabItem(this, "Top RPM", 0.0);
+        dashboard_secondaryWheelRPM = DashboardManager.addTabItem(this, "Bottom RPM", 0.0);
+        dashboard_primaryPID = DashboardManager.addTabItem(this, "Top PID", 0.0);
+        dashboard_secondaryPID = DashboardManager.addTabItem(this, "Bottom PID", 0.0);
 
         setDefaultCommand(new TemplateCommand(this));
 
@@ -49,51 +51,65 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
 
     @Override
     public void periodic() {
+        updateTopPIDMode();
+        updateBottomPIDMode();
 
-        if(lastMode != mode){
-            if (mode == SHOOTER_MODE.SHOOTING){
-                pid.setPID(Constants.ShooterValues.SHOOTING_kP, 0, Constants.ShooterValues.SHOOTING_kD);
-            } else if (mode == SHOOTER_MODE.SPINNING_UP) {
-                pid.setPID(Constants.ShooterValues.SPIN_UP_kP, 0, Constants.ShooterValues.SPIN_UP_kD);
-            } else if (mode == SHOOTER_MODE.SPINNING_DOWN) {
-                pid.setPID(Constants.ShooterValues.SPIN_DOWN_kP, 0, Constants.ShooterValues.SPIN_DOWN_kD);
-            } else {
-                pid.setPID(0,0,0);
-            }
-        }
     }
 
     @Override
     public void updateDashboardData () {
-        dashboard_wheelRPM.setDouble(primaryMotor.getSensorVelocity());
-        if (oi.stratComInterface.getArcadeBlackLeft().get()) {
-            setRPM(dashboard_wheelRPM.getDouble(0));
-        }
+        dashboard_primaryWheelRPM.setDouble(primaryMotor.getSensorVelocity());
+        dashboard_secondaryWheelRPM.setDouble(secondaryMotor.getSensorVelocity());
 
     }
 
     public void setShooterMode (SHOOTER_MODE mode) {
-        lastMode = this.mode;
-        this.mode = mode;
+        setPrimaryMode(mode);
+        setSecondaryMode(mode);
     }
 
-    public SHOOTER_MODE getMode () {
-        return mode;
+    private void setPrimaryMode(SHOOTER_MODE mode) {
+        primaryLast = this.primaryMode;
+        this.primaryMode = mode;
     }
 
-    private void updatePIDMode () {
-        if (mode == SHOOTER_MODE.SPINNING_UP){
-            pid.setPID(Constants.ShooterValues.SPIN_UP_kP, 0, Constants.ShooterValues.SPIN_UP_kD);
-        } else if (mode == SHOOTER_MODE.SPINNING_DOWN) {
-            pid.setPID(Constants.ShooterValues.SPIN_DOWN_kP, 0, Constants.ShooterValues.SPIN_DOWN_kD);
-        } else if (mode == SHOOTER_MODE.SHOOTING){
-            pid.setPID(Constants.ShooterValues.SHOOTING_kP, 0, Constants.ShooterValues.SHOOTING_kD);
+    private void setSecondaryMode(SHOOTER_MODE mode) {
+        secondaryLast = this.secondaryMode;
+        this.secondaryMode = mode;
+    }
+
+    public SHOOTER_MODE getPrimaryMode() {
+        return primaryMode;
+    }
+    public SHOOTER_MODE getSecondaryMode() {
+        return secondaryMode;
+    }
+
+    private void updateTopPIDMode () {
+        if (primaryMode == SHOOTER_MODE.SPINNING_UP){
+            primaryPid.setPID(Constants.ShooterValues.SPIN_UP_kP, 0, Constants.ShooterValues.SPIN_UP_kD);
+        } else if (primaryMode == SHOOTER_MODE.SPINNING_DOWN) {
+            primaryPid.setPID(Constants.ShooterValues.SPIN_DOWN_kP, 0, Constants.ShooterValues.SPIN_DOWN_kD);
+        } else if (primaryMode == SHOOTER_MODE.SHOOTING){
+            primaryPid.setPID(Constants.ShooterValues.SHOOTING_kP, 0, Constants.ShooterValues.SHOOTING_kD);
         } else {
-            pid.setPID(Constants.ShooterValues.IDLE_kP, 0, Constants.ShooterValues.SHOOTING_kD);
+            primaryPid.setPID(Constants.ShooterValues.IDLE_kP, 0, Constants.ShooterValues.SHOOTING_kD);
         }
     }
 
-    public void setRPM(double rpm) {
+    private void updateBottomPIDMode () {
+        if (secondaryMode == SHOOTER_MODE.SPINNING_UP){
+            secondaryPid.setPID(Constants.ShooterValues.SPIN_UP_kP, 0, Constants.ShooterValues.SPIN_UP_kD);
+        } else if (secondaryMode == SHOOTER_MODE.SPINNING_DOWN) {
+            secondaryPid.setPID(Constants.ShooterValues.SPIN_DOWN_kP, 0, Constants.ShooterValues.SPIN_DOWN_kD);
+        } else if (secondaryMode == SHOOTER_MODE.SHOOTING){
+            secondaryPid.setPID(Constants.ShooterValues.SHOOTING_kP, 0, Constants.ShooterValues.SHOOTING_kD);
+        } else {
+            secondaryPid.setPID(Constants.ShooterValues.IDLE_kP, 0, Constants.ShooterValues.SHOOTING_kD);
+        }
+    }
+
+    public void setTopRPM(double rpm) {
         if (rpm > primaryMotor.getSensorVelocity() + 1000) {
             setShooterMode(SHOOTER_MODE.SPINNING_UP);
         } else if (rpm < primaryMotor.getSensorVelocity() - 1000) {
@@ -101,7 +117,22 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
         } else {
             setShooterMode(SHOOTER_MODE.IDLE);
         }
-        primaryMotor.setVelocity(rpm);
+        double power = primaryPid.calculate(primaryMotor.getSensorVelocity(), rpm);
+        dashboard_primaryPID.setDouble(power);
+        primaryMotor.set(power);
+    }
+
+    public void setBottomRPM(double rpm) {
+        if (rpm > primaryMotor.getSensorVelocity() + 1000) {
+            setShooterMode(SHOOTER_MODE.SPINNING_UP);
+        } else if (rpm < primaryMotor.getSensorVelocity() - 1000) {
+            setShooterMode(SHOOTER_MODE.SPINNING_DOWN);
+        } else {
+            setShooterMode(SHOOTER_MODE.IDLE);
+        }
+        double power = secondaryPid.calculate(secondaryMotor.getSensorVelocity(), rpm);
+        dashboard_secondaryPID.setDouble(power);
+        secondaryMotor.set(power);
     }
 
     public enum SHOOTER_MODE {
@@ -110,6 +141,5 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
         SHOOTING,
         IDLE
     }
-
 
 }
