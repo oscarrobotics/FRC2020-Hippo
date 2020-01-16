@@ -1,10 +1,19 @@
 package frc.team832.robot.subsystems;
 
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.geometry.Pose2d;
+import edu.wpi.first.wpilibj.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.kinematics.DifferentialDriveOdometry;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.util.Units;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.team832.lib.drive.SmartDiffDrive;
 import frc.team832.lib.driverinput.oi.DriveAxesSupplier;
 import frc.team832.lib.driverstation.dashboard.DashboardUpdatable;
 import frc.team832.lib.motorcontrol2.vendor.CANTalonFX;
+import frc.team832.lib.sensors.NavXMicro;
 import frc.team832.lib.util.OscarMath;
 import frc.team832.robot.Constants;
 
@@ -17,9 +26,25 @@ import static frc.team832.robot.Robot.oi;
 public class Drivetrain extends SubsystemBase implements DashboardUpdatable {
     private boolean initSuccessful = false;
     private CANTalonFX rightMaster, rightSlave, leftMaster, leftSlave;
+
     private SmartDiffDrive diffDrive;
+    public DifferentialDriveOdometry driveOdometry;
+
+    public Pose2d pose = new Pose2d();
+    public NavXMicro navX;
+    private Pose2d startingPose = new Pose2d();
 
     private TankDriveProfile tankProfile = new TankDriveProfile();
+    ArcadeDriveProfile arcadeProfile = new ArcadeDriveProfile();
+
+    private NetworkTable falconTable = NetworkTableInstance.getDefault().getTable("Live_Dashboard");
+    private NetworkTableEntry falconPoseXEntry = falconTable.getEntry("robotX");
+    private NetworkTableEntry falconPoseYEntry = falconTable.getEntry("robotY");
+    private NetworkTableEntry falconPoseHeadingEntry = falconTable.getEntry("robotHeading");
+    private NetworkTableEntry falconIsPathingEntry = falconTable.getEntry("isFollowingPath");
+    private NetworkTableEntry falconPathXEntry = falconTable.getEntry("pathX");
+    private NetworkTableEntry falconPathYEntry = falconTable.getEntry("pathY");
+    private NetworkTableEntry falconPathHeadingEntry = falconTable.getEntry("pathHeading");
 
     public Drivetrain() {
         leftMaster = new CANTalonFX(Constants.DrivetrainValues.LEFT_MASTER_CAN_ID);
@@ -43,6 +68,8 @@ public class Drivetrain extends SubsystemBase implements DashboardUpdatable {
         setCurrentLimit(40);
 
         diffDrive = new SmartDiffDrive(leftMaster, rightMaster, Constants.DrivetrainValues.MAX_RPM);
+        driveOdometry = new DifferentialDriveOdometry(getDriveHeading(), startingPose);
+        resetPose();
 
         setDefaultCommand(new TemplateCommand(this));
 
@@ -60,15 +87,6 @@ public class Drivetrain extends SubsystemBase implements DashboardUpdatable {
         rightSlave.limitInputCurrent(amps);
     }
 
-    public void arcadeDrive() {
-        double rightPower = 0;
-        double leftPower = 0;
-        DriveAxesSupplier axes = oi.driverOI.getArcadeDriveAxes();
-        rightPower = OscarMath.signumPow(-axes.getRight() * Constants.DrivetrainValues.stickDriveMultiplier, 3);
-        leftPower = OscarMath.signumPow(axes.getLeft() * Constants.DrivetrainValues.stickDriveMultiplier, 3);
-        diffDrive.arcadeDrive(rightPower, leftPower, SmartDiffDrive.LoopMode.PERCENTAGE);
-    }
-
     public ArcadeDriveProfile calculateArcadeSpeeds() {
         double xPower = 0;
         double rotPower = 0;
@@ -82,46 +100,15 @@ public class Drivetrain extends SubsystemBase implements DashboardUpdatable {
     public void tankDrive() {
         tankProfile.calculateTankSpeeds();
         diffDrive.tankDrive(tankProfile.leftPow, tankProfile.rightPow, tankProfile.loopMode);
-//        double rightPower = 0;
-//        double leftPower = 0;
-//        DriveAxesSupplier axes = oi.driverOI.getTankDriveAxes();
-//        double rightStick = axes.getRight();
-//        double leftStick = axes.getLeft();
-//        boolean isRotate = ((SticksDriverOI) oi.driverOI).rightStick.two.get();
-//        boolean driveStraight = ((SticksDriverOI) oi.driverOI).leftStick.trigger.get() || ((SticksDriverOI) oi.driverOI).rightStick.trigger.get();
-//
-//        if (driveStraight) {
-//            double power;
-//            if (((SticksDriverOI) oi.driverOI).leftStick.trigger.get() && ((SticksDriverOI) oi.driverOI).rightStick.trigger.get()) {
-//                power = (OscarMath.signumPow(rightStick * stickDriveMultiplier, 2) + OscarMath.signumPow(leftStick * stickDriveMultiplier, 2)) / 2;
-//            } else if (((SticksDriverOI) oi.driverOI).rightStick.trigger.get()) {
-//                power = OscarMath.signumPow(rightStick * stickDriveMultiplier, 2);
-//            } else {
-//                power = (OscarMath.signumPow(leftStick * stickDriveMultiplier, 2));
-//            }
-//            if (isRotate) {
-//                rightPower = power - OscarMath.signumPow(axes.getRotation() * stickRotateMultiplier, 2);
-//                leftPower = power + OscarMath.signumPow(axes.getRotation() * stickRotateMultiplier, 2);
-//            } else {
-//                rightPower = power;
-//                leftPower = power;
-//            }
-//            diffDrive.tankDrive(leftPower, rightPower, SmartDiffDrive.LoopMode.PERCENTAGE);
-//        } else {
-//            if (isRotate) {
-//                double rotation = OscarMath.signumPow(axes.getRotation() * stickRotateOnCenterMultiplier, 3);
-//                diffDrive.arcadeDrive(rotation, 0.0, SmartDiffDrive.LoopMode.PERCENTAGE);
-//            } else {
-//                rightPower = OscarMath.signumPow(rightStick * stickDriveMultiplier, 2);
-//                leftPower = OscarMath.signumPow(leftStick * stickDriveMultiplier, 2);
-//                diffDrive.tankDrive(leftPower, rightPower, SmartDiffDrive.LoopMode.PERCENTAGE);
-//            }
-//        }
     }
 
     public void xBoxDrive() {
-        ArcadeDriveProfile profile = calculateArcadeSpeeds();
-        diffDrive.arcadeDrive(profile.xPow, profile.rotPow, profile.loopMode);
+        arcadeProfile.calculateArcadeSpeeds();
+        diffDrive.arcadeDrive(arcadeProfile.xPow, arcadeProfile.rotPow, arcadeProfile.loopMode);
+    }
+
+    public Rotation2d getDriveHeading() {
+        return Rotation2d.fromDegrees(-navX.getYaw());
     }
 
     @Override
@@ -132,5 +119,32 @@ public class Drivetrain extends SubsystemBase implements DashboardUpdatable {
     @Override
     public void updateDashboardData () {
 
+    }
+
+    public void updateDashboardPose() {
+        var translation = pose.getTranslation();
+        var poseX = translation.getX();
+        var poseY = translation.getY();
+        var heading = pose.getRotation();
+
+        falconPoseXEntry.setDouble(Units.metersToFeet(poseX));
+        falconPoseYEntry.setDouble(Units.metersToFeet(poseY));
+        falconPoseHeadingEntry.setDouble(heading.getRadians());
+    }
+
+    public void resetPose(Pose2d pose) {
+        resetEncoders();
+        this.pose = pose;
+        navX.zero();
+        driveOdometry.resetPosition(this.pose, getDriveHeading());
+    }
+
+    public void resetPose() {
+        resetPose(startingPose);
+    }
+
+    public void resetEncoders() {
+        leftMaster.rezeroSensor();
+        rightMaster.rezeroSensor();
     }
 }

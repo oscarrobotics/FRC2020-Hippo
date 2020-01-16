@@ -1,5 +1,14 @@
 package frc.team832.robot;
 
+import edu.wpi.first.wpilibj.controller.SimpleMotorFeedforward;
+import edu.wpi.first.wpilibj.kinematics.DifferentialDriveKinematics;
+import edu.wpi.first.wpilibj.trajectory.TrajectoryConfig;
+import edu.wpi.first.wpilibj.trajectory.constraint.DifferentialDriveVoltageConstraint;
+import edu.wpi.first.wpilibj.util.Units;
+import frc.team832.lib.motors.DTPowerTrain;
+import frc.team832.lib.motors.Gearbox;
+import frc.team832.lib.motors.Motor;
+
 public class Constants {
     public static class DrivetrainValues {
         public static final int RIGHT_MASTER_CAN_ID = 1;
@@ -13,6 +22,27 @@ public class Constants {
 
         public static final int MAX_RPM = 5000;
 
+        public static final double kDriveWheelDiameter = Units.inchesToMeters(6);
+
+        public static final float kDriveGearReduction = 1f / (9f/84f);
+
+        private static final Gearbox driveGearbox = new Gearbox(kDriveGearReduction);
+        public static final DTPowerTrain dtPowertrain = new DTPowerTrain(driveGearbox, Motor.kFalcon500, 2, kDriveWheelDiameter);
+        public static DifferentialDriveKinematics kDriveKinematics = new DifferentialDriveKinematics(Units.inchesToMeters(28.0));
+
+        private static final double kDrive_kS = 0.0;
+        private static final double kDrive_kV = 0.0;
+        private static final double kDrive_kA = 0.0;
+
+        private static final SimpleMotorFeedforward kDriveFF = new SimpleMotorFeedforward(kDrive_kS, kDrive_kV, kDrive_kA);
+
+        public static final DifferentialDriveVoltageConstraint kAutoVoltageConstraint =
+                new DifferentialDriveVoltageConstraint(kDriveFF, kDriveKinematics, 10);
+
+        public static final TrajectoryConfig kTrajectoryConfig =
+                new TrajectoryConfig(2, 4)
+                        .setKinematics(kDriveKinematics)
+                        .addConstraint(kAutoVoltageConstraint);
     }
 
     public static class ShooterValues {
