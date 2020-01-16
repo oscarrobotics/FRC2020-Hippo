@@ -10,10 +10,7 @@ package frc.team832.robot;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.TimedRobot;
 import frc.team832.lib.control.PDP;
-import frc.team832.robot.subsystems.Drivetrain;
-import frc.team832.robot.subsystems.Intake;
-import frc.team832.robot.subsystems.Shooter;
-import frc.team832.robot.subsystems.Vision;
+import frc.team832.robot.subsystems.*;
 
 public class Robot extends TimedRobot {
 
@@ -21,6 +18,7 @@ public class Robot extends TimedRobot {
   public static final Drivetrain drivetrain = new Drivetrain();
   public static final Intake intake = new Intake();
   public static final Shooter shooter = new Shooter();
+  public static final Spindexer spindexer = new Spindexer();
   public static final Vision vision = new Vision();
   public static final PDP pdp = new PDP(0);
 
@@ -36,10 +34,10 @@ public class Robot extends TimedRobot {
       System.out.println("Intake - init FAILED");
 //    } else if (vision.isInitSuccessful()) {
 //      System.out.println("Vision - init FAILED");
-    } else if (intake.isInitSuccessful()) {
-      System.out.println("Intake - init FAILED");
-    } else if (intake.isInitSuccessful()) {
-      System.out.println("Intake - init FAILED");
+    } else if (shooter.isInitSuccessful()) {
+      System.out.println("Shooter - init FAILED");
+    } else if (spindexer.isInitSuccessful()) {
+      System.out.println("Spindexer - init FAILED");
     }
   }
 

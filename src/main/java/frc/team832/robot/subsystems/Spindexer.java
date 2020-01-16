@@ -12,6 +12,7 @@ public class Spindexer extends SubsystemBase {
 
 	private final CANSparkMax spinMotor, feedMotor;
 	private final DigitalInput hallEffect;
+	private boolean[] ballPositions = {false, false, false, false, false};
 
 	public Spindexer() {
 		spinMotor = new CANSparkMax(Constants.SpindexerValues.SPIN_MOTOR_CAN_ID, CANSparkMaxLowLevel.MotorType.kBrushless);
@@ -44,23 +45,23 @@ public class Spindexer extends SubsystemBase {
 		feedMotor.limitInputCurrent(currentLimit);
 	}
 
-	public void spin(double pow){
+	public void spin(double pow) {
 		spinMotor.set(pow);
 	}
 
-	public void feed(double pow){
+	public void feed(double pow) {
 		feedMotor.set(pow);
 	}
 
-	public void setSpindexerPosition(int pos){
+	public void setSpindexerPosition(int pos) {
 		spinMotor.setPosition(pos);
 	}
 	
-	public double getSpindexerPosition(){
+	public double getSpindexerPosition() {
 		return spinMotor.getSensorPosition();
 	}
 
-	public void setFeederVelocity(double velocity){
+	public void setFeederVelocity(double velocity) {
 		feedMotor.setVelocity(velocity);
 	}
 
@@ -68,11 +69,26 @@ public class Spindexer extends SubsystemBase {
 		spinMotor.setVelocity(velocity);
 	}
 
-	public void zeroSpindexer(){
+	public void zeroSpindexer() {
 		spinMotor.rezeroSensor();
 	}
 
-	private boolean getHallEffect(){
+	private boolean getHallEffect() {
 		return hallEffect.get();
+	}
+
+	public double getFeederPosition() {
+		return feedMotor.getSensorPosition();
+	}
+
+	public void holdFeederPosition() {
+		feedMotor.setPosition(getFeederPosition());
+	}
+	public boolean isInitSuccessful() {
+		return initSuccessful;
+	}
+
+	public boolean[] getBallPositions() {
+		return ballPositions;
 	}
 }

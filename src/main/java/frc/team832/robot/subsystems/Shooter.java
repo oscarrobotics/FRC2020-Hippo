@@ -142,4 +142,8 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
         IDLE
     }
 
+    public boolean isInitSuccessful(){
+        return initSuccessful;
+    }
+
 }
