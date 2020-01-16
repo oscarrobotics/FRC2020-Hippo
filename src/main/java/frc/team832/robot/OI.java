@@ -1,26 +1,27 @@
 package frc.team832.robot;
 
-import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj2.command.RunCommand;
-import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import frc.team832.lib.driverinput.controllers.*;
 import frc.team832.lib.driverinput.oi.DriverOI;
 import frc.team832.lib.driverinput.oi.SticksDriverOI;
+import frc.team832.lib.driverinput.oi.XboxDriverOI;
 
 public class OI {
 
 	public final DriverOI driverOI;
-	public static final StratComInterface stratComInterface = new StratComInterface(1);
+	public static final boolean isSticks = true;
+	public static final StratComInterface stratComInterface = new StratComInterface(isSticks ? 2 : 1);
 
 	public final Attack3 leftStick;
 	public final Extreme3DPro rightStick;
 
 	public OI() {
-//        driverOI = new XboxDriverOI();
-		driverOI = new SticksDriverOI();
-
-		leftStick = ((SticksDriverOI)driverOI).leftStick;
-		rightStick = ((SticksDriverOI)driverOI).rightStick;
+		if (isSticks) {
+			driverOI = new SticksDriverOI();
+			leftStick = ((SticksDriverOI)driverOI).leftStick;
+			rightStick = ((SticksDriverOI)driverOI).rightStick;
+		} else {
+			driverOI = new XboxDriverOI();
+		}
 
 		// do commands here
 

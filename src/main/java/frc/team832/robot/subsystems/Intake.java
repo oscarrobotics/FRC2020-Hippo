@@ -10,11 +10,11 @@ import frc.team832.robot.commands.TemplateCommand;
 public class Intake extends SubsystemBase {
 	private boolean initSuccessful = false;
 
-	private CANSparkMax intakeMotor;
+	private final CANSparkMax intakeMotor;
 
 	public Intake() {
 		//Change Can ID
-		intakeMotor = new CANSparkMax(Constants.INTAKE_MOTOR_CAN_ID, CANSparkMaxLowLevel.MotorType.kBrushless);
+		intakeMotor = new CANSparkMax(Constants.IntakeValues.INTAKE_MOTOR_CAN_ID, CANSparkMaxLowLevel.MotorType.kBrushless);
 
 		intakeMotor.wipeSettings();
 

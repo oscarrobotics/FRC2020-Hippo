@@ -72,6 +72,11 @@ public class Constants {
 
     }
 
+    public static class SpindexerValues {
+        public static final int SPIN_MOTOR_CAN_ID = 6;
+        public static final int FEED_MOTOR_CAN_ID = 7;
+    }
+
 
 
 

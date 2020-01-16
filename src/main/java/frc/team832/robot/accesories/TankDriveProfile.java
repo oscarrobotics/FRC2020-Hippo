@@ -100,6 +100,4 @@ public class TankDriveProfile {
 
         return new TankDriveProfile(-rotation, rotation, SmartDiffDrive.LoopMode.PERCENTAGE);
     }
-
-
 }

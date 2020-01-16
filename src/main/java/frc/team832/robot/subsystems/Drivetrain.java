@@ -6,22 +6,17 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveOdometry;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.util.Units;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.team832.lib.drive.SmartDiffDrive;
-import frc.team832.lib.driverinput.oi.DriveAxesSupplier;
 import frc.team832.lib.driverstation.dashboard.DashboardUpdatable;
 import frc.team832.lib.motorcontrol2.vendor.CANTalonFX;
 import frc.team832.lib.sensors.NavXMicro;
-import frc.team832.lib.util.OscarMath;
 import frc.team832.robot.Constants;
 
 import frc.team832.robot.accesories.ArcadeDriveProfile;
 import frc.team832.robot.accesories.TankDriveProfile;
 import frc.team832.robot.commands.TemplateCommand;
-
-import static frc.team832.robot.Robot.oi;
 
 public class Drivetrain extends SubsystemBase implements DashboardUpdatable {
     private boolean initSuccessful = false;
@@ -35,7 +30,7 @@ public class Drivetrain extends SubsystemBase implements DashboardUpdatable {
     private Pose2d startingPose = new Pose2d();
 
     private TankDriveProfile tankProfile = new TankDriveProfile();
-    ArcadeDriveProfile arcadeProfile = new ArcadeDriveProfile();
+    private ArcadeDriveProfile arcadeProfile = new ArcadeDriveProfile();
 
     private NetworkTable falconTable = NetworkTableInstance.getDefault().getTable("Live_Dashboard");
     private NetworkTableEntry falconPoseXEntry = falconTable.getEntry("robotX");
@@ -85,16 +80,6 @@ public class Drivetrain extends SubsystemBase implements DashboardUpdatable {
         leftSlave.limitInputCurrent(amps);
         rightMaster.limitInputCurrent(amps);
         rightSlave.limitInputCurrent(amps);
-    }
-
-    public ArcadeDriveProfile calculateArcadeSpeeds() {
-        double xPower = 0;
-        double rotPower = 0;
-        DriveAxesSupplier axes = oi.driverOI.getArcadeDriveAxes();
-        xPower = OscarMath.signumPow(-axes.getRight() * Constants.DrivetrainValues.stickDriveMultiplier, 3);
-        rotPower = OscarMath.signumPow(axes.getLeft() * Constants.DrivetrainValues.stickDriveMultiplier, 3);
-
-        return new ArcadeDriveProfile(xPower, rotPower, SmartDiffDrive.LoopMode.PERCENTAGE);
     }
 
     public void tankDrive() {
