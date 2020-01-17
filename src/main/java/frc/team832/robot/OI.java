@@ -4,6 +4,9 @@ import frc.team832.lib.driverinput.controllers.*;
 import frc.team832.lib.driverinput.oi.DriverOI;
 import frc.team832.lib.driverinput.oi.SticksDriverOI;
 import frc.team832.lib.driverinput.oi.XboxDriverOI;
+import frc.team832.robot.commands.BasicIntake;
+import frc.team832.robot.subsystems.Intake;
+import frc.team832.robot.subsystems.Spindexer;
 
 public class OI {
 
@@ -24,7 +27,7 @@ public class OI {
 		}
 
 		// do commands here
-
+		stratComInterface.getArcadeWhiteLeft().whileHeld(new BasicIntake(Robot.intake, Robot.spindexer));
 	}
 
 }
