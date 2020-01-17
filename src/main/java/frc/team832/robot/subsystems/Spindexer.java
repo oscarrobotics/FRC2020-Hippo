@@ -45,7 +45,7 @@ public class Spindexer extends SubsystemBase {
 	public void setPosition(int pos){
 		spinMotor.setPosition(pos);
 	}
-	
+
 	public double getPosition(){
 		return spinMotor.getSensorPosition();
 	}

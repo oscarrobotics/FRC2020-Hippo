@@ -46,8 +46,11 @@ public class Constants {
     }
 
     public static class ShooterValues {
-        public static final int SHOOTER_ID_PRIMARY = 6;
-        public static final int SHOOTER_ID_SECONDARY = 7;
+        public static final int PRIMARY_CAN_ID = 6;
+        public static final int SECONDARY_CAN_ID = 7;
+
+        public static final int HOOD_CAN_ID = 8;
+        public static final int TURRET_CAN_ID = 9;
 
         public static double SPIN_UP_kP = 0;
         public static double SPIN_UP_kD = 0;
@@ -73,8 +76,8 @@ public class Constants {
     }
 
     public static class SpindexerValues {
-        public static final int SPIN_MOTOR_CAN_ID = 6;
-        public static final int FEED_MOTOR_CAN_ID = 7;
+        public static final int SPIN_MOTOR_CAN_ID = 10;
+        public static final int FEED_MOTOR_CAN_ID = 11;
     }
 
 
