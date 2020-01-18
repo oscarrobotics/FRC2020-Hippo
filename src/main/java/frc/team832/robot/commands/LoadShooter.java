@@ -14,7 +14,7 @@ public class LoadShooter extends CommandBase {
 
     @Override
     public void initialize() {
-        spindexer.spin(0.8);
+        spindexer.spinCounterclockwise(0.8);
         spindexer.feed(0.8);
     }
 
@@ -25,7 +25,7 @@ public class LoadShooter extends CommandBase {
 
     @Override
     public void end(boolean interrupted) {
-        spindexer.spin(0);
-        spindexer.feed(0);
+        spindexer.stopSpin();
+        spindexer.stopFeed();
     }
 }

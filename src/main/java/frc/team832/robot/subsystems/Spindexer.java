@@ -3,8 +3,11 @@ package frc.team832.robot.subsystems;
 import com.revrobotics.CANSparkMaxLowLevel;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.team832.lib.OscarIterativeRobotBase;
 import frc.team832.lib.motorcontrol2.vendor.CANSparkMax;
+import frc.team832.lib.util.OscarMath;
 import frc.team832.robot.Constants;
+import frc.team832.robot.accesories.SpindexerStatus;
 import frc.team832.robot.commands.TemplateCommand;
 
 public class Spindexer extends SubsystemBase {
@@ -12,7 +15,8 @@ public class Spindexer extends SubsystemBase {
 
 	private final CANSparkMax spinMotor, feedMotor;
 	private final DigitalInput hallEffect;
-	private boolean[] ballPositions = {false, false, false, false, false};
+	private SpindexerStatus spindexerStatus = new SpindexerStatus();
+	private boolean[] sensorData = {false, false, false, false, false};
 
 	public Spindexer() {
 		spinMotor = new CANSparkMax(Constants.SpindexerValues.SPIN_MOTOR_CAN_ID, CANSparkMaxLowLevel.MotorType.kBrushless);
@@ -38,6 +42,7 @@ public class Spindexer extends SubsystemBase {
 		if(getHallEffect()) {
 			zeroSpindexer();
 		}
+		spindexerStatus.update(sensorData);
 	}
 
 	public void setCurrentLimit(int currentLimit) {
@@ -45,27 +50,39 @@ public class Spindexer extends SubsystemBase {
 		feedMotor.limitInputCurrent(currentLimit);
 	}
 
-	public void spin(double pow) {
-		spinMotor.set(pow);
+	public void spinClockwise(double pow) {
+		spinMotor.set(OscarMath.clip(pow, 0, 1));
+	}
+
+	public void stopSpin() {
+		spinMotor.set(0);
+	}
+
+	public void stopFeed() {
+		feedMotor.set(0);
+	}
+
+	public void spinCounterclockwise(double pow) {
+		spinMotor.set(-OscarMath.clip(pow, 0, 1));
 	}
 
 	public void feed(double pow) {
 		feedMotor.set(pow);
 	}
 
-	public void setSpindexerPosition(int pos) {
+	public void setPosition(int pos) {
 		spinMotor.setPosition(pos);
 	}
 	
-	public double getSpindexerPosition() {
+	public double getPosition() {
 		return spinMotor.getSensorPosition();
 	}
 
-	public void setFeederVelocity(double velocity) {
+	public void setFeederProfileVelocity(double velocity) {
 		feedMotor.setVelocity(velocity);
 	}
 
-	public void setSpinVelocity(double velocity) {
+	public void setSpinProfileVelocity(double velocity) {
 		spinMotor.setVelocity(velocity);
 	}
 
@@ -84,11 +101,12 @@ public class Spindexer extends SubsystemBase {
 	public void holdFeederPosition() {
 		feedMotor.setPosition(getFeederPosition());
 	}
+
 	public boolean isInitSuccessful() {
 		return initSuccessful;
 	}
 
-	public boolean[] getBallPositions() {
-		return ballPositions;
-	}
+	public boolean[] getBallPositions() { return spindexerStatus.getStateArray(); }
+
+	public SpindexerStatus.SpindexerState getState() { return spindexerStatus.getState(); }
 }

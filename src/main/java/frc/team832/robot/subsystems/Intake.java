@@ -47,4 +47,8 @@ public class Intake extends SubsystemBase {
 		OscarMath.clip(power, 0, 1);
 		intakeMotor.set(-power);
 	}
+
+	public void stop() {
+		intakeMotor.set(0);
+	}
 }

@@ -16,7 +16,7 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
     private boolean initSuccessful = false;
 
     private CANSparkMax primaryMotor, secondaryMotor, hoodMotor, turretMotor; //if needed add hood motor
-    private NetworkTableEntry dashboard_wheelRPM, dashboard_PID;
+    private NetworkTableEntry dashboard_wheelRPM, dashboard_PID, dashboard_hoodPos, dashboard_turretPos;
 
     PIDController pid = new PIDController(Constants.ShooterValues.IDLE_kP,0, Constants.ShooterValues.IDLE_kD);
 
@@ -50,11 +50,20 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
 
         primaryMotor.setInverted(false);
         secondaryMotor.setInverted(false);
+        primaryMotor.setSensorPhase(true);
+        secondaryMotor.setSensorPhase(true);
+
+        hoodMotor.setInverted(false);
+        turretMotor.setInverted(false);
+        hoodMotor.setSensorPhase(true);
+        turretMotor.setSensorPhase(true);
 
         setCurrentLimit(40);
 
         dashboard_wheelRPM = DashboardManager.addTabItem(this, "RPM", 0.0);
         dashboard_PID = DashboardManager.addTabItem(this, "PID", 0.0);
+        dashboard_hoodPos = DashboardManager.addTabItem(this, "Hood Position", 0.0);
+        dashboard_turretPos = DashboardManager.addTabItem(this, "Turret Position", 0.0);
 
         setDefaultCommand(new TemplateCommand(this));
 
@@ -79,6 +88,8 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
     public void setShooterMode (SHOOTER_MODE mode) {
         setMode(mode);
     }
+
+    public boolean isInitSuccessful() { return initSuccessful; }
 
     private void setMode (SHOOTER_MODE mode) {
         lastMode = this.mode;

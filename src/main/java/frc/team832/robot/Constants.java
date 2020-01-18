@@ -78,9 +78,13 @@ public class Constants {
     public static class SpindexerValues {
         public static final int SPIN_MOTOR_CAN_ID = 10;
         public static final int FEED_MOTOR_CAN_ID = 11;
+
+        public static final int HALL_EFFECT_CHANNEL = 0;
     }
 
-
+    public static class ClimberValues {
+        public static final int WINCH_CAN_ID = 12;
+    }
 
 
 
