@@ -52,21 +52,29 @@ public class Constants {
         public static final int HOOD_CAN_ID = 8;
         public static final int TURRET_CAN_ID = 9;
 
-        public static double SPIN_UP_kP = 0;
-        public static double SPIN_UP_kD = 0;
-        public static double SPIN_UP_kF = 0;
+        public static final double TURRET_kP = 0;
+        public static final double TURRET_kD = 0;
+        public static final double TURRET_kF = 0;
 
-        public static double SHOOTING_kP = 0;
-        public static double SHOOTING_kD = 0;
-        public static double SHOOTING_kF = 0;
+        public static final double HOOD_kP = 0;
+        public static final double HOOD_kD = 0;
+        public static final double HOOD_kF = 0;
 
-        public static double SPIN_DOWN_kP = 0;
-        public static double SPIN_DOWN_kD = 0;
-        public static double SPIN_DOWN_kF = 0;
+        public static final double SPIN_UP_kP = 0;
+        public static final double SPIN_UP_kD = 0;
+        public static final double SPIN_UP_kF = 0;
 
-        public static double IDLE_kP = 0;
-        public static double IDLE_kD = 0;
-        public static double IDLE_kF = 0;
+        public static final double SHOOTING_kP = 0;
+        public static final double SHOOTING_kD = 0;
+        public static final double SHOOTING_kF = 0;
+
+        public static final double SPIN_DOWN_kP = 0;
+        public static final double SPIN_DOWN_kD = 0;
+        public static final double SPIN_DOWN_kF = 0;
+
+        public static final double IDLE_kP = 0;
+        public static final double IDLE_kD = 0;
+        public static final double IDLE_kF = 0;
 
     }
 
@@ -86,7 +94,8 @@ public class Constants {
         public static final int WINCH_CAN_ID = 12;
     }
 
-
-
-
+    public static class WOFValues {
+        public static final int SPINNER_CAN_ID = 13;
+        public static final double RevsToTicks = .0002;// 5000 encoder ticks = 1 color wheel revolution (just a guess)
+    }
 }
