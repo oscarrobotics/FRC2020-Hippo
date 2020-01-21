@@ -34,7 +34,10 @@ public class Constants {
         private static final double kDrive_kV = 0.0;
         private static final double kDrive_kA = 0.0;
 
-        private static final SimpleMotorFeedforward kDriveFF = new SimpleMotorFeedforward(kDrive_kS, kDrive_kV, kDrive_kA);
+        public static final double kLeft_kP = .00;
+        public static final double kRight_kP = .00;
+
+        public static final SimpleMotorFeedforward kDriveFF = new SimpleMotorFeedforward(kDrive_kS, kDrive_kV, kDrive_kA);
 
         public static final DifferentialDriveVoltageConstraint kAutoVoltageConstraint =
                 new DifferentialDriveVoltageConstraint(kDriveFF, kDriveKinematics, 10);

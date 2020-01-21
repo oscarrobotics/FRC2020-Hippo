@@ -6,6 +6,7 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveOdometry;
+import edu.wpi.first.wpilibj.kinematics.DifferentialDriveWheelSpeeds;
 import edu.wpi.first.wpilibj.util.Units;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.team832.lib.drive.SmartDiffDrive;
@@ -29,6 +30,7 @@ public class Drivetrain extends SubsystemBase implements DashboardUpdatable {
     public NavXMicro navX;
     private Pose2d startingPose = new Pose2d();
 
+    private double latestLeftWheelVolts, latestRightWheelVolts;
 
     private TankDriveProfile tankProfile = new TankDriveProfile();
     private ArcadeDriveProfile arcadeProfile = new ArcadeDriveProfile();
@@ -107,6 +109,37 @@ public class Drivetrain extends SubsystemBase implements DashboardUpdatable {
 
     }
 
+    public double getRightDistanceMeters () {
+        return Constants.DrivetrainValues.dtPowertrain.calculateWheelDistanceMeters(-rightMaster.getSensorPosition());
+    }
+
+    public double getLeftDistanceMeters () {
+        return Constants.DrivetrainValues.dtPowertrain.calculateWheelDistanceMeters(leftMaster.getSensorPosition());
+    }
+
+    public double getRightVelocityMetersPerSec () {
+        return Constants.DrivetrainValues.dtPowertrain.calculateMetersPerSec(rightMaster.getSensorVelocity());
+    }
+
+    public double getLeftVelocityMetersPerSec () {
+        return Constants.DrivetrainValues.dtPowertrain.calculateMetersPerSec(leftMaster.getSensorVelocity());
+    }
+
+    public DifferentialDriveWheelSpeeds getWheelSpeeds () {
+        return new DifferentialDriveWheelSpeeds(getLeftVelocityMetersPerSec(), getRightVelocityMetersPerSec());
+    }
+
+    public void setWheelVolts(Double leftVolts, Double rightVolts) {
+        double leftBusVoltage = leftMaster.getInputVoltage();
+        double rightBusVoltage = rightMaster.getInputVoltage();
+
+        latestLeftWheelVolts = Math.abs(leftVolts / leftBusVoltage) * Math.signum(leftVolts);
+        latestRightWheelVolts = -Math.abs(rightVolts / rightBusVoltage) * Math.signum(rightVolts);
+
+        leftMaster.set(latestLeftWheelVolts);
+        rightMaster.set(latestRightWheelVolts);
+    }
+
     public void updateDashboardPose() {
         var translation = pose.getTranslation();
         var poseX = translation.getX();
@@ -116,6 +149,15 @@ public class Drivetrain extends SubsystemBase implements DashboardUpdatable {
         falconPoseXEntry.setDouble(Units.metersToFeet(poseX));
         falconPoseYEntry.setDouble(Units.metersToFeet(poseY));
         falconPoseHeadingEntry.setDouble(heading.getRadians());
+    }
+
+    public Pose2d getLatestPose() {
+        updatePose();
+        return pose;
+    }
+
+    private void updatePose() {
+        pose = driveOdometry.update(getDriveHeading(), getLeftDistanceMeters(), getRightDistanceMeters());
     }
 
     public void resetPose(Pose2d pose) {
