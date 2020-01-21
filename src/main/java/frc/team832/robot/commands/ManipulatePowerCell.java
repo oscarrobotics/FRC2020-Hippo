@@ -4,20 +4,30 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.team832.robot.subsystems.Intake;
 import frc.team832.robot.subsystems.Spindexer;
 
-public class IntakePowerCell extends CommandBase {
+public class ManipulatePowerCell extends CommandBase {
     private final Intake intake;
     private final Spindexer spindexer;
 
-    public IntakePowerCell(final Intake intake, Spindexer spindexer) {
+    public enum IntakeState {
+        Intake,
+        Outake
+    }
+
+    private final IntakeState intakeState;
+
+    public ManipulatePowerCell(final Intake intake, final Spindexer spindexer, IntakeState intakeState) {
         this.intake = intake;
         this.spindexer = spindexer;
+        this.intakeState = intakeState;
         addRequirements(intake, spindexer);
     }
 
     @Override
     public void initialize() {
-        intake.intake(0.8);
-        spindexer.spinClockwise(0.8);
+        if (intakeState == IntakeState.Intake) {
+            intake.intake(0.8);
+            spindexer.spinClockwise(0.8);
+        } else intake.outtake(0.8);
     }
 
     @Override

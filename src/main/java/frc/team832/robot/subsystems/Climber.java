@@ -35,6 +35,18 @@ public class Climber extends SubsystemBase implements DashboardUpdatable {
 
     public boolean isInitSuccessful() { return initSuccessful; }
 
+    public void unwindWinch() {
+        winch.set(-Constants.ClimberValues.WINCH_POWER);
+    }
+
+    public void windWinch() {
+        winch.set(Constants.ClimberValues.WINCH_POWER);
+    }
+
+    public void stopWinch() {
+        winch.set(0);
+    }
+
     @Override
     public String getDashboardTabName() {
         return "Climber";

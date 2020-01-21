@@ -92,10 +92,18 @@ public class Constants {
 
     public static class ClimberValues {
         public static final int WINCH_CAN_ID = 12;
+        public static final double WINCH_POWER = .5;
     }
 
     public static class WOFValues {
         public static final int SPINNER_CAN_ID = 13;
         public static final double RevsToTicks = .0002;// 5000 encoder ticks = 1 color wheel revolution (just a guess)
+    }
+
+    public class PneumaticsValues {
+        public static final int INTAKE_SOLENOID_ID = 0;
+        public static final int PROP_UP_SOLENOID_ID = 0;
+        public static final int PCM_MODULE_NUM = 0;
+        public static final int WHEEL_O_FORTUNE_SOLENOID_ID = 0;
     }
 }
