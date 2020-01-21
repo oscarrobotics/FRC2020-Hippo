@@ -10,13 +10,16 @@ import frc.team832.robot.Constants;
 import frc.team832.robot.accesories.SpindexerStatus;
 import frc.team832.robot.commands.TemplateCommand;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Spindexer extends SubsystemBase {
 	private boolean initSuccessful = false;
 
 	private final CANSparkMax spinMotor, feedMotor;
 	private final DigitalInput hallEffect;
 	private SpindexerStatus spindexerStatus = new SpindexerStatus();
-	private boolean[] sensorData = {false, false, false, false, false};
+	private final List<Boolean> ballStatus = new ArrayList<>();
 
 	public Spindexer() {
 		spinMotor = new CANSparkMax(Constants.SpindexerValues.SPIN_MOTOR_CAN_ID, CANSparkMaxLowLevel.MotorType.kBrushless);
@@ -42,7 +45,7 @@ public class Spindexer extends SubsystemBase {
 		if(getHallEffect()) {
 			zeroSpindexer();
 		}
-		spindexerStatus.update(sensorData);
+		spindexerStatus.update(ballStatus);
 	}
 
 	public void setCurrentLimit(int currentLimit) {
@@ -106,7 +109,7 @@ public class Spindexer extends SubsystemBase {
 		return initSuccessful;
 	}
 
-	public boolean[] getBallPositions() { return spindexerStatus.getStateArray(); }
+	public List<Boolean> getBallPositions() { return spindexerStatus.getStateArray(); }
 
 	public SpindexerStatus.SpindexerState getState() { return spindexerStatus.getState(); }
 }

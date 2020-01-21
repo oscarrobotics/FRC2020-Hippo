@@ -2,11 +2,13 @@ package frc.team832.robot.accesories;
 
 import frc.team832.lib.util.OscarMath;
 
+import java.util.List;
+
 public class SpindexerStatus {
-    private boolean[] ballPositions;
+    private List<Boolean> ballPositions;
     public SpindexerState state;
 
-    public void update(boolean[] sensorData) {
+    public void update(List<Boolean> sensorData) {
         ballPositions = sensorData;
         if (isFull())
             state = SpindexerState.FULL;
@@ -18,7 +20,7 @@ public class SpindexerStatus {
 
     public boolean getPosition(int pos) {
         pos = OscarMath.clip(pos, 1, 5) - 1;
-        return ballPositions[pos];
+        return ballPositions.get(pos);
     }
 
     public boolean isFull() {
@@ -33,7 +35,7 @@ public class SpindexerStatus {
         return state;
     }
 
-    public boolean[] getStateArray() {
+    public List<Boolean> getStateArray() {
         return ballPositions;
     }
 
