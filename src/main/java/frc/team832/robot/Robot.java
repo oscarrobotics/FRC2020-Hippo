@@ -21,6 +21,7 @@ public class Robot extends TimedRobot {
   public static final Spindexer spindexer = new Spindexer();
   public static final Vision vision = new Vision();
   public static final Climber climber = new Climber();
+  public static final Pneumatics pneumatics = new Pneumatics();
   public static final PDP pdp = new PDP(0);
 
   private static final Notifier drivetrainTelemetryNotifier = new Notifier(drivetrain::updateDashboardData);
@@ -39,9 +40,10 @@ public class Robot extends TimedRobot {
       System.out.println("Shooter - init FAILED");
     } else if (spindexer.isInitSuccessful()) {
       System.out.println("Spindexer - init FAILED");
-    }
-    else if (climber.isInitSuccessful()) {
+    } else if (climber.isInitSuccessful()) {
       System.out.println("Climber - init FAILED");
+    } else if (pneumatics.isInitSuccessful()) {
+      System.out.println("Pneumatics - init FAILED");
     }
   }
 

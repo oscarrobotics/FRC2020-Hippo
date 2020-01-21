@@ -105,5 +105,6 @@ public class Constants {
         public static final int PROP_UP_SOLENOID_ID = 0;
         public static final int PCM_MODULE_NUM = 0;
         public static final int WHEEL_O_FORTUNE_SOLENOID_ID = 0;
+        public static final int CLIMB_LOCK_SOLENOID_ID = 0;
     }
 }

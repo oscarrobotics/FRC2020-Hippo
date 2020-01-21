@@ -9,6 +9,8 @@ import frc.team832.lib.motorcontrol2.vendor.CANSparkMax;
 import frc.team832.robot.Constants;
 import frc.team832.robot.commands.TemplateCommand;
 
+import static frc.team832.robot.Robot.pneumatics;
+
 public class Climber extends SubsystemBase implements DashboardUpdatable {
     private boolean initSuccessful;
     private CANSparkMax winch;
@@ -36,15 +38,18 @@ public class Climber extends SubsystemBase implements DashboardUpdatable {
     public boolean isInitSuccessful() { return initSuccessful; }
 
     public void unwindWinch() {
+        pneumatics.unlockClimb();
         winch.set(-Constants.ClimberValues.WINCH_POWER);
     }
 
     public void windWinch() {
+        pneumatics.unlockClimb();
         winch.set(Constants.ClimberValues.WINCH_POWER);
     }
 
     public void stopWinch() {
         winch.set(0);
+        pneumatics.lockClimb();
     }
 
     @Override

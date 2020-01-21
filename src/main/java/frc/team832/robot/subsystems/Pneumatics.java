@@ -6,40 +6,55 @@ import frc.team832.lib.driverstation.dashboard.DashboardManager;
 import frc.team832.lib.driverstation.dashboard.DashboardUpdatable;
 import frc.team832.robot.Constants;
 
-import java.security.cert.CertificateParsingException;
-
 public class Pneumatics extends SubsystemBase implements DashboardUpdatable {
 	boolean initSuccessful;
-	private Solenoid intakeSolenoid;
-	private Solenoid propUpSolenoid;
-	private Solenoid wheelOfFortuneSolenoid;
-
+	private Solenoid moveIntake;
+	private Solenoid propUpRobot;
+	private Solenoid wheelOfFortune;
+	private Solenoid climbLock;
 
 	public Pneumatics() {
 		DashboardManager.addTab(this);
 		DashboardManager.getTab(this).add(this);
 
-		this.intakeSolenoid = new Solenoid(Constants.PneumaticsValues.PCM_MODULE_NUM, Constants.PneumaticsValues.INTAKE_SOLENOID_ID);
-		this.propUpSolenoid = new Solenoid(Constants.PneumaticsValues.PCM_MODULE_NUM, Constants.PneumaticsValues.PROP_UP_SOLENOID_ID);
-		this.wheelOfFortuneSolenoid = new Solenoid(Constants.PneumaticsValues.PCM_MODULE_NUM, Constants.PneumaticsValues.WHEEL_O_FORTUNE_SOLENOID_ID);
+		this.moveIntake = new Solenoid(Constants.PneumaticsValues.PCM_MODULE_NUM, Constants.PneumaticsValues.INTAKE_SOLENOID_ID);
+		this.propUpRobot = new Solenoid(Constants.PneumaticsValues.PCM_MODULE_NUM, Constants.PneumaticsValues.PROP_UP_SOLENOID_ID);
+		this.wheelOfFortune = new Solenoid(Constants.PneumaticsValues.PCM_MODULE_NUM, Constants.PneumaticsValues.WHEEL_O_FORTUNE_SOLENOID_ID);
+		this.climbLock = new Solenoid(Constants.PneumaticsValues.PCM_MODULE_NUM, Constants.PneumaticsValues.CLIMB_LOCK_SOLENOID_ID);
 
 		this.initSuccessful = true;
 	}
 
 	public void extendIntake() {
-		intakeSolenoid.set(true);
+		moveIntake.set(true);
 	}
 
 	public void retractIntake() {
-		intakeSolenoid.set(false);
+		moveIntake.set(false);
 	}
 
 	public void propUp() {
-		propUpSolenoid.set(true);
+		propUpRobot.set(true);
 	}
 
 	public void retractProp() {
-		propUpSolenoid.set(false);
+		propUpRobot.set(false);
+	}
+
+	public void extendWOFManipulator() {
+		wheelOfFortune.set(true);
+	}
+
+	public void retractWOFManipulator() {
+		wheelOfFortune.set(true);
+	}
+
+	public void lockClimb() {
+		climbLock.set(true);
+	}
+
+	public void unlockClimb() {
+		climbLock.set(false);
 	}
 
 	@Override
@@ -50,5 +65,9 @@ public class Pneumatics extends SubsystemBase implements DashboardUpdatable {
 	@Override
 	public void updateDashboardData () {
 
+	}
+
+	public boolean isInitSuccessful () {
+		return initSuccessful;
 	}
 }
