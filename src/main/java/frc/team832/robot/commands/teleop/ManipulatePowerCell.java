@@ -27,7 +27,10 @@ public class ManipulatePowerCell extends CommandBase {
         if (intakeState == IntakeState.Intake) {
             intake.intake(0.8);
             spindexer.spinClockwise(0.8);
-        } else intake.outtake(0.8);
+        } else {
+            intake.outtake(0.8);
+            spindexer.spinCounterclockwise(0.5);
+        }
     }
 
     @Override

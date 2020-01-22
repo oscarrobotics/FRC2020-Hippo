@@ -32,6 +32,9 @@ public class Spindexer extends SubsystemBase {
 		spinMotor.setInverted(false); //these might change
 		feedMotor.setInverted(false);
 
+		spinMotor.setSensorPhase(true);
+		feedMotor.setSensorPhase(true);
+
 		hallEffect = new DigitalInput(Constants.SpindexerValues.HALL_EFFECT_CHANNEL);
 
 		setDefaultCommand(new TemplateCommand(this));

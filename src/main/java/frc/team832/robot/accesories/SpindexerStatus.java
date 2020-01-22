@@ -9,7 +9,7 @@ public class SpindexerStatus {
     public SpindexerState state;
 
     public void update(List<Boolean> sensorData) {
-        ballPositions = sensorData;
+        this.ballPositions = sensorData;
         if (isFull())
             state = SpindexerState.FULL;
         else if (!isEmpty())
@@ -29,6 +29,15 @@ public class SpindexerStatus {
 
     public boolean isEmpty() {
         return !getPosition(1) && !getPosition(2) && !getPosition(3) && !getPosition(4) && !getPosition(5);
+    }
+
+    public double getBallNumber() {
+        double count = 0;
+        for (int i = 0; i < 5; i++) {
+            if (ballPositions.get(i))
+                count++;
+        }
+        return count;
     }
 
     public SpindexerState getState() {
