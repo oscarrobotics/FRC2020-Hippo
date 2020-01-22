@@ -3,12 +3,11 @@ package frc.team832.robot.subsystems;
 import com.revrobotics.CANSparkMaxLowLevel;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.team832.lib.OscarIterativeRobotBase;
 import frc.team832.lib.motorcontrol2.vendor.CANSparkMax;
 import frc.team832.lib.util.OscarMath;
 import frc.team832.robot.Constants;
 import frc.team832.robot.accesories.SpindexerStatus;
-import frc.team832.robot.commands.TemplateCommand;
+import frc.team832.robot.commands.teleop.TemplateCommand;
 
 import java.util.ArrayList;
 import java.util.List;

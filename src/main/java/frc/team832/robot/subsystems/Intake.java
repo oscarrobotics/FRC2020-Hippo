@@ -5,7 +5,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.team832.lib.motorcontrol2.vendor.CANSparkMax;
 import frc.team832.lib.util.OscarMath;
 import frc.team832.robot.Constants;
-import frc.team832.robot.commands.TemplateCommand;
+import frc.team832.robot.commands.teleop.TemplateCommand;
 
 public class Intake extends SubsystemBase {
 	private boolean initSuccessful = false;

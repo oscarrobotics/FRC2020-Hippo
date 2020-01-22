@@ -7,7 +7,7 @@ import frc.team832.lib.driverstation.dashboard.DashboardUpdatable;
 import frc.team832.lib.motorcontrol.NeutralMode;
 import frc.team832.lib.motorcontrol2.vendor.CANSparkMax;
 import frc.team832.robot.Constants;
-import frc.team832.robot.commands.TemplateCommand;
+import frc.team832.robot.commands.teleop.TemplateCommand;
 
 import static frc.team832.robot.Robot.pneumatics;
 

@@ -1,16 +1,24 @@
 package frc.team832.robot.subsystems;
 
 import com.revrobotics.CANSparkMaxLowLevel;
+import edu.wpi.first.wpilibj.I2C;
+import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.team832.lib.driverstation.dashboard.DashboardUpdatable;
 import frc.team832.lib.motorcontrol.NeutralMode;
 import frc.team832.lib.motorcontrol2.vendor.CANSparkMax;
 import frc.team832.robot.Constants;
 import frc.team832.robot.accesories.ColorWheelPath;
-import frc.team832.robot.commands.TemplateCommand;
+import frc.team832.robot.commands.teleop.TemplateCommand;
 
-public class WheelOfFortune extends SubsystemBase {
+public class WheelOfFortune extends SubsystemBase implements DashboardUpdatable {
     private boolean initSuccessful = false;
+
     public CANSparkMax spinner;
+
+    private final I2C.Port i2cPort = I2C.Port.kOnboard;
+//    public final ColorSensorV3 colorSensor = new ColorSensorV3(i2cPort);
+
     public ColorWheelPath path;
 
     public WheelOfFortune() {
@@ -27,6 +35,17 @@ public class WheelOfFortune extends SubsystemBase {
         setDefaultCommand(new TemplateCommand(this));
 
         initSuccessful = true;
+    }
+
+    public void senseColor() {
+//        Color detectedColor = colorSensor.getColor();
+//        double IR = colorSensor.getIR();
+//
+//        SmartDashboard.putNumber("Red", detectedColor.red);
+//        SmartDashboard.putNumber("Green", detectedColor.green);
+//        SmartDashboard.putNumber("Blue", detectedColor.blue);
+//        SmartDashboard.putNumber("IR", IR);
+//        int proximity = m_colorSensor.getProximity();
     }
 
     public void spinWheel(double revolutions) {
@@ -50,5 +69,15 @@ public class WheelOfFortune extends SubsystemBase {
 
     public boolean isInitSuccessful() {
         return initSuccessful;
+    }
+
+    @Override
+    public String getDashboardTabName () {
+        return "Color Sensor";
+    }
+
+    @Override
+    public void updateDashboardData () {
+
     }
 }

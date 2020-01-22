@@ -5,7 +5,7 @@ import frc.team832.lib.driverinput.controllers.*;
 import frc.team832.lib.driverinput.oi.DriverOI;
 import frc.team832.lib.driverinput.oi.SticksDriverOI;
 import frc.team832.lib.driverinput.oi.XboxDriverOI;
-import frc.team832.robot.commands.ManipulatePowerCell;
+import frc.team832.robot.commands.teleop.ManipulatePowerCell;
 
 import static frc.team832.robot.Robot.climber;
 
@@ -29,6 +29,7 @@ public class OI {
 		// do commands here
 		stratComInterface.getArcadeWhiteLeft().whileHeld(new StartEndCommand(climber::unwindWinch, climber::stopWinch, Robot.climber));
 		stratComInterface.getArcadeBlackLeft().whileHeld(new StartEndCommand(climber::windWinch, climber::stopWinch, Robot.climber));
+
 		stratComInterface.getArcadeWhiteRight().whileHeld(new ManipulatePowerCell(Robot.intake, Robot.spindexer, ManipulatePowerCell.IntakeState.Intake));
 		stratComInterface.getArcadeBlackRight().whileHeld(new ManipulatePowerCell(Robot.intake, Robot.spindexer, ManipulatePowerCell.IntakeState.Outake));
 	}

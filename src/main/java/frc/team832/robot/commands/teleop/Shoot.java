@@ -1,4 +1,4 @@
-package frc.team832.robot.commands;
+package frc.team832.robot.commands.teleop;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.team832.robot.accesories.SpindexerStatus;
@@ -21,7 +21,7 @@ public class Shoot extends CommandBase {
     @Override
     public void initialize() {
         shooter.setRPM(rpm);
-        spindexer.spinClockwise(.8);
+        spindexer.spinCounterclockwise(0.8);
     }
 
     @Override
@@ -30,6 +30,6 @@ public class Shoot extends CommandBase {
 
     @Override
     public boolean isFinished() {
-        return spindexer.getState() == SpindexerStatus.SpindexerState.EMPTY;
+        return false;
     }
 }

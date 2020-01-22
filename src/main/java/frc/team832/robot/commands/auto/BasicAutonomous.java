@@ -1,4 +1,4 @@
-package frc.team832.robot.commands;
+package frc.team832.robot.commands.auto;
 
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
@@ -6,6 +6,7 @@ import edu.wpi.first.wpilibj.trajectory.Trajectory;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.team832.lib.motion.PathHelper;
 import frc.team832.robot.Robot;
+import frc.team832.robot.commands.teleop.Shoot;
 import frc.team832.robot.subsystems.Drivetrain;
 import frc.team832.robot.subsystems.Shooter;
 import frc.team832.robot.subsystems.Spindexer;

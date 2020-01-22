@@ -17,7 +17,7 @@ import frc.team832.robot.Constants;
 
 import frc.team832.robot.accesories.ArcadeDriveProfile;
 import frc.team832.robot.accesories.TankDriveProfile;
-import frc.team832.robot.commands.TemplateCommand;
+import frc.team832.robot.commands.teleop.TemplateCommand;
 
 public class Drivetrain extends SubsystemBase implements DashboardUpdatable {
     private boolean initSuccessful = false;

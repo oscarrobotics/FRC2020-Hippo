@@ -1,4 +1,4 @@
-package frc.team832.robot.commands;
+package frc.team832.robot.commands.teleop;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.team832.robot.subsystems.Intake;
