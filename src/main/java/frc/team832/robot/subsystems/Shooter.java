@@ -88,13 +88,9 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
         dashboard_wheelRPM.setDouble(primaryMotor.getSensorVelocity());
     }
 
-    public void setShooterMode (SHOOTER_MODE mode) {
-        setMode(mode);
-    }
-
     public boolean isInitSuccessful() { return initSuccessful; }
 
-    private void setMode (SHOOTER_MODE mode) {
+    public void setMode (SHOOTER_MODE mode) {
         lastMode = this.mode;
         this.mode = mode;
     }
@@ -115,14 +111,23 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
         }
     }
 
+    private void handleShooterMode() {
+        switch (mode) {
+            case SPINNING_UP:
+                break;
+            case SHOOTING:
+        }
+    }
+
+
     public void setRPM(double rpm) {
         if (mode != SHOOTER_MODE.SHOOTING) {
             if (rpm > primaryMotor.getSensorVelocity() + 1000) {
-                setShooterMode(SHOOTER_MODE.SPINNING_UP);
+                setMode(SHOOTER_MODE.SPINNING_UP);
             } else if (rpm < primaryMotor.getSensorVelocity() - 1000) {
-                setShooterMode(SHOOTER_MODE.SPINNING_DOWN);
+                setMode(SHOOTER_MODE.SPINNING_DOWN);
             } else if (rpm > 500) {
-                setShooterMode(SHOOTER_MODE.IDLE);
+                setMode(SHOOTER_MODE.IDLE);
             }
         }
         double power = flywheelPID.calculate(primaryMotor.getSensorVelocity(), rpm);

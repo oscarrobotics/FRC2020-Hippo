@@ -4,10 +4,12 @@ import com.revrobotics.CANSparkMaxLowLevel;
 import edu.wpi.first.wpilibj.I2C;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.team832.lib.driverinput.controllers.StratComInterface;
 import frc.team832.lib.driverstation.dashboard.DashboardUpdatable;
 import frc.team832.lib.motorcontrol.NeutralMode;
 import frc.team832.lib.motorcontrol2.vendor.CANSparkMax;
 import frc.team832.robot.Constants;
+import frc.team832.robot.OI;
 import frc.team832.robot.accesories.ColorWheelPath;
 import frc.team832.robot.commands.teleop.TemplateCommand;
 
@@ -48,6 +50,19 @@ public class WheelOfFortune extends SubsystemBase implements DashboardUpdatable 
 //        int proximity = m_colorSensor.getProximity();
     }
 
+    public void spinClockWise() {
+        if (OI.stratComInterface.getSC2().get()) spinner.set(Constants.WOFValues.BASIC_SPIN_POW);
+    }
+
+    public void spinCounterClockWise() {
+        if (OI.stratComInterface.getSC2().get()) spinner.set(-Constants.WOFValues.BASIC_SPIN_POW);
+    }
+
+    public void spinThreeRot() {
+        double additionalTicks = 3 / Constants.WOFValues.RevsToTicks;
+        if (OI.stratComInterface.getSC2().get()) spinner.set(spinner.getSensorPosition() + additionalTicks);
+    }
+
     public void spinWheel(double revolutions) {
         double additionalTicks = revolutions / Constants.WOFValues.RevsToTicks;
         spinner.set(spinner.getSensorPosition() + additionalTicks);
@@ -61,7 +76,9 @@ public class WheelOfFortune extends SubsystemBase implements DashboardUpdatable 
         spinner.set(rotations * Constants.WOFValues.RevsToTicks);
     }
 
-
+    public void stopSpin() {
+        spinner.set(0);
+    }
 
     public void setCurrentLimit(int limit) {
         spinner.limitInputCurrent(limit);

@@ -2,6 +2,7 @@ package frc.team832.robot.subsystems;
 
 import com.revrobotics.CANSparkMaxLowLevel;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.team832.lib.motorcontrol2.vendor.CANSparkMax;
 import frc.team832.lib.util.OscarMath;
@@ -19,6 +20,9 @@ public class Spindexer extends SubsystemBase {
 	private final DigitalInput hallEffect;
 	private SpindexerStatus spindexerStatus = new SpindexerStatus();
 	private final List<Boolean> ballStatus = new ArrayList<>();
+	public PIDController shootPID = new PIDController(Constants.SpindexerValues.SHOOT_kP,0, Constants.SpindexerValues.SHOOT_kD);
+	public PIDController feedPID = new PIDController(Constants.SpindexerValues.FEED_kP, 0, Constants.SpindexerValues.FEED_kD);
+
 
 	public Spindexer() {
 		spinMotor = new CANSparkMax(Constants.SpindexerValues.SPIN_MOTOR_CAN_ID, CANSparkMaxLowLevel.MotorType.kBrushless);
@@ -73,6 +77,10 @@ public class Spindexer extends SubsystemBase {
 
 	public void feed(double pow) {
 		feedMotor.set(pow);
+	}
+
+	public void setFeedRPM(double rpm) {
+		feedPID.calculate(feedMotor.getSensorVelocity(), rpm);
 	}
 
 	public void setPosition(int pos) {

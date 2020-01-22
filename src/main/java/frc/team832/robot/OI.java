@@ -1,13 +1,16 @@
 package frc.team832.robot;
 
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.RunEndCommand;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import frc.team832.lib.driverinput.controllers.*;
 import frc.team832.lib.driverinput.oi.DriverOI;
 import frc.team832.lib.driverinput.oi.SticksDriverOI;
 import frc.team832.lib.driverinput.oi.XboxDriverOI;
 import frc.team832.robot.commands.teleop.ManipulatePowerCell;
+import frc.team832.robot.subsystems.WheelOfFortune;
 
-import static frc.team832.robot.Robot.climber;
+import static frc.team832.robot.Robot.*;
 
 public class OI {
 	public final DriverOI driverOI;
@@ -30,8 +33,12 @@ public class OI {
 		stratComInterface.getArcadeWhiteLeft().whileHeld(new StartEndCommand(climber::unwindWinch, climber::stopWinch, Robot.climber));
 		stratComInterface.getArcadeBlackLeft().whileHeld(new StartEndCommand(climber::windWinch, climber::stopWinch, Robot.climber));
 
-		stratComInterface.getArcadeWhiteRight().whileHeld(new ManipulatePowerCell(Robot.intake, Robot.spindexer, ManipulatePowerCell.IntakeState.Intake));
-		stratComInterface.getArcadeBlackRight().whileHeld(new ManipulatePowerCell(Robot.intake, Robot.spindexer, ManipulatePowerCell.IntakeState.Outake));
-	}
+		stratComInterface.getSCSideTop().whileHeld(new ManipulatePowerCell(Robot.intake, Robot.spindexer, ManipulatePowerCell.IntakeState.Intake));
+		stratComInterface.getSCSideBot().whileHeld(new ManipulatePowerCell(Robot.intake, Robot.spindexer, ManipulatePowerCell.IntakeState.Outake));
 
+		stratComInterface.getSC2().whileHeld(new RunEndCommand(pneumatics::extendWOFManipulator, pneumatics::retractWOFManipulator, Robot.pneumatics));
+		stratComInterface.getSC1().whileHeld(new StartEndCommand(wheelOfFortune::spinCounterClockWise, wheelOfFortune::stopSpin, Robot.wheelOfFortune));
+		stratComInterface.getSC1().whileHeld(new StartEndCommand(wheelOfFortune::spinClockWise, wheelOfFortune::stopSpin, Robot.wheelOfFortune));
+		stratComInterface.getSC6().whenPressed(new InstantCommand(wheelOfFortune::spinThreeRot, Robot.wheelOfFortune));
+	}
 }

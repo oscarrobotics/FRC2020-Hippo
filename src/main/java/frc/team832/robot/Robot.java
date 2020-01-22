@@ -25,6 +25,7 @@ public class Robot extends TimedRobot {
   public static final Vision vision = new Vision();
   public static final Climber climber = new Climber();
   public static final Pneumatics pneumatics = new Pneumatics();
+  public static final WheelOfFortune wheelOfFortune = new WheelOfFortune();
   public static final PDP pdp = new PDP(0);
 
   private static final Notifier drivetrainTelemetryNotifier = new Notifier(drivetrain::updateDashboardData);
@@ -47,6 +48,8 @@ public class Robot extends TimedRobot {
       System.out.println("Climber - init FAILED");
     } else if (pneumatics.isInitSuccessful()) {
       System.out.println("Pneumatics - init FAILED");
+    } else if (wheelOfFortune.isInitSuccessful()) {
+      System.out.println("WheelOfFortune - init FAILED");
     }
   }
 

@@ -55,6 +55,8 @@ public class Constants {
         public static final int HOOD_CAN_ID = 8;
         public static final int TURRET_CAN_ID = 9;
 
+        public static final double SHOOTING_RPM = 6000;
+
         public static final double TURRET_kP = 0;
         public static final double TURRET_kD = 0;
         public static final double TURRET_kF = 0;
@@ -91,6 +93,14 @@ public class Constants {
         public static final int FEED_MOTOR_CAN_ID = 11;
 
         public static final int HALL_EFFECT_CHANNEL = 0;
+
+        public static final double SHOOT_kP = 0;
+        public static final double SHOOT_kD = 0;
+        public static final double SHOOT_kF = 0;
+
+        public static final double FEED_kP = 0;
+        public static final double FEED_kD = 0;
+        public static final double FEED_kF = 0;
     }
 
     public static class ClimberValues {
@@ -101,6 +111,7 @@ public class Constants {
     public static class WOFValues {
         public static final int SPINNER_CAN_ID = 13;
         public static final double RevsToTicks = .0002;// 5000 encoder ticks = 1 color wheel revolution (just a guess)
+        public static final double BASIC_SPIN_POW = 0.8;
     }
 
     public class PneumaticsValues {

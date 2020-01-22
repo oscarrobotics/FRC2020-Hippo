@@ -1,6 +1,7 @@
 package frc.team832.robot.commands.teleop;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.team832.robot.Constants;
 import frc.team832.robot.accesories.SpindexerStatus;
 import frc.team832.robot.subsystems.Shooter;
 import frc.team832.robot.subsystems.Spindexer;
@@ -9,19 +10,17 @@ public class Shoot extends CommandBase {
 
     public final Shooter shooter;
     public final Spindexer spindexer;
-    public double rpm;
 
-    public Shoot(Shooter shooter, Spindexer spindexer, double rpm) {
+    public Shoot(Shooter shooter, Spindexer spindexer) {
         addRequirements(shooter, spindexer);
         this.shooter = shooter;
         this.spindexer = spindexer;
-        this.rpm = rpm;
     }
 
     @Override
     public void initialize() {
-        shooter.setRPM(rpm);
-        spindexer.spinCounterclockwise(0.8);
+        shooter.setMode(Shooter.SHOOTER_MODE.SHOOTING);
+        spindexer.setFeedRPM(1200);
     }
 
     @Override
@@ -31,5 +30,10 @@ public class Shoot extends CommandBase {
     @Override
     public boolean isFinished() {
         return false;
+    }
+
+    @Override
+    public void end(boolean interrupted) {
+        shooter.setMode(Shooter.SHOOTER_MODE.IDLE);
     }
 }

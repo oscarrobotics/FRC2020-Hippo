@@ -10,7 +10,7 @@ public class Pneumatics extends SubsystemBase implements DashboardUpdatable {
 	boolean initSuccessful;
 	private Solenoid moveIntake;
 	private Solenoid propUpRobot;
-	private Solenoid wheelOfFortune;
+	private Solenoid wheelOfFortunePneumatics;
 	private Solenoid climbLock;
 
 	public Pneumatics() {
@@ -19,7 +19,7 @@ public class Pneumatics extends SubsystemBase implements DashboardUpdatable {
 
 		this.moveIntake = new Solenoid(Constants.PneumaticsValues.PCM_MODULE_NUM, Constants.PneumaticsValues.INTAKE_SOLENOID_ID);
 		this.propUpRobot = new Solenoid(Constants.PneumaticsValues.PCM_MODULE_NUM, Constants.PneumaticsValues.PROP_UP_SOLENOID_ID);
-		this.wheelOfFortune = new Solenoid(Constants.PneumaticsValues.PCM_MODULE_NUM, Constants.PneumaticsValues.WHEEL_O_FORTUNE_SOLENOID_ID);
+		this.wheelOfFortunePneumatics = new Solenoid(Constants.PneumaticsValues.PCM_MODULE_NUM, Constants.PneumaticsValues.WHEEL_O_FORTUNE_SOLENOID_ID);
 		this.climbLock = new Solenoid(Constants.PneumaticsValues.PCM_MODULE_NUM, Constants.PneumaticsValues.CLIMB_LOCK_SOLENOID_ID);
 
 		this.initSuccessful = true;
@@ -42,12 +42,14 @@ public class Pneumatics extends SubsystemBase implements DashboardUpdatable {
 	}
 
 	public void extendWOFManipulator() {
-		wheelOfFortune.set(true);
+		wheelOfFortunePneumatics.set(true);
 	}
 
 	public void retractWOFManipulator() {
-		wheelOfFortune.set(true);
+		wheelOfFortunePneumatics.set(true);
 	}
+
+	public boolean getWOFManipulator() { return wheelOfFortunePneumatics.get(); }
 
 	public void lockClimb() {
 		climbLock.set(true);
