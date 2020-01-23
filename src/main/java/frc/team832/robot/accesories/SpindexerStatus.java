@@ -44,7 +44,7 @@ public class SpindexerStatus {
         return state;
     }
 
-    public List<Boolean> getStateArray() {
+    public List<Boolean> getBooleanList() {
         return ballPositions;
     }
 

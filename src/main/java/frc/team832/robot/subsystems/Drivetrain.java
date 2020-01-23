@@ -110,19 +110,19 @@ public class Drivetrain extends SubsystemBase implements DashboardUpdatable {
     }
 
     public double getRightDistanceMeters () {
-        return Constants.DrivetrainValues.dtPowertrain.calculateWheelDistanceMeters(-rightMaster.getSensorPosition());
+        return Constants.DrivetrainValues.DrivePowerTrain.calculateWheelDistanceMeters(-rightMaster.getSensorPosition());
     }
 
     public double getLeftDistanceMeters () {
-        return Constants.DrivetrainValues.dtPowertrain.calculateWheelDistanceMeters(leftMaster.getSensorPosition());
+        return Constants.DrivetrainValues.DrivePowerTrain.calculateWheelDistanceMeters(leftMaster.getSensorPosition());
     }
 
     public double getRightVelocityMetersPerSec () {
-        return Constants.DrivetrainValues.dtPowertrain.calculateMetersPerSec(rightMaster.getSensorVelocity());
+        return Constants.DrivetrainValues.DrivePowerTrain.calculateMetersPerSec(rightMaster.getSensorVelocity());
     }
 
     public double getLeftVelocityMetersPerSec () {
-        return Constants.DrivetrainValues.dtPowertrain.calculateMetersPerSec(leftMaster.getSensorVelocity());
+        return Constants.DrivetrainValues.DrivePowerTrain.calculateMetersPerSec(leftMaster.getSensorVelocity());
     }
 
     public DifferentialDriveWheelSpeeds getWheelSpeeds () {

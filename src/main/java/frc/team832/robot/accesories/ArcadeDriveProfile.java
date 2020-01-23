@@ -26,8 +26,8 @@ public class ArcadeDriveProfile {
         double xPower = 0;
         double rotPower = 0;
         DriveAxesSupplier axes = oi.driverOI.getArcadeDriveAxes();
-        xPower = OscarMath.signumPow(-axes.getRight() * Constants.DrivetrainValues.stickDriveMultiplier, 3);
-        rotPower = OscarMath.signumPow(axes.getLeft() * Constants.DrivetrainValues.stickDriveMultiplier, 3);
+        xPower = OscarMath.signumPow(-axes.getRight() * Constants.DrivetrainValues.StickDriveMultiplier, 3);
+        rotPower = OscarMath.signumPow(axes.getLeft() * Constants.DrivetrainValues.StickDriveMultiplier, 3);
 
         this.xPow = xPower;
         this.rotPow = rotPower;

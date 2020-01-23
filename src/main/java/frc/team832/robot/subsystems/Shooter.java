@@ -9,6 +9,7 @@ import frc.team832.lib.driverstation.dashboard.DashboardUpdatable;
 import frc.team832.lib.motorcontrol.NeutralMode;
 import frc.team832.lib.motorcontrol2.vendor.CANSparkMax;
 import frc.team832.robot.Constants;
+import frc.team832.robot.SuperStructure;
 import frc.team832.robot.commands.teleop.TemplateCommand;
 
 public class Shooter extends SubsystemBase implements DashboardUpdatable {
@@ -18,12 +19,11 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
     private CANSparkMax primaryMotor, secondaryMotor, hoodMotor, turretMotor; //if needed add hood motor
     private NetworkTableEntry dashboard_wheelRPM, dashboard_PID, dashboard_hoodPos, dashboard_turretPos;
 
+    private ShootMode mode = ShootMode.Idle, lastMode = ShootMode.Idle;
+
     PIDController flywheelPID = new PIDController(Constants.ShooterValues.IDLE_kP,0, Constants.ShooterValues.IDLE_kD);
     PIDController turretPID = new PIDController(Constants.ShooterValues.SHOOTING_kP, 0, Constants.ShooterValues.TURRET_kD);
     PIDController hoodPID = new PIDController(Constants.ShooterValues.HOOD_kP, 0, Constants.ShooterValues.HOOD_kD);
-
-    private SHOOTER_MODE mode = SHOOTER_MODE.IDLE, lastMode = SHOOTER_MODE.IDLE;
-
 
     public Shooter(){
         DashboardManager.addTab(this);
@@ -90,46 +90,24 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
 
     public boolean isInitSuccessful() { return initSuccessful; }
 
-    public void setMode (SHOOTER_MODE mode) {
-        lastMode = this.mode;
-        this.mode = mode;
-    }
-
-    public SHOOTER_MODE getMode () {
-        return mode;
-    }
-
     private void updatePIDMode () {
-        if (mode == SHOOTER_MODE.SPINNING_UP){
+        if (mode == ShootMode.SpinUp){
             flywheelPID.setPID(Constants.ShooterValues.SPIN_UP_kP, 0, Constants.ShooterValues.SPIN_UP_kD);
-        } else if (mode == SHOOTER_MODE.SPINNING_DOWN) {
+        } else if (mode == ShootMode.SpinDown) {
             flywheelPID.setPID(Constants.ShooterValues.SPIN_DOWN_kP, 0, Constants.ShooterValues.SPIN_DOWN_kD);
-        } else if (mode == SHOOTER_MODE.SHOOTING){
+        } else if (mode == ShootMode.Shooting){
             flywheelPID.setPID(Constants.ShooterValues.SHOOTING_kP, 0, Constants.ShooterValues.SHOOTING_kD);
         } else {
             flywheelPID.setPID(Constants.ShooterValues.IDLE_kP, 0, Constants.ShooterValues.IDLE_kD);
         }
     }
 
-    private void handleShooterMode() {
-        switch (mode) {
-            case SPINNING_UP:
-                break;
-            case SHOOTING:
-        }
+    public void setMode (ShootMode mode) {
+        this.lastMode = this.mode;
+        this.mode = mode;
     }
 
-
     public void setRPM(double rpm) {
-        if (mode != SHOOTER_MODE.SHOOTING) {
-            if (rpm > primaryMotor.getSensorVelocity() + 1000) {
-                setMode(SHOOTER_MODE.SPINNING_UP);
-            } else if (rpm < primaryMotor.getSensorVelocity() - 1000) {
-                setMode(SHOOTER_MODE.SPINNING_DOWN);
-            } else if (rpm > 500) {
-                setMode(SHOOTER_MODE.IDLE);
-            }
-        }
         double power = flywheelPID.calculate(primaryMotor.getSensorVelocity(), rpm);
         dashboard_PID.setDouble(power);
         primaryMotor.set(power);
@@ -143,13 +121,6 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
         turretMotor.set(turretPID.calculate(turretMotor.getSensorPosition(), degrees));
     }
 
-    public enum SHOOTER_MODE {
-        SPINNING_UP,
-        SPINNING_DOWN,
-        SHOOTING,
-        IDLE
-    }
-
     public void stopShooter() {
         primaryMotor.set(0);
     }
@@ -157,6 +128,13 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
     public void setCurrentLimit(int limit) {
         primaryMotor.limitInputCurrent(limit);
         secondaryMotor.limitInputCurrent(limit);
+    }
+
+    public enum ShootMode {
+        SpinUp,
+        Shooting,
+        SpinDown,
+        Idle
     }
 
 }

@@ -20,7 +20,7 @@ public class Spindexer extends SubsystemBase {
 	private final DigitalInput hallEffect;
 	private SpindexerStatus spindexerStatus = new SpindexerStatus();
 	private final List<Boolean> ballStatus = new ArrayList<>();
-	public PIDController shootPID = new PIDController(Constants.SpindexerValues.SHOOT_kP,0, Constants.SpindexerValues.SHOOT_kD);
+	public PIDController spinPID = new PIDController(Constants.SpindexerValues.SPIN_kP,0, Constants.SpindexerValues.SPIN_kD);
 	public PIDController feedPID = new PIDController(Constants.SpindexerValues.FEED_kP, 0, Constants.SpindexerValues.FEED_kD);
 
 
@@ -63,6 +63,11 @@ public class Spindexer extends SubsystemBase {
 		spinMotor.set(OscarMath.clip(pow, 0, 1));
 	}
 
+	public void stopAll() {
+		stopSpin();
+		stopFeed();
+	}
+
 	public void stopSpin() {
 		spinMotor.set(0);
 	}
@@ -81,6 +86,16 @@ public class Spindexer extends SubsystemBase {
 
 	public void setFeedRPM(double rpm) {
 		feedPID.calculate(feedMotor.getSensorVelocity(), rpm);
+	}
+
+	public void setClockwiseRPM(double rpm) {
+		OscarMath.clip(rpm, 0, 6000);
+		spinPID.calculate(spinMotor.getSensorVelocity(), rpm);
+	}
+
+	public void setCounterclockwiseRPM(double rpm) {
+		OscarMath.clip(rpm, 0, 6000);
+		spinPID.calculate(spinMotor.getSensorVelocity(), -rpm);
 	}
 
 	public void setPosition(int pos) {
@@ -119,7 +134,7 @@ public class Spindexer extends SubsystemBase {
 		return initSuccessful;
 	}
 
-	public List<Boolean> getBallPositions() { return spindexerStatus.getStateArray(); }
+	public List<Boolean> getBallPositions() { return spindexerStatus.getBooleanList(); }
 
 	public SpindexerStatus.SpindexerState getState() { return spindexerStatus.getState(); }
 }

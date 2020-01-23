@@ -19,7 +19,7 @@ public class Shoot extends CommandBase {
 
     @Override
     public void initialize() {
-        shooter.setMode(Shooter.SHOOTER_MODE.SHOOTING);
+        shooter.setMode(Shooter.ShootMode.Shooting);
         spindexer.setFeedRPM(1200);
     }
 
@@ -34,6 +34,6 @@ public class Shoot extends CommandBase {
 
     @Override
     public void end(boolean interrupted) {
-        shooter.setMode(Shooter.SHOOTER_MODE.IDLE);
+        shooter.setMode(Shooter.ShootMode.Idle);
     }
 }
