@@ -28,6 +28,7 @@ public class Spindexer extends SubsystemBase {
 	public PIDController feedPID = new PIDController(Constants.SpindexerValues.FEED_kP, 0, Constants.SpindexerValues.FEED_kD);
 	public PIDController spinPID = new PIDController(Constants.SpindexerValues.SPIN_kP, 0, Constants.SpindexerValues.SPIN_kD);
 
+	public PIDController feedPID = new PIDController(Constants.SpindexerValues.FEED_kP, 0, Constants.SpindexerValues.FEED_kD);
 
 	public Spindexer() {
 		spinMotor = new CANSparkMax(Constants.SpindexerValues.SPIN_MOTOR_CAN_ID, CANSparkMaxLowLevel.MotorType.kBrushless);
@@ -101,6 +102,20 @@ public class Spindexer extends SubsystemBase {
 	public void setCounterclockwiseRPM(double rpm) {
 		OscarMath.clip(rpm, 0, 6000);
 		spinMotor.set(spinPID.calculate(spinMotor.getSensorVelocity(), -rpm));
+	}
+
+	public enum SpinnerDirection {
+		clockwise,
+		counterClockwise;
+	}
+
+	public void setSpinRPM(double rpm, SpinnerDirection spinDirection) {
+		if (spinDirection == SpinnerDirection.clockwise) spinMotor.set(Constants.SpindexerValues.SPIN_FF.calculate(rpm, Constants.SpindexerValues.SPIN_ACC));
+		else spinMotor.set(Constants.SpindexerValues.SPIN_FF.calculate(-rpm, Constants.SpindexerValues.SPIN_ACC));
+	}
+
+	public boolean isStalled() {
+		return superStructure.isStalling(Constants.SpindexerValues.SPIN_MOTOR_PDP_SLOT, Constants.SpindexerValues.STALL_CURRENT, Constants.SpindexerValues.STALL_SEC) == SuperStructure.StallState.STALLED;
 	}
 
 	public enum SpinnerDirection {
