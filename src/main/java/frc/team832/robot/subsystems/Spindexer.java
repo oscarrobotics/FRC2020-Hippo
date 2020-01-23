@@ -20,7 +20,6 @@ public class Spindexer extends SubsystemBase {
 	private final DigitalInput hallEffect;
 	private SpindexerStatus spindexerStatus = new SpindexerStatus();
 	private final List<Boolean> ballStatus = new ArrayList<>();
-	public PIDController spinPID = new PIDController(Constants.SpindexerValues.SPIN_kP,0, Constants.SpindexerValues.SPIN_kD);
 	public PIDController feedPID = new PIDController(Constants.SpindexerValues.FEED_kP, 0, Constants.SpindexerValues.FEED_kD);
 
 
@@ -90,12 +89,12 @@ public class Spindexer extends SubsystemBase {
 
 	public void setClockwiseRPM(double rpm) {
 		OscarMath.clip(rpm, 0, 6000);
-		spinPID.calculate(spinMotor.getSensorVelocity(), rpm);
+		spinMotor.set(Constants.SpindexerValues.SPIN_FF.calculate(rpm, Constants.SpindexerValues.SPIN_ACC));
 	}
 
 	public void setCounterclockwiseRPM(double rpm) {
 		OscarMath.clip(rpm, 0, 6000);
-		spinPID.calculate(spinMotor.getSensorVelocity(), -rpm);
+		spinMotor.set(Constants.SpindexerValues.SPIN_FF.calculate(-rpm, Constants.SpindexerValues.SPIN_ACC));
 	}
 
 	public void setPosition(int pos) {
@@ -104,14 +103,6 @@ public class Spindexer extends SubsystemBase {
 	
 	public double getPosition() {
 		return spinMotor.getSensorPosition();
-	}
-
-	public void setFeederProfileVelocity(double velocity) {
-		feedMotor.setVelocity(velocity);
-	}
-
-	public void setSpinProfileVelocity(double velocity) {
-		spinMotor.setVelocity(velocity);
 	}
 
 	public void zeroSpindexer() {
@@ -126,10 +117,6 @@ public class Spindexer extends SubsystemBase {
 		return feedMotor.getSensorPosition();
 	}
 
-	public void holdFeederPosition() {
-		feedMotor.setPosition(getFeederPosition());
-	}
-
 	public boolean isInitSuccessful() {
 		return initSuccessful;
 	}
@@ -137,4 +124,8 @@ public class Spindexer extends SubsystemBase {
 	public List<Boolean> getBallPositions() { return spindexerStatus.getBooleanList(); }
 
 	public SpindexerStatus.SpindexerState getState() { return spindexerStatus.getState(); }
+
+	public boolean atFeedRpm() {
+		return Math.abs(spinMotor.getSensorVelocity() - Constants.SpindexerValues.FEED_RPM) < 100;
+	}
 }

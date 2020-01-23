@@ -23,7 +23,6 @@ public class Constants {
         public static final int MAX_RPM = (int)Motor.kFalcon500.freeSpeed;
 
         public static final double DriveWheelDiameter = Units.inchesToMeters(6);
-
         public static final float DriveGearReduction = 1f / (9f/84f);
 
         private static final Gearbox DriveGearbox = new Gearbox(DriveGearReduction);
@@ -86,13 +85,15 @@ public class Constants {
     public static class IntakeValues {
         public static final int INTAKE_MOTOR_CAN_ID = 5;
 
-        public static final float intakeReduction = 1f / (2f/1f);
-        private static final Gearbox intakeGearbox = new Gearbox(intakeReduction);
-        public static final WheeledPowerTrain intakePowertrain = new WheeledPowerTrain(intakeGearbox, Motor.kNEO550, 1, Units.inchesToMeters(2));
+        public static final float IntakeReduction = 1f / (2f/1f);
+        private static final Gearbox IntakeGearbox = new Gearbox(IntakeReduction);
+        public static final WheeledPowerTrain IntakePowertrain = new WheeledPowerTrain(IntakeGearbox, Motor.kNEO550, 1, Units.inchesToMeters(2));
 
-        public static final double kP = 0;
-        public static final double kD = 0;
-        public static final double kF = 0;
+        private static final double kS = 0.25;
+        private static final double kV = 0.0005;
+        private static final double kA = 0.0001;
+
+        public static final SimpleMotorFeedforward FF = new SimpleMotorFeedforward(kS, kV, kA);
 
     }
 
@@ -102,13 +103,22 @@ public class Constants {
 
         public static final int HALL_EFFECT_CHANNEL = 0;
 
-        public static final float spinReduction = 1f / (100f/1f);
-        private static final Gearbox spinGearbox = new Gearbox(spinReduction);
-        public static final WheeledPowerTrain spinPowertrain = new WheeledPowerTrain(spinGearbox, Motor.kNEO, 1, Units.inchesToMeters(20));
+        public static final float FeedReduction = 1f;
+        private static final Gearbox FeedGearbox = new Gearbox(FeedReduction);
+        public static final WheeledPowerTrain FeedPowertrain = new WheeledPowerTrain(FeedGearbox, Motor.kNEO, 1, Units.inchesToMeters(4));
 
-        public static final double SPIN_kP = 0;
-        public static final double SPIN_kD = 0;
-        public static final double SPIN_kF = 0;
+        public static final float SpinReduction = 1f / (100f/1f);
+        private static final Gearbox SpinGearbox = new Gearbox(SpinReduction);
+        public static final WheeledPowerTrain SpinPowertrain = new WheeledPowerTrain(SpinGearbox, Motor.kNEO, 1, Units.inchesToMeters(20));
+
+        public static final double FEED_RPM = FeedPowertrain.calculateMotorRpmFromWheelRpm(3000);
+
+        private static final double kS = 0.25;
+        private static final double kV = 0.0005;
+        private static final double kA = 0.0001;
+
+        public static final SimpleMotorFeedforward SPIN_FF = new SimpleMotorFeedforward(kS, kV, kA);
+        public static final double SPIN_ACC = 240;//figure out units
 
         public static final double FEED_kP = 0;
         public static final double FEED_kD = 0;

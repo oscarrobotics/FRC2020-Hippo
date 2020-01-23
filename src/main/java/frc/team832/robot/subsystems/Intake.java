@@ -8,12 +8,12 @@ import frc.team832.lib.util.OscarMath;
 import frc.team832.robot.Constants;
 import frc.team832.robot.commands.teleop.TemplateCommand;
 
+import static frc.team832.robot.Robot.pneumatics;
+
 public class Intake extends SubsystemBase {
 	private boolean initSuccessful = false;
 
 	private final CANSparkMax intakeMotor;
-
-	public PIDController PID = new PIDController(Constants.IntakeValues.kP,0, Constants.IntakeValues.kD);
 
 	public Intake() {
 		//Change Can ID
@@ -51,12 +51,12 @@ public class Intake extends SubsystemBase {
 
 	public void setIntakeRPM(double rpm) {
 		OscarMath.clip(rpm, 0, 15000);
-		intakeMotor.set(PID.calculate(intakeMotor.getSensorVelocity(), rpm));
+		intakeMotor.set(Constants.IntakeValues.FF.calculate(rpm));
 	}
 
 	public void setOuttakeRPM(double rpm) {
 		OscarMath.clip(rpm, 0, 15000);
-		intakeMotor.set(PID.calculate(intakeMotor.getSensorVelocity(), -rpm));
+		intakeMotor.set(Constants.IntakeValues.FF.calculate(-rpm));
 	}
 
 	public void stop() {

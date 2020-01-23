@@ -49,8 +49,6 @@ public class Pneumatics extends SubsystemBase implements DashboardUpdatable {
 		wheelOfFortunePneumatics.set(true);
 	}
 
-	public boolean getWOFManipulator() { return wheelOfFortunePneumatics.get(); }
-
 	public void lockClimb() {
 		climbLock.set(true);
 	}

@@ -7,8 +7,6 @@ import frc.team832.lib.driverinput.controllers.*;
 import frc.team832.lib.driverinput.oi.DriverOI;
 import frc.team832.lib.driverinput.oi.SticksDriverOI;
 import frc.team832.lib.driverinput.oi.XboxDriverOI;
-import frc.team832.robot.commands.teleop.ManipulatePowerCell;
-import frc.team832.robot.subsystems.WheelOfFortune;
 
 import static frc.team832.robot.Robot.*;
 
@@ -33,8 +31,8 @@ public class OI {
 		stratComInterface.getArcadeWhiteLeft().whileHeld(new StartEndCommand(climber::unwindWinch, climber::stopWinch, Robot.climber));
 		stratComInterface.getArcadeBlackLeft().whileHeld(new StartEndCommand(climber::windWinch, climber::stopWinch, Robot.climber));
 
-		stratComInterface.getSCSideTop().whileHeld(new ManipulatePowerCell(Robot.intake, Robot.spindexer, ManipulatePowerCell.IntakeState.Intake));
-		stratComInterface.getSCSideBot().whileHeld(new ManipulatePowerCell(Robot.intake, Robot.spindexer, ManipulatePowerCell.IntakeState.Outake));
+		stratComInterface.getSCSideTop().whileHeld(new StartEndCommand(() -> superStructure.setMode(SuperStructure.SuperstructureMode.Intake), () -> superStructure.setMode(SuperStructure.SuperstructureMode.Idle)));
+		stratComInterface.getSCSideBot().whileHeld(new StartEndCommand(() -> superStructure.setMode(SuperStructure.SuperstructureMode.Outtake), () -> superStructure.setMode(SuperStructure.SuperstructureMode.Idle)));
 
 		stratComInterface.getSC2().whileHeld(new RunEndCommand(pneumatics::extendWOFManipulator, pneumatics::retractWOFManipulator, Robot.pneumatics));
 		stratComInterface.getSC1().whileHeld(new StartEndCommand(wheelOfFortune::spinCounterClockWise, wheelOfFortune::stopSpin, Robot.wheelOfFortune));

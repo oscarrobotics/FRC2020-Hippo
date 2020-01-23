@@ -121,6 +121,10 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
         turretMotor.set(turretPID.calculate(turretMotor.getSensorPosition(), degrees));
     }
 
+    public boolean atShootingRpm() {
+        return Math.abs(primaryMotor.getSensorVelocity() - Constants.ShooterValues.SHOOTING_RPM) < 100;
+    }
+
     public void stopShooter() {
         primaryMotor.set(0);
     }
