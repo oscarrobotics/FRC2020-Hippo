@@ -110,7 +110,7 @@ public class Spindexer extends SubsystemBase {
 		spinMotor.rezeroSensor();
 	}
 
-	private boolean getHallEffect() {
+	public boolean getHallEffect() {
 		return hallEffect.get();
 	}
 
