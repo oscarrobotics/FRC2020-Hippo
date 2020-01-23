@@ -119,6 +119,9 @@ public class Constants {
         public static final int HALL_EFFECT_CHANNEL = 0;
 
         public static final float FeedReduction = 1f;
+        public static final int STALL_CURRENT = 20;
+        public static final double STALL_SEC = 5;
+        public static final int SPIN_MOTOR_PDP_SLOT = 0;
         private static final Gearbox FeedGearbox = new Gearbox(FeedReduction);
         public static final WheeledPowerTrain FeedPowertrain = new WheeledPowerTrain(FeedGearbox, Motor.kNEO, 1, Units.inchesToMeters(4));
 

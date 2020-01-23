@@ -7,11 +7,14 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.team832.lib.motorcontrol2.vendor.CANSparkMax;
 import frc.team832.lib.util.OscarMath;
 import frc.team832.robot.Constants;
+import frc.team832.robot.SuperStructure;
 import frc.team832.robot.accesories.SpindexerStatus;
 import frc.team832.robot.commands.teleop.TemplateCommand;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static frc.team832.robot.Robot.superStructure;
 
 public class Spindexer extends SubsystemBase {
 	private boolean initSuccessful = false;
@@ -22,7 +25,6 @@ public class Spindexer extends SubsystemBase {
 	private final List<Boolean> ballStatus = new ArrayList<>();
 	public PIDController feedPID = new PIDController(Constants.SpindexerValues.FEED_kP, 0, Constants.SpindexerValues.FEED_kD);
 	public PIDController spinPID = new PIDController(Constants.SpindexerValues.SPIN_kP, 0, Constants.SpindexerValues.SPIN_kD);
-
 
 	public Spindexer() {
 		spinMotor = new CANSparkMax(Constants.SpindexerValues.SPIN_MOTOR_CAN_ID, CANSparkMaxLowLevel.MotorType.kBrushless);
@@ -88,18 +90,32 @@ public class Spindexer extends SubsystemBase {
 		feedPID.calculate(feedMotor.getSensorVelocity(), rpm);
 	}
 
-	public void setClockwiseRPM(double rpm) {
-		OscarMath.clip(rpm, 0, 6000);
-		spinMotor.set(spinPID.calculate(spinMotor.getSensorVelocity(), rpm));
+//	public void setClockwiseRPM(double rpm) {
+//		OscarMath.clip(rpm, 0, 6000);
+//		spinMotor.set(spinPID.calculate(spinMotor.getSensorVelocity(), rpm));
+//	}
+//
+//	public void setCounterclockwiseRPM(double rpm) {
+//		OscarMath.clip(rpm, 0, 6000);
+//		spinMotor.set(spinPID.calculate(spinMotor.getSensorVelocity(), -rpm));
+//	}
+
+	public enum SpinnerDirection {
+		Clockwise,
+		CounterClockwise;
 	}
 
-	public void setCounterclockwiseRPM(double rpm) {
-		OscarMath.clip(rpm, 0, 6000);
-		spinMotor.set(spinPID.calculate(spinMotor.getSensorVelocity(), -rpm));
+	public void setSpinRPM(double rpm, SpinnerDirection spinDirection) {
+		if (spinDirection == SpinnerDirection.Clockwise) spinMotor.set(spinPID.calculate(spinMotor.getSensorVelocity(), rpm));
+		else spinMotor.set(spinPID.calculate(spinMotor.getSensorVelocity(), -rpm));
 	}
 
-	public void setPosition(double pos) {
-		spinMotor.set(spinPID.calculate(spinMotor.getSensorPosition(), pos));
+	public boolean isStalled() {
+		return superStructure.isStalling(Constants.SpindexerValues.SPIN_MOTOR_PDP_SLOT, Constants.SpindexerValues.STALL_CURRENT, Constants.SpindexerValues.STALL_SEC) == SuperStructure.StallState.STALLED;
+	}
+
+	public void setPosition(int pos) {
+		spinMotor.setPosition(pos);
 	}
 	
 	public double getPosition() {
@@ -134,9 +150,8 @@ public class Spindexer extends SubsystemBase {
 		int pos;
 		if(getState() != SpindexerStatus.SpindexerState.FULL){
 			pos = spindexerStatus.getFirstEmpty();
-			setPosition(intToPosition(pos).getValue());
+			setPosition((int)intToPosition(pos).getValue());
 		}
-
 	}
 
 	private BallPosition intToPosition(int i) {
