@@ -128,16 +128,13 @@ public class Constants {
 
         public static final double FEED_RPM = FeedPowertrain.calculateMotorRpmFromWheelRpm(3000);
 
-        private static final double kS = 0.25;
-        private static final double kV = 0.0005;
-        private static final double kA = 0.0001;
-
-        public static final SimpleMotorFeedforward SPIN_FF = new SimpleMotorFeedforward(kS, kV, kA);
-        public static final double SPIN_ACC = 240;//figure out units
-
         public static final double FEED_kP = 0;
         public static final double FEED_kD = 0;
         public static final double FEED_kF = 0;
+
+        public static final double SPIN_kP = 0;
+        public static final double SPIN_kD = 0;
+        public static final double SPIN_kF = 0;
     }
 
     public static class ClimberValues {

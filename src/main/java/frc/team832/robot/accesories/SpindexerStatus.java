@@ -40,6 +40,15 @@ public class SpindexerStatus {
         return count;
     }
 
+    public int getFirstEmpty(){
+        for(int i = 0; i < 5; i++) {
+            if(getBooleanList().get(i) == false){
+                return i;
+            }
+        }
+        return 0;
+    }
+
     public SpindexerState getState() {
         return state;
     }

@@ -21,6 +21,7 @@ public class Spindexer extends SubsystemBase {
 	private SpindexerStatus spindexerStatus = new SpindexerStatus();
 	private final List<Boolean> ballStatus = new ArrayList<>();
 	public PIDController feedPID = new PIDController(Constants.SpindexerValues.FEED_kP, 0, Constants.SpindexerValues.FEED_kD);
+	public PIDController spinPID = new PIDController(Constants.SpindexerValues.SPIN_kP, 0, Constants.SpindexerValues.SPIN_kD);
 
 
 	public Spindexer() {
@@ -89,16 +90,16 @@ public class Spindexer extends SubsystemBase {
 
 	public void setClockwiseRPM(double rpm) {
 		OscarMath.clip(rpm, 0, 6000);
-		spinMotor.set(Constants.SpindexerValues.SPIN_FF.calculate(rpm, Constants.SpindexerValues.SPIN_ACC));
+		spinMotor.set(spinPID.calculate(spinMotor.getSensorVelocity(), rpm));
 	}
 
 	public void setCounterclockwiseRPM(double rpm) {
 		OscarMath.clip(rpm, 0, 6000);
-		spinMotor.set(Constants.SpindexerValues.SPIN_FF.calculate(-rpm, Constants.SpindexerValues.SPIN_ACC));
+		spinMotor.set(spinPID.calculate(spinMotor.getSensorVelocity(), -rpm));
 	}
 
-	public void setPosition(int pos) {
-		spinMotor.setPosition(pos);
+	public void setPosition(double pos) {
+		spinMotor.set(spinPID.calculate(spinMotor.getSensorPosition(), pos));
 	}
 	
 	public double getPosition() {
@@ -127,5 +128,45 @@ public class Spindexer extends SubsystemBase {
 
 	public boolean atFeedRpm() {
 		return Math.abs(spinMotor.getSensorVelocity() - Constants.SpindexerValues.FEED_RPM) < 100;
+	}
+
+	public void setToEmpty() {
+		int pos;
+		if(getState() != SpindexerStatus.SpindexerState.FULL){
+			pos = spindexerStatus.getFirstEmpty();
+			setPosition(intToPosition(pos).getValue());
+		}
+
+	}
+
+	private BallPosition intToPosition(int i) {
+		if(i == 0) {
+			return BallPosition.Position1;
+		} else if(i == 1) {
+			return BallPosition.Position2;
+		} else if (i == 2) {
+			return BallPosition.Position3;
+		} else if (i == 3) {
+			return BallPosition.Position4;
+		} else {
+			return BallPosition.Position5;
+		}
+	}
+
+	public enum BallPosition {
+		Position1(Constants.SpindexerValues.SpinPowertrain.calculateTicksFromPosition(.2*0)),
+		Position2(Constants.SpindexerValues.SpinPowertrain.calculateTicksFromPosition(.2*1)),
+		Position3(Constants.SpindexerValues.SpinPowertrain.calculateTicksFromPosition(.2*2)),
+		Position4(Constants.SpindexerValues.SpinPowertrain.calculateTicksFromPosition(.2*3)),
+		Position5(Constants.SpindexerValues.SpinPowertrain.calculateTicksFromPosition(.2*4));
+
+		double value;
+		private BallPosition(double value) {
+			this.value = value;
+		}
+
+		public double getValue() {
+			return value;
+		}
 	}
 }
