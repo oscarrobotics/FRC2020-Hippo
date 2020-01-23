@@ -54,8 +54,19 @@ public class Constants {
         public static final int HOOD_CAN_ID = 8;
         public static final int TURRET_CAN_ID = 9;
 
+        public static final float FlywheelReduction = 1f / (9f/84f);
+        private static final Gearbox FlywheelGearbox = new Gearbox(FlywheelReduction);
+        public static final WheeledPowerTrain FlywheelPowerTrain = new WheeledPowerTrain(FlywheelGearbox, Motor.kNEO, 2, Units.inchesToMeters(4));
+
+        public static final float HoodReduction = 1f / (50f/1f);
+        private static final Gearbox HoodGearbox = new Gearbox(HoodReduction);
+        public static final WheeledPowerTrain HoodPowerTrain = new WheeledPowerTrain(HoodGearbox, Motor.kNEO550, 1, Units.inchesToMeters(0));
+
         public static final double HOOD_MIN_ANGLE = 0;
         public static final double HOOD_MAX_ANGLE = 60;
+
+        public static final double HOOD_MIN_TICKS = 0;
+        public static final double HOOD_MAX_TICKS = 1000;
 
         public static final double SHOOTING_RPM = 6000;
 

@@ -8,6 +8,7 @@ import frc.team832.lib.driverstation.dashboard.DashboardManager;
 import frc.team832.lib.driverstation.dashboard.DashboardUpdatable;
 import frc.team832.lib.motorcontrol.NeutralMode;
 import frc.team832.lib.motorcontrol2.vendor.CANSparkMax;
+import frc.team832.lib.util.OscarMath;
 import frc.team832.robot.Constants;
 import frc.team832.robot.accesories.ShooterCalculations;
 import frc.team832.robot.accesories.VisionProfile;
@@ -135,7 +136,9 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
     private void trackTarget() {
         VisionProfile profile = vision.getProfile();
         shooterCalcs.calculate(profile.distance, profile.pitch, profile.yaw);
-        hoodMotor.setPosition();
+        setRPM(shooterCalcs.flywheelRPM);
+        setHoodAngle(shooterCalcs.hoodAngle);
+        setTurretAngle(shooterCalcs.turretHeading);
     }
 
     private void spinUp() {
@@ -150,7 +153,8 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
     }
 
     private void setHoodAngle(double degrees) {
-        hoodMotor.set(hoodPID.calculate(hoodMotor.getSensorPosition(), degrees));
+        double ticks = OscarMath.map(degrees, Constants.ShooterValues.HOOD_MIN_ANGLE, Constants.ShooterValues.HOOD_MAX_ANGLE, Constants.ShooterValues.HOOD_MIN_ANGLE, Constants.ShooterValues.HOOD_MAX_ANGLE);
+        hoodMotor.set(hoodPID.calculate(hoodMotor.getSensorPosition(), ticks));
     }
 
     private void setTurretAngle(double degrees) {
