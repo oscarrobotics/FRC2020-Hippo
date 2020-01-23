@@ -36,13 +36,13 @@ public class SuperStructure extends SubsystemBase {
 	}
 
 	private void intake() {
-		intake.intake(Constants.IntakeValues.IntakePowertrain.calculateRpmFromSurfaceSpeed(10));
+		intake.intake(Constants.IntakeValues.IntakePowertrain.calculateMotorRpmFromSurfaceSpeed(10));
 		spindexer.setClockwiseRPM(Constants.SpindexerValues.SpinPowertrain.calculateMotorRpmFromWheelRpm(60));
 		pneumatics.extendIntake();
 	}
 
 	private void outtake() {
-		intake.outtake(Constants.IntakeValues.IntakePowertrain.calculateRpmFromSurfaceSpeed(5));
+		intake.outtake(Constants.IntakeValues.IntakePowertrain.calculateMotorRpmFromSurfaceSpeed(5));
 		spindexer.setCounterclockwiseRPM(Constants.SpindexerValues.SpinPowertrain.calculateMotorRpmFromWheelRpm(60));
 		pneumatics.extendIntake();
 	}
@@ -50,7 +50,7 @@ public class SuperStructure extends SubsystemBase {
 	private void prepareShoot() {
 		shooter.setMode(Shooter.ShootMode.SpinUp);
 		spindexer.stopSpin();
-		shooter.setRPM(Constants.ShooterValues.SHOOTING_RPM);
+		shooter.setMode(Shooter.ShootMode.SpinUp);
 		spindexer.setFeedRPM(Constants.SpindexerValues.FEED_RPM);
 		pneumatics.propUp();
 	}

@@ -54,6 +54,9 @@ public class Constants {
         public static final int HOOD_CAN_ID = 8;
         public static final int TURRET_CAN_ID = 9;
 
+        public static final double HOOD_MIN_ANGLE = 0;
+        public static final double HOOD_MAX_ANGLE = 60;
+
         public static final double SHOOTING_RPM = 6000;
 
         public static final double TURRET_kP = 0;
@@ -79,6 +82,7 @@ public class Constants {
         public static final double IDLE_kP = 0;
         public static final double IDLE_kD = 0;
         public static final double IDLE_kF = 0;
+
 
     }
 

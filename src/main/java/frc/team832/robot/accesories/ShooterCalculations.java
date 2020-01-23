@@ -1,11 +1,15 @@
 package frc.team832.robot.accesories;
 
 
-public class ShooterCalculations {
-    public double flywheelRPM, hoodAngle;
+import frc.team832.lib.util.OscarMath;
+import frc.team832.robot.Constants;
 
-    public void calculate(double distanceMeters) {
-        hoodAngle = Math.tan(2.5 / distanceMeters);
+public class ShooterCalculations {
+    public double flywheelRPM, hoodAngle, turretHeading;
+
+    public void calculate(double distanceMeters, double pitch, double yaw) {
+        hoodAngle = OscarMath.map(pitch, 0, 90, Constants.ShooterValues.HOOD_MIN_ANGLE, Constants.ShooterValues.HOOD_MAX_ANGLE);
         flywheelRPM = (distanceMeters * 300) + 5000;
+        turretHeading = yaw;
     }
 }

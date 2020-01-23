@@ -9,8 +9,12 @@ import frc.team832.lib.driverstation.dashboard.DashboardUpdatable;
 import frc.team832.lib.motorcontrol.NeutralMode;
 import frc.team832.lib.motorcontrol2.vendor.CANSparkMax;
 import frc.team832.robot.Constants;
-import frc.team832.robot.SuperStructure;
+import frc.team832.robot.accesories.ShooterCalculations;
+import frc.team832.robot.accesories.VisionProfile;
 import frc.team832.robot.commands.teleop.TemplateCommand;
+
+import static frc.team832.robot.Robot.shooter;
+import static frc.team832.robot.Robot.vision;
 
 public class Shooter extends SubsystemBase implements DashboardUpdatable {
 
@@ -24,6 +28,8 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
     PIDController flywheelPID = new PIDController(Constants.ShooterValues.IDLE_kP,0, Constants.ShooterValues.IDLE_kD);
     PIDController turretPID = new PIDController(Constants.ShooterValues.SHOOTING_kP, 0, Constants.ShooterValues.TURRET_kD);
     PIDController hoodPID = new PIDController(Constants.ShooterValues.HOOD_kP, 0, Constants.ShooterValues.HOOD_kD);
+
+    private ShooterCalculations shooterCalcs = new ShooterCalculations();
 
     public Shooter(){
         DashboardManager.addTab(this);
@@ -80,7 +86,7 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
 
     @Override
     public void periodic() {
-        updatePIDMode();
+        runShooter();
     }
 
     @Override
@@ -90,15 +96,34 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
 
     public boolean isInitSuccessful() { return initSuccessful; }
 
+    private void runShooter() {
+        updatePIDMode();
+        switch (mode) {
+            case SpinUp:
+                break;
+            case Shooting:
+                break;
+            case SpinDown:
+                break;
+            case Idle:
+                break;
+        }
+    }
+
     private void updatePIDMode () {
-        if (mode == ShootMode.SpinUp){
-            flywheelPID.setPID(Constants.ShooterValues.SPIN_UP_kP, 0, Constants.ShooterValues.SPIN_UP_kD);
-        } else if (mode == ShootMode.SpinDown) {
-            flywheelPID.setPID(Constants.ShooterValues.SPIN_DOWN_kP, 0, Constants.ShooterValues.SPIN_DOWN_kD);
-        } else if (mode == ShootMode.Shooting){
-            flywheelPID.setPID(Constants.ShooterValues.SHOOTING_kP, 0, Constants.ShooterValues.SHOOTING_kD);
-        } else {
-            flywheelPID.setPID(Constants.ShooterValues.IDLE_kP, 0, Constants.ShooterValues.IDLE_kD);
+        switch (mode) {
+            case SpinUp:
+                flywheelPID.setPID(Constants.ShooterValues.SPIN_UP_kP, 0, Constants.ShooterValues.SPIN_UP_kD);
+                break;
+            case Shooting:
+                flywheelPID.setPID(Constants.ShooterValues.SHOOTING_kP, 0, Constants.ShooterValues.SHOOTING_kD);
+                break;
+            case SpinDown:
+                flywheelPID.setPID(Constants.ShooterValues.SPIN_DOWN_kP, 0, Constants.ShooterValues.SPIN_DOWN_kD);
+                break;
+            case Idle:
+                flywheelPID.setPID(Constants.ShooterValues.IDLE_kP, 0, Constants.ShooterValues.IDLE_kD);
+                break;
         }
     }
 
@@ -107,22 +132,33 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
         this.mode = mode;
     }
 
-    public void setRPM(double rpm) {
+    private void trackTarget() {
+        VisionProfile profile = vision.getProfile();
+        shooterCalcs.calculate(profile.distance, profile.pitch, profile.yaw);
+        hoodMotor.setPosition();
+    }
+
+    private void spinUp() {
+        primaryMotor.set(shooterCalcs.flywheelRPM);
+
+    }
+
+    private void setRPM(double rpm) {
         double power = flywheelPID.calculate(primaryMotor.getSensorVelocity(), rpm);
         dashboard_PID.setDouble(power);
         primaryMotor.set(power);
     }
 
-    public void setHoodAngle(double degrees) {
+    private void setHoodAngle(double degrees) {
         hoodMotor.set(hoodPID.calculate(hoodMotor.getSensorPosition(), degrees));
     }
 
-    public void setTurretAngle(double degrees) {
+    private void setTurretAngle(double degrees) {
         turretMotor.set(turretPID.calculate(turretMotor.getSensorPosition(), degrees));
     }
 
     public boolean atShootingRpm() {
-        return Math.abs(primaryMotor.getSensorVelocity() - Constants.ShooterValues.SHOOTING_RPM) < 100;
+        return Math.abs(primaryMotor.getSensorVelocity() - shooterCalcs.flywheelRPM) < 100;
     }
 
     public void stopShooter() {
