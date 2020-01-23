@@ -4,6 +4,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.team832.lib.util.OscarMath;
 import frc.team832.robot.subsystems.Shooter;
+import frc.team832.robot.subsystems.Spindexer;
 
 
 import static frc.team832.robot.Robot.*;
@@ -44,13 +45,13 @@ public class SuperStructure extends SubsystemBase {
 
 	private void intake () {
 		intake.intake(Constants.IntakeValues.IntakePowertrain.calculateMotorRpmFromSurfaceSpeed(10));
-		spindexer.setClockwiseRPM(Constants.SpindexerValues.SpinPowertrain.calculateMotorRpmFromWheelRpm(60));
+		spindexer.setSpinRPM(Constants.SpindexerValues.SpinPowertrain.calculateMotorRpmFromWheelRpm(60), Spindexer.SpinnerDirection.Clockwise);
 		pneumatics.extendIntake();
 	}
 
 	private void outtake () {
 		intake.outtake(Constants.IntakeValues.IntakePowertrain.calculateMotorRpmFromSurfaceSpeed(5));
-		spindexer.setCounterclockwiseRPM(Constants.SpindexerValues.SpinPowertrain.calculateMotorRpmFromWheelRpm(60));
+		spindexer.setSpinRPM(Constants.SpindexerValues.SpinPowertrain.calculateMotorRpmFromWheelRpm(60), Spindexer.SpinnerDirection.CounterClockwise);
 		pneumatics.extendIntake();
 	}
 
@@ -63,7 +64,7 @@ public class SuperStructure extends SubsystemBase {
 	}
 
 	private void shooting () {
-		spindexer.setCounterclockwiseRPM(Constants.SpindexerValues.SpinPowertrain.calculateMotorRpmFromWheelRpm(120));
+		spindexer.setSpinRPM(Constants.SpindexerValues.SpinPowertrain.calculateMotorRpmFromWheelRpm(120), Spindexer.SpinnerDirection.CounterClockwise);
 	}
 
 	private void idle () {
@@ -78,7 +79,7 @@ public class SuperStructure extends SubsystemBase {
 	}
 
 	public void idleSpindexer () {
-		spindexer.setCounterclockwiseRPM(Constants.SpindexerValues.SpinPowertrain.calculateMotorRpmFromWheelRpm(30));
+		spindexer.setSpinRPM(Constants.SpindexerValues.SpinPowertrain.calculateMotorRpmFromWheelRpm(30), Spindexer.SpinnerDirection.CounterClockwise);
 		spindexer.stopFeed();
 	}
 
