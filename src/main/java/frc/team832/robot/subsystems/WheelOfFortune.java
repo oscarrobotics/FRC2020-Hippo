@@ -11,7 +11,6 @@ import frc.team832.lib.motorcontrol2.vendor.CANSparkMax;
 import frc.team832.robot.Constants;
 import frc.team832.robot.OI;
 import frc.team832.robot.accesories.ColorWheelPath;
-import frc.team832.robot.commands.teleop.TemplateCommand;
 
 public class WheelOfFortune extends SubsystemBase implements DashboardUpdatable {
     private boolean initSuccessful = false;
@@ -33,8 +32,6 @@ public class WheelOfFortune extends SubsystemBase implements DashboardUpdatable 
         spinner.setSensorPhase(true);
 
         setCurrentLimit(40);
-
-        setDefaultCommand(new TemplateCommand(this));
 
         initSuccessful = true;
     }

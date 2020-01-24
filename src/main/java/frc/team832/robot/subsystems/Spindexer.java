@@ -10,7 +10,6 @@ import frc.team832.lib.util.StallStatus;
 import frc.team832.robot.Constants;
 import frc.team832.robot.SuperStructure;
 import frc.team832.robot.accesories.SpindexerStatus;
-import frc.team832.robot.commands.teleop.TemplateCommand;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,8 +44,6 @@ public class Spindexer extends SubsystemBase {
 		feedMotor.setSensorPhase(true);
 
 		hallEffect = new DigitalInput(Constants.SpindexerValues.HALL_EFFECT_CHANNEL);
-
-		setDefaultCommand(new TemplateCommand(this));
 
 		initSuccessful = true;
 	}

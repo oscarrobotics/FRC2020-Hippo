@@ -12,7 +12,6 @@ import frc.team832.lib.util.OscarMath;
 import frc.team832.robot.Constants;
 import frc.team832.robot.accesories.ShooterCalculations;
 import frc.team832.robot.accesories.VisionProfile;
-import frc.team832.robot.commands.teleop.TemplateCommand;
 
 import static frc.team832.robot.Robot.shooter;
 import static frc.team832.robot.Robot.vision;
@@ -75,7 +74,7 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
         dashboard_hoodPos = DashboardManager.addTabItem(this, "Hood Position", 0.0);
         dashboard_turretPos = DashboardManager.addTabItem(this, "Turret Position", 0.0);
 
-        setDefaultCommand(new TemplateCommand(this));
+//        setDefaultCommand();
 
         initSuccessful = true;
     }
@@ -111,7 +110,7 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
         }
     }
 
-    private void updatePIDMode () {
+    private void updatePIDMode() {
         switch (mode) {
             case SpinUp:
                 flywheelPID.setPID(Constants.ShooterValues.SPIN_UP_kP, 0, Constants.ShooterValues.SPIN_UP_kD);

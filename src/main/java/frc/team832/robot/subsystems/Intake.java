@@ -6,7 +6,6 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.team832.lib.motorcontrol2.vendor.CANSparkMax;
 import frc.team832.lib.util.OscarMath;
 import frc.team832.robot.Constants;
-import frc.team832.robot.commands.teleop.TemplateCommand;
 
 import static frc.team832.robot.Robot.pneumatics;
 
@@ -25,8 +24,6 @@ public class Intake extends SubsystemBase {
 		intakeMotor.setInverted(false);
 
 		setCurrentLimit(40);
-
-		setDefaultCommand(new TemplateCommand(this));
 
 		initSuccessful = true;
 	}

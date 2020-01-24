@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveWheelSpeeds;
 import edu.wpi.first.wpilibj.util.Units;
+import edu.wpi.first.wpilibj2.command.RunEndCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.team832.lib.drive.SmartDiffDrive;
 import frc.team832.lib.driverstation.dashboard.DashboardUpdatable;
@@ -17,7 +18,6 @@ import frc.team832.robot.Constants;
 
 import frc.team832.robot.accesories.ArcadeDriveProfile;
 import frc.team832.robot.accesories.TankDriveProfile;
-import frc.team832.robot.commands.teleop.TemplateCommand;
 
 public class Drivetrain extends SubsystemBase implements DashboardUpdatable {
     private boolean initSuccessful = false;
@@ -69,7 +69,7 @@ public class Drivetrain extends SubsystemBase implements DashboardUpdatable {
         driveOdometry = new DifferentialDriveOdometry(getDriveHeading(), startingPose);
         resetPose();
 
-        setDefaultCommand(new TemplateCommand(this));
+        setDefaultCommand(new RunEndCommand(this::tankDrive, this::stopDrive));
 
         initSuccessful = true;
     }
@@ -93,6 +93,11 @@ public class Drivetrain extends SubsystemBase implements DashboardUpdatable {
     public void xBoxDrive() {
         arcadeProfile.calculateArcadeSpeeds();
         diffDrive.arcadeDrive(arcadeProfile.xPow, arcadeProfile.rotPow, arcadeProfile.loopMode);
+    }
+
+    public void stopDrive() {
+        leftMaster.set(0);
+        rightMaster.set(0);
     }
 
     public Rotation2d getDriveHeading() {
