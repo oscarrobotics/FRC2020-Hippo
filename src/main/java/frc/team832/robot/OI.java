@@ -35,7 +35,7 @@ public class OI {
 		stratComInterface.getSCSideBot().whileHeld(new StartEndCommand(() -> superStructure.setMode(SuperStructure.SuperstructureMode.Outtake), () -> superStructure.setMode(SuperStructure.SuperstructureMode.Idle)));
 
 		stratComInterface.getArcadeBlackRight().whenPressed(new StartEndCommand(() -> superStructure.setMode(SuperStructure.SuperstructureMode.PrepareShoot), () -> superStructure.setMode(SuperStructure.SuperstructureMode.Idle)));
-		stratComInterface.getArcadeWhiteRight().whenPressed(new StartEndCommand(() -> superStructure.setMode(SuperStructure.SuperstructureMode.Shooting), () -> superStructure.setMode(SuperStructure.SuperstructureMode.Idle)));
+		stratComInterface.getArcadeWhiteRight().whileHeld(new StartEndCommand(() -> superStructure.setMode(SuperStructure.SuperstructureMode.Shooting), () -> superStructure.setMode(SuperStructure.SuperstructureMode.Idle)));
 
 		stratComInterface.getSC2().whileHeld(new RunEndCommand(pneumatics::extendWOFManipulator, pneumatics::retractWOFManipulator, Robot.pneumatics));
 		stratComInterface.getSC1().whileHeld(new StartEndCommand(wheelOfFortune::spinCounterClockWise, wheelOfFortune::stopSpin, Robot.wheelOfFortune));

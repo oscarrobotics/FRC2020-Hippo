@@ -1,8 +1,8 @@
-package frc.team832.robot.commands;
+package frc.team832.robot.commands.auto;
 
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.team832.robot.SuperStructure;
-import frc.team832.robot.commands.teleop.PrepareShooter;
+import frc.team832.robot.commands.PrepareShooter;
 import frc.team832.robot.subsystems.Spindexer;
 
 public class ShootCommandGroup extends SequentialCommandGroup {

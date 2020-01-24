@@ -11,11 +11,6 @@ import static frc.team832.robot.Robot.*;
 
 public class SuperStructure extends SubsystemBase {
 
-	private int stallCounter = 0;
-	private StallState spindexerStallState = StallState.NOT_STALLED;
-	private boolean hasStalled;
-	private boolean hasHatch;
-
 	private SuperstructureMode superstructureMode = SuperstructureMode.Idle, lastSuperstructureMode = SuperstructureMode.Idle;
 
 	@Override
@@ -44,8 +39,12 @@ public class SuperStructure extends SubsystemBase {
 	}
 
 	private void intake () {
+		if (spindexer.isStalled()) {
+			spindexer.setSpinRPM(Constants.SpindexerValues.SpinPowertrain.calculateMotorRpmFromWheelRpm(60), Spindexer.SpinnerDirection.Clockwise);
+		} else {
+			spindexer.setSpinRPM(Constants.SpindexerValues.SpinPowertrain.calculateMotorRpmFromWheelRpm(60), spindexer.getSpinnerDirection() == Spindexer.SpinnerDirection.Clockwise ? Spindexer.SpinnerDirection.CounterClockwise : Spindexer.SpinnerDirection.Clockwise);
+		}
 		intake.intake(Constants.IntakeValues.IntakePowertrain.calculateMotorRpmFromSurfaceSpeed(10));
-		spindexer.setSpinRPM(Constants.SpindexerValues.SpinPowertrain.calculateMotorRpmFromWheelRpm(60), Spindexer.SpinnerDirection.Clockwise);
 		pneumatics.extendIntake();
 	}
 
@@ -56,14 +55,14 @@ public class SuperStructure extends SubsystemBase {
 	}
 
 	private void prepareShoot () {
-		shooter.setMode(Shooter.ShootMode.SpinUp);
 		spindexer.stopSpin();
 		shooter.setMode(Shooter.ShootMode.SpinUp);
-		spindexer.setFeedRPM(Constants.SpindexerValues.FEED_RPM);
 		pneumatics.propUp();
+		spindexer.setFeedRPM(Constants.SpindexerValues.FEED_RPM);
 	}
 
 	private void shooting () {
+		shooter.setMode(Shooter.ShootMode.Shooting);
 		spindexer.setSpinRPM(Constants.SpindexerValues.SpinPowertrain.calculateMotorRpmFromWheelRpm(120), Spindexer.SpinnerDirection.CounterClockwise);
 	}
 
@@ -79,7 +78,11 @@ public class SuperStructure extends SubsystemBase {
 	}
 
 	public void idleSpindexer () {
-		spindexer.setSpinRPM(Constants.SpindexerValues.SpinPowertrain.calculateMotorRpmFromWheelRpm(30), Spindexer.SpinnerDirection.CounterClockwise);
+		if (spindexer.isStalled()) {
+			spindexer.setSpinRPM(Constants.SpindexerValues.SpinPowertrain.calculateMotorRpmFromWheelRpm(30), Spindexer.SpinnerDirection.CounterClockwise);
+		} else {
+			spindexer.setSpinRPM(Constants.SpindexerValues.SpinPowertrain.calculateMotorRpmFromWheelRpm(30), spindexer.getSpinnerDirection() == Spindexer.SpinnerDirection.Clockwise ? Spindexer.SpinnerDirection.CounterClockwise : Spindexer.SpinnerDirection.Clockwise);
+		}
 		spindexer.stopFeed();
 	}
 
@@ -100,50 +103,5 @@ public class SuperStructure extends SubsystemBase {
 		PrepareShoot,
 		Shooting,
 		Idle
-	}
-
-	public StallState isStalling(int PDPSlot, double stallCurrent, double stallSec) {
-		int slowdownMultiplier = 8;
-		int  stallLoops = (int)(stallSec * 20);
-		stallLoops *= slowdownMultiplier;
-		StallState stallState = StallState.NOT_STALLED;
-		double motorCurrent = pdp.getChannelCurrent(PDPSlot);
-
-		SmartDashboard.putNumber("Stall Count", stallCounter);
-		SmartDashboard.putNumber("Stall Loops", stallLoops);
-		if (motorCurrent >= stallCurrent) {
-			stallCounter += slowdownMultiplier;
-		} else if (motorCurrent < stallCurrent) {
-			stallCounter--;
-		}
-
-		stallCounter = OscarMath.clip(stallCounter, 0, stallLoops + 1);
-		if (stallCounter >= stallLoops) {
-			hasStalled = true;
-			stallState = StallState.STALLED;
-		}
-		else if (stallCounter == 0) {
-			hasStalled = false;
-			stallState = StallState.NOT_STALLED;
-		}
-		else if (hasStalled & stallCounter < stallLoops / 4) {
-			stallState = StallState.LEAVING_STALL;
-		}
-		return stallState;
-	}
-
-	public void resetStall(){
-		stallCounter = 0;
-		spindexerStallState = StallState.NOT_STALLED;
-	}
-
-	public enum StallState {
-		STALLED,
-		LEAVING_STALL,
-		NOT_STALLED
-	}
-
-	public void unStallSpindexer() {
-		if (spindexer.isStalled()) spindexer.spinClockwise(0.3);
 	}
 }

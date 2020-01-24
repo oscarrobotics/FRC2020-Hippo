@@ -1,4 +1,4 @@
-package frc.team832.robot.commands.teleop;
+package frc.team832.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.team832.robot.SuperStructure;

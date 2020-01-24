@@ -6,6 +6,7 @@ import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.team832.lib.motorcontrol2.vendor.CANSparkMax;
 import frc.team832.lib.util.OscarMath;
+import frc.team832.lib.util.StallStatus;
 import frc.team832.robot.Constants;
 import frc.team832.robot.SuperStructure;
 import frc.team832.robot.accesories.SpindexerStatus;
@@ -14,10 +15,12 @@ import frc.team832.robot.commands.teleop.TemplateCommand;
 import java.util.ArrayList;
 import java.util.List;
 
+import static frc.team832.robot.Robot.stallStatus;
 import static frc.team832.robot.Robot.superStructure;
 
 public class Spindexer extends SubsystemBase {
 	private boolean initSuccessful = false;
+	private SpinnerDirection currentSpinDirection;
 
 	private final CANSparkMax spinMotor, feedMotor;
 	private final DigitalInput hallEffect;
@@ -61,10 +64,6 @@ public class Spindexer extends SubsystemBase {
 		feedMotor.limitInputCurrent(currentLimit);
 	}
 
-	public void spinClockwise(double pow) {
-		spinMotor.set(OscarMath.clip(pow, 0, 1));
-	}
-
 	public void stopAll() {
 		stopSpin();
 		stopFeed();
@@ -80,6 +79,12 @@ public class Spindexer extends SubsystemBase {
 
 	public void spinCounterclockwise(double pow) {
 		spinMotor.set(-OscarMath.clip(pow, 0, 1));
+		currentSpinDirection = SpinnerDirection.CounterClockwise;
+	}
+
+	public void spinClockwise(double pow) {
+		spinMotor.set(OscarMath.clip(pow, 0, 1));
+		currentSpinDirection = SpinnerDirection.Clockwise;
 	}
 
 	public void feed(double pow) {
@@ -90,28 +95,28 @@ public class Spindexer extends SubsystemBase {
 		feedPID.calculate(feedMotor.getSensorVelocity(), rpm);
 	}
 
-//	public void setClockwiseRPM(double rpm) {
-//		OscarMath.clip(rpm, 0, 6000);
-//		spinMotor.set(spinPID.calculate(spinMotor.getSensorVelocity(), rpm));
-//	}
-//
-//	public void setCounterclockwiseRPM(double rpm) {
-//		OscarMath.clip(rpm, 0, 6000);
-//		spinMotor.set(spinPID.calculate(spinMotor.getSensorVelocity(), -rpm));
-//	}
-
 	public enum SpinnerDirection {
 		Clockwise,
 		CounterClockwise;
 	}
 
+	public SpinnerDirection getSpinnerDirection() {
+		return currentSpinDirection;
+	}
+
 	public void setSpinRPM(double rpm, SpinnerDirection spinDirection) {
-		if (spinDirection == SpinnerDirection.Clockwise) spinMotor.set(spinPID.calculate(spinMotor.getSensorVelocity(), rpm));
-		else spinMotor.set(spinPID.calculate(spinMotor.getSensorVelocity(), -rpm));
+		if (spinDirection == SpinnerDirection.Clockwise) {
+			spinMotor.set(spinPID.calculate(spinMotor.getSensorVelocity(), rpm));
+			currentSpinDirection = SpinnerDirection.Clockwise;
+		}
+		else {
+			spinMotor.set(spinPID.calculate(spinMotor.getSensorVelocity(), -rpm));
+			currentSpinDirection = SpinnerDirection.CounterClockwise;
+		}
 	}
 
 	public boolean isStalled() {
-		return superStructure.isStalling(Constants.SpindexerValues.SPIN_MOTOR_PDP_SLOT, Constants.SpindexerValues.STALL_CURRENT, Constants.SpindexerValues.STALL_SEC) == SuperStructure.StallState.STALLED;
+		return stallStatus.isStalling(Constants.SpindexerValues.SPIN_MOTOR_PDP_SLOT, Constants.SpindexerValues.STALL_CURRENT, Constants.SpindexerValues.STALL_SEC) == StallStatus.StallState.STALLED;
 	}
 
 	public void setPosition(int pos) {
