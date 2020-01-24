@@ -20,8 +20,6 @@ public class Constants {
         public static final double StickRotateOnCenterMultiplier = 0.6;
         public static final double StickRotateMultiplier = 0.85;
 
-        public static final int MAX_RPM = (int)Motor.kFalcon500.freeSpeed;
-
         public static final double DriveWheelDiameter = Units.inchesToMeters(6);
         public static final float DriveGearReduction = 1f / (9f/84f);
 
@@ -33,8 +31,8 @@ public class Constants {
         private static final double kDrive_kV = 0.0;
         private static final double kDrive_kA = 0.0;
 
-        public static final double kLeft_kP = .00;
-        public static final double kRight_kP = .00;
+        public static final double kLeft_kP = 0.0;
+        public static final double kRight_kP = 0.0;
 
         public static final SimpleMotorFeedforward kDriveFF = new SimpleMotorFeedforward(kDrive_kS, kDrive_kV, kDrive_kA);
 
@@ -61,6 +59,10 @@ public class Constants {
         public static final float HoodReduction = 1f / (50f/1f);
         private static final Gearbox HoodGearbox = new Gearbox(HoodReduction);
         public static final WheeledPowerTrain HoodPowerTrain = new WheeledPowerTrain(HoodGearbox, Motor.kNEO550, 1, Units.inchesToMeters(0));
+
+        public static final float TurretReduction = 1f / (30f/1f);
+        private static final Gearbox TurretGearbox = new Gearbox(TurretReduction);
+        public static final WheeledPowerTrain TurretPowerTrain = new WheeledPowerTrain(TurretGearbox, Motor.kNEO550, 1, Units.inchesToMeters(10));
 
         public static final double HOOD_MIN_ANGLE = 0;
         public static final double HOOD_MAX_ANGLE = 60;
@@ -116,12 +118,14 @@ public class Constants {
         public static final int SPIN_MOTOR_CAN_ID = 10;
         public static final int FEED_MOTOR_CAN_ID = 11;
 
+        public static final int SPIN_MOTOR_PDP_SLOT = 0;
+
         public static final int HALL_EFFECT_CHANNEL = 0;
 
-        public static final float FeedReduction = 1f;
         public static final int STALL_CURRENT = 20;
         public static final double STALL_SEC = 5;
-        public static final int SPIN_MOTOR_PDP_SLOT = 0;
+
+        public static final float FeedReduction = 1f;
         private static final Gearbox FeedGearbox = new Gearbox(FeedReduction);
         public static final WheeledPowerTrain FeedPowertrain = new WheeledPowerTrain(FeedGearbox, Motor.kNEO, 1, Units.inchesToMeters(4));
 

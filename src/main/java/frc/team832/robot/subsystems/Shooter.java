@@ -1,5 +1,6 @@
 package frc.team832.robot.subsystems;
 
+import com.revrobotics.CANDigitalInput;
 import com.revrobotics.CANSparkMaxLowLevel;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.controller.PIDController;
@@ -8,12 +9,10 @@ import frc.team832.lib.driverstation.dashboard.DashboardManager;
 import frc.team832.lib.driverstation.dashboard.DashboardUpdatable;
 import frc.team832.lib.motorcontrol.NeutralMode;
 import frc.team832.lib.motorcontrol2.vendor.CANSparkMax;
-import frc.team832.lib.util.OscarMath;
 import frc.team832.robot.Constants;
 import frc.team832.robot.accesories.ShooterCalculations;
 import frc.team832.robot.accesories.VisionProfile;
 
-import static frc.team832.robot.Robot.shooter;
 import static frc.team832.robot.Robot.vision;
 
 public class Shooter extends SubsystemBase implements DashboardUpdatable {
@@ -22,6 +21,8 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
 
     private CANSparkMax primaryMotor, secondaryMotor, hoodMotor, turretMotor; //if needed add hood motor
     private NetworkTableEntry dashboard_wheelRPM, dashboard_PID, dashboard_hoodPos, dashboard_turretPos;
+
+    CANDigitalInput turretLimitInput;
 
     private ShootMode mode = ShootMode.Idle, lastMode = ShootMode.Idle;
 
@@ -66,6 +67,8 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
         turretMotor.setInverted(false);
         hoodMotor.setSensorPhase(true);
         turretMotor.setSensorPhase(true);
+
+        turretLimitInput = new CANDigitalInput(turretMotor, CANDigitalInput.LimitSwitch.kForward, CANDigitalInput.LimitSwitchPolarity.kNormallyOpen);
 
         setCurrentLimit(40);
 
@@ -127,7 +130,7 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
         }
     }
 
-    public void setMode (ShootMode mode) {
+    public void setMode(ShootMode mode) {
         this.lastMode = this.mode;
         this.mode = mode;
     }
@@ -136,12 +139,13 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
         VisionProfile profile = vision.getProfile();
         shooterCalcs.calculate(profile.distance, profile.pitch, profile.yaw);
         setRPM(shooterCalcs.flywheelRPM);
-        setHoodAngle(shooterCalcs.hoodAngle);
-        setTurretAngle(shooterCalcs.turretHeading);
+        setHoodAngle(shooterCalcs.hoodPosition);
+        setTurretAngle(shooterCalcs.turretPosition);
     }
 
-    private void spinUp() {
-        primaryMotor.set(shooterCalcs.flywheelRPM);
+    public void spinUp() {
+        setMode(ShootMode.SpinUp);
+
 
     }
 
@@ -152,12 +156,11 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
     }
 
     private void setHoodAngle(double degrees) {
-        double ticks = OscarMath.map(degrees, Constants.ShooterValues.HOOD_MIN_ANGLE, Constants.ShooterValues.HOOD_MAX_ANGLE, Constants.ShooterValues.HOOD_MIN_ANGLE, Constants.ShooterValues.HOOD_MAX_ANGLE);
-        hoodMotor.set(hoodPID.calculate(hoodMotor.getSensorPosition(), ticks));
+        hoodMotor.set(hoodPID.calculate(hoodMotor.getSensorPosition(), shooterCalcs.hoodPosition));
     }
 
     private void setTurretAngle(double degrees) {
-        turretMotor.set(turretPID.calculate(turretMotor.getSensorPosition(), degrees));
+        turretMotor.set(turretPID.calculate(turretMotor.getSensorPosition(), shooterCalcs.turretPosition));
     }
 
     public boolean atShootingRpm() {

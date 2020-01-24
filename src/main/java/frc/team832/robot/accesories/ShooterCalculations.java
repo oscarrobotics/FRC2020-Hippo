@@ -5,11 +5,11 @@ import frc.team832.lib.util.OscarMath;
 import frc.team832.robot.Constants;
 
 public class ShooterCalculations {
-    public double flywheelRPM, hoodAngle, turretHeading;
+    public double flywheelRPM, hoodPosition, turretPosition;
 
     public void calculate(double distanceMeters, double pitch, double yaw) {
-        hoodAngle = OscarMath.map(pitch, 0, 90, Constants.ShooterValues.HOOD_MIN_ANGLE, Constants.ShooterValues.HOOD_MAX_ANGLE);
+        hoodPosition = OscarMath.map(pitch, Constants.ShooterValues.HOOD_MIN_ANGLE, Constants.ShooterValues.HOOD_MAX_ANGLE, Constants.ShooterValues.HOOD_MIN_TICKS, Constants.ShooterValues.HOOD_MAX_TICKS);
         flywheelRPM = (distanceMeters * 300) + 5000;
-        turretHeading = yaw;
+        turretPosition = Constants.ShooterValues.TurretPowerTrain.calculateTicksFromPosition(yaw / 180);
     }
 }

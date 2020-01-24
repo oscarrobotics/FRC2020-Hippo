@@ -14,7 +14,7 @@ public class SuperStructure extends SubsystemBase {
 	private SuperstructureMode superstructureMode = SuperstructureMode.Idle, lastSuperstructureMode = SuperstructureMode.Idle;
 
 	@Override
-	public void periodic () {
+	public void periodic() {
 		runSuperStructure();
 	}
 
@@ -38,7 +38,7 @@ public class SuperStructure extends SubsystemBase {
 		}
 	}
 
-	private void intake () {
+	private void intake() {
 		if (spindexer.isStalled()) {
 			spindexer.setSpinRPM(Constants.SpindexerValues.SpinPowertrain.calculateMotorRpmFromWheelRpm(60), Spindexer.SpinnerDirection.Clockwise);
 		} else {
@@ -48,36 +48,36 @@ public class SuperStructure extends SubsystemBase {
 		pneumatics.extendIntake();
 	}
 
-	private void outtake () {
+	private void outtake() {
 		intake.outtake(Constants.IntakeValues.IntakePowertrain.calculateMotorRpmFromSurfaceSpeed(5));
 		spindexer.setSpinRPM(Constants.SpindexerValues.SpinPowertrain.calculateMotorRpmFromWheelRpm(60), Spindexer.SpinnerDirection.CounterClockwise);
 		pneumatics.extendIntake();
 	}
 
-	private void prepareShoot () {
+	private void prepareShoot() {
 		spindexer.stopSpin();
-		shooter.setMode(Shooter.ShootMode.SpinUp);
+		shooter.spinUp();
 		pneumatics.propUp();
 		spindexer.setFeedRPM(Constants.SpindexerValues.FEED_RPM);
 	}
 
-	private void shooting () {
+	private void shooting() {
 		shooter.setMode(Shooter.ShootMode.Shooting);
 		spindexer.setSpinRPM(Constants.SpindexerValues.SpinPowertrain.calculateMotorRpmFromWheelRpm(120), Spindexer.SpinnerDirection.CounterClockwise);
 	}
 
-	private void idle () {
+	private void idle() {
 		stopIntake();
 		pneumatics.retractProp();
 		idleSpindexer();
 	}
 
-	public void stopIntake () {
+	public void stopIntake() {
 		intake.stop();
 		pneumatics.retractIntake();
 	}
 
-	public void idleSpindexer () {
+	public void idleSpindexer() {
 		if (spindexer.isStalled()) {
 			spindexer.setSpinRPM(Constants.SpindexerValues.SpinPowertrain.calculateMotorRpmFromWheelRpm(30), Spindexer.SpinnerDirection.CounterClockwise);
 		} else {
@@ -86,14 +86,14 @@ public class SuperStructure extends SubsystemBase {
 		spindexer.stopFeed();
 	}
 
-	public void setMode (SuperstructureMode mode) {
+	public void setMode(SuperstructureMode mode) {
 		if (superstructureMode != SuperstructureMode.Shooting || superstructureMode != SuperstructureMode.PrepareShoot) {
 			lastSuperstructureMode = this.superstructureMode;
 			this.superstructureMode = mode;
 		}
 	}
 
-	public boolean isShooterPrepared () {
+	public boolean isShooterPrepared() {
 		return shooter.atShootingRpm() && spindexer.atFeedRpm();
 	}
 

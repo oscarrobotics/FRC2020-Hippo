@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.team832.lib.drive.SmartDiffDrive;
 import frc.team832.lib.driverstation.dashboard.DashboardUpdatable;
 import frc.team832.lib.motorcontrol2.vendor.CANTalonFX;
+import frc.team832.lib.motors.Motor;
 import frc.team832.lib.sensors.NavXMicro;
 import frc.team832.robot.Constants;
 
@@ -65,7 +66,7 @@ public class Drivetrain extends SubsystemBase implements DashboardUpdatable {
 
         setCurrentLimit(40);
 
-        diffDrive = new SmartDiffDrive(leftMaster, rightMaster, Constants.DrivetrainValues.MAX_RPM);
+        diffDrive = new SmartDiffDrive(leftMaster, rightMaster, (int)Motor.kFalcon500.freeSpeed);
         driveOdometry = new DifferentialDriveOdometry(getDriveHeading(), startingPose);
         resetPose();
 
