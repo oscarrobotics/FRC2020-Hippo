@@ -8,14 +8,12 @@ import frc.team832.lib.motorcontrol2.vendor.CANSparkMax;
 import frc.team832.lib.util.OscarMath;
 import frc.team832.lib.util.StallStatus;
 import frc.team832.robot.Constants;
-import frc.team832.robot.SuperStructure;
 import frc.team832.robot.accesories.SpindexerStatus;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static frc.team832.robot.Robot.stallStatus;
-import static frc.team832.robot.Robot.superStructure;
 
 public class Spindexer extends SubsystemBase {
 	private boolean initSuccessful = false;
@@ -116,8 +114,8 @@ public class Spindexer extends SubsystemBase {
 		return stallStatus.isStalling(Constants.SpindexerValues.SPIN_MOTOR_PDP_SLOT, Constants.SpindexerValues.STALL_CURRENT, Constants.SpindexerValues.STALL_SEC) == StallStatus.StallState.STALLED;
 	}
 
-	public void setPosition(int pos) {
-		spinMotor.setPosition(pos);
+	public void setTargetPosition(int pos) {
+		spinMotor.set(spinPID.calculate(spinMotor.getSensorPosition(), Constants.SpindexerValues.SpinPowertrain.calculateTicksFromPosition(pos)));
 	}
 	
 	public double getPosition() {
@@ -152,7 +150,7 @@ public class Spindexer extends SubsystemBase {
 		int pos;
 		if(getState() != SpindexerStatus.SpindexerState.FULL){
 			pos = spindexerStatus.getFirstEmpty();
-			setPosition((int)intToPosition(pos).getValue());
+			setTargetPosition((int)intToPosition(pos).getValue());
 		}
 	}
 

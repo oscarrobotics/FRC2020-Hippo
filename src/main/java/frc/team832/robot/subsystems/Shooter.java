@@ -68,7 +68,7 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
         hoodMotor.setSensorPhase(true);
         turretMotor.setSensorPhase(true);
 
-        turretLimitInput = new CANDigitalInput(turretMotor, CANDigitalInput.LimitSwitch.kForward, CANDigitalInput.LimitSwitchPolarity.kNormallyOpen);
+        turretLimitInput = new CANDigitalInput(turretMotor.getBaseController(), CANDigitalInput.LimitSwitch.kForward, CANDigitalInput.LimitSwitchPolarity.kNormallyOpen);
 
         setCurrentLimit(40);
 
@@ -76,8 +76,6 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
         dashboard_PID = DashboardManager.addTabItem(this, "PID", 0.0);
         dashboard_hoodPos = DashboardManager.addTabItem(this, "Hood Position", 0.0);
         dashboard_turretPos = DashboardManager.addTabItem(this, "Turret Position", 0.0);
-
-//        setDefaultCommand();
 
         initSuccessful = true;
     }
@@ -148,6 +146,8 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
 
 
     }
+
+
 
     private void setRPM(double rpm) {
         double power = flywheelPID.calculate(primaryMotor.getSensorVelocity(), rpm);
