@@ -94,7 +94,7 @@ public class SuperStructure extends SubsystemBase {
 	}
 
 	public boolean isShooterPrepared() {
-		return shooter.atShootingRpm() && spindexer.atFeedRpm();
+		return shooter.readyToShoot() && spindexer.atFeedRpm();
 	}
 
 	public enum SuperstructureMode {

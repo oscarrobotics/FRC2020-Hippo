@@ -13,6 +13,7 @@ import frc.team832.robot.Constants;
 import frc.team832.robot.accesories.ShooterCalculations;
 import frc.team832.robot.accesories.VisionProfile;
 
+import static frc.team832.robot.Robot.shooter;
 import static frc.team832.robot.Robot.vision;
 
 public class Shooter extends SubsystemBase implements DashboardUpdatable {
@@ -133,21 +134,13 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
         this.mode = mode;
     }
 
-    private void trackTarget() {
-        VisionProfile profile = vision.getProfile();
-        shooterCalcs.calculate(profile.distance, profile.pitch, profile.yaw);
-        setRPM(shooterCalcs.flywheelRPM);
-        setHoodAngle(shooterCalcs.hoodPosition);
-        setTurretAngle(shooterCalcs.turretPosition);
-    }
-
     public void spinUp() {
         setMode(ShootMode.SpinUp);
-
+        setRPM(shooterCalcs.flywheelRPM);
+        hoodTrackTarget();
+        turretTrackTarget();
 
     }
-
-
 
     private void setRPM(double rpm) {
         double power = flywheelPID.calculate(primaryMotor.getSensorVelocity(), rpm);
@@ -155,16 +148,28 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
         primaryMotor.set(power);
     }
 
-    private void setHoodAngle(double degrees) {
+    private void hoodTrackTarget() {
         hoodMotor.set(hoodPID.calculate(hoodMotor.getSensorPosition(), shooterCalcs.hoodPosition));
     }
 
-    private void setTurretAngle(double degrees) {
+    private void turretTrackTarget() {
         turretMotor.set(turretPID.calculate(turretMotor.getSensorPosition(), shooterCalcs.turretPosition));
     }
 
-    public boolean atShootingRpm() {
+    public boolean readyToShoot() {
+        return atShootingRpm() && atTurretTarget() && atHoodTarget();
+    }
+
+    private boolean atShootingRpm() {
         return Math.abs(primaryMotor.getSensorVelocity() - shooterCalcs.flywheelRPM) < 100;
+    }
+
+    private boolean atTurretTarget() {
+        return Math.abs(turretMotor.getSensorPosition() - shooterCalcs.turretPosition) < 10;
+    }
+
+    private boolean atHoodTarget() {
+        return Math.abs(hoodMotor.getSensorPosition() - shooterCalcs.hoodPosition) < 10;
     }
 
     public void stopShooter() {

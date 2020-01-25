@@ -11,10 +11,11 @@ import frc.team832.lib.motors.Motor;
 
 public class Constants {
     public static class DrivetrainValues {
-        public static final int RIGHT_MASTER_CAN_ID = 1;
-        public static final int LEFT_MASTER_CAN_ID = 2;
-        public static final int RIGHT_SLAVE_CAN_ID = 3;
-        public static final int LEFT_SLAVE_CAN_ID = 4;
+        public static final int LEFT_MASTER_CAN_ID = 1;
+        public static final int LEFT_SLAVE_CAN_ID = 2;
+        public static final int RIGHT_MASTER_CAN_ID = 3;
+        public static final int RIGHT_SLAVE_CAN_ID = 4;
+
 
         public static final double StickDriveMultiplier = 1.0;
         public static final double StickRotateOnCenterMultiplier = 0.6;
@@ -46,13 +47,13 @@ public class Constants {
     }
 
     public static class ShooterValues {
-        public static final int PRIMARY_CAN_ID = 6;
-        public static final int SECONDARY_CAN_ID = 7;
+        public static final int PRIMARY_CAN_ID = 2;
+        public static final int SECONDARY_CAN_ID = 3;
 
-        public static final int HOOD_CAN_ID = 8;
-        public static final int TURRET_CAN_ID = 9;
+        public static final int HOOD_CAN_ID = 4;
+        public static final int TURRET_CAN_ID = 5;
 
-        public static final float FlywheelReduction = 1f / (9f/84f);
+        public static final float FlywheelReduction = 2f / 1f;
         private static final Gearbox FlywheelGearbox = new Gearbox(FlywheelReduction);
         public static final WheeledPowerTrain FlywheelPowerTrain = new WheeledPowerTrain(FlywheelGearbox, Motor.kNEO, 2, Units.inchesToMeters(4));
 
@@ -65,7 +66,7 @@ public class Constants {
         public static final WheeledPowerTrain TurretPowerTrain = new WheeledPowerTrain(TurretGearbox, Motor.kNEO550, 1, Units.inchesToMeters(10));
 
         public static final double HOOD_MIN_ANGLE = 0;
-        public static final double HOOD_MAX_ANGLE = 60;
+        public static final double HOOD_MAX_ANGLE = 80;
 
         public static final double HOOD_MIN_TICKS = 0;
         public static final double HOOD_MAX_TICKS = 1000;
@@ -100,9 +101,9 @@ public class Constants {
     }
 
     public static class IntakeValues {
-        public static final int INTAKE_MOTOR_CAN_ID = 5;
+        public static final int INTAKE_MOTOR_CAN_ID = 1;
 
-        public static final float IntakeReduction = 1f / (2f/1f);
+        public static final float IntakeReduction = 1f / (18f/36f);
         private static final Gearbox IntakeGearbox = new Gearbox(IntakeReduction);
         public static final WheeledPowerTrain IntakePowertrain = new WheeledPowerTrain(IntakeGearbox, Motor.kNEO550, 1, Units.inchesToMeters(2));
 
@@ -115,8 +116,8 @@ public class Constants {
     }
 
     public static class SpindexerValues {
-        public static final int SPIN_MOTOR_CAN_ID = 10;
-        public static final int FEED_MOTOR_CAN_ID = 11;
+        public static final int SPIN_MOTOR_CAN_ID = 6;
+        public static final int FEED_MOTOR_CAN_ID = 7;
 
         public static final int SPIN_MOTOR_PDP_SLOT = 0;
 
@@ -145,12 +146,12 @@ public class Constants {
     }
 
     public static class ClimberValues {
-        public static final int WINCH_CAN_ID = 12;
+        public static final int WINCH_CAN_ID = 8;
         public static final double WINCH_POWER = .5;
     }
 
     public static class WOFValues {
-        public static final int SPINNER_CAN_ID = 13;
+        public static final int SPINNER_CAN_ID = 9;
         public static final double RevsToTicks = .0002;// 5000 encoder ticks = 1 color wheel revolution (just a guess)
         public static final double BASIC_SPIN_POW = 0.8;
     }

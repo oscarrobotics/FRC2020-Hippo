@@ -4,6 +4,7 @@ import com.revrobotics.CANSparkMaxLowLevel;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.team832.lib.motorcontrol.NeutralMode;
 import frc.team832.lib.motorcontrol2.vendor.CANSparkMax;
 import frc.team832.lib.util.OscarMath;
 import frc.team832.lib.util.StallStatus;
@@ -40,6 +41,9 @@ public class Spindexer extends SubsystemBase {
 
 		spinMotor.setSensorPhase(true);
 		feedMotor.setSensorPhase(true);
+
+		feedMotor.setNeutralMode(NeutralMode.kCoast);
+		spinMotor.setNeutralMode(NeutralMode.kBrake);
 
 		hallEffect = new DigitalInput(Constants.SpindexerValues.HALL_EFFECT_CHANNEL);
 
