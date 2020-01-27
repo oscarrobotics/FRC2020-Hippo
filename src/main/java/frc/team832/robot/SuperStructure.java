@@ -87,7 +87,7 @@ public class SuperStructure extends SubsystemBase {
 	}
 
 	public void setMode(SuperstructureMode mode) {
-		if (superstructureMode != SuperstructureMode.Shooting || superstructureMode != SuperstructureMode.PrepareShoot) {
+		if (superstructureMode != SuperstructureMode.Shooting && superstructureMode != SuperstructureMode.PrepareShoot) {
 			lastSuperstructureMode = this.superstructureMode;
 			this.superstructureMode = mode;
 		}

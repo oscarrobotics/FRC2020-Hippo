@@ -49,29 +49,25 @@ public class Constants {
     public static class ShooterValues {
         public static final int PRIMARY_CAN_ID = 2;
         public static final int SECONDARY_CAN_ID = 3;
+        public static final int TURRET_CAN_ID = 4;
 
-        public static final int HOOD_CAN_ID = 4;
-        public static final int TURRET_CAN_ID = 5;
+        public static final int HOOD_CHANNEL = 0;
 
         public static final float FlywheelReduction = 2f / 1f;
         private static final Gearbox FlywheelGearbox = new Gearbox(FlywheelReduction);
         public static final WheeledPowerTrain FlywheelPowerTrain = new WheeledPowerTrain(FlywheelGearbox, Motor.kNEO, 2, Units.inchesToMeters(4));
-
-        public static final float HoodReduction = 1f / (50f/1f);
-        private static final Gearbox HoodGearbox = new Gearbox(HoodReduction);
-        public static final WheeledPowerTrain HoodPowerTrain = new WheeledPowerTrain(HoodGearbox, Motor.kNEO550, 1, Units.inchesToMeters(0));
 
         public static final float TurretReduction = 1f / (30f/1f);
         private static final Gearbox TurretGearbox = new Gearbox(TurretReduction);
         public static final WheeledPowerTrain TurretPowerTrain = new WheeledPowerTrain(TurretGearbox, Motor.kNEO550, 1, Units.inchesToMeters(10));
 
         public static final double HOOD_MIN_ANGLE = 0;
-        public static final double HOOD_MAX_ANGLE = 80;
+        public static final double HOOD_MAX_ANGLE = 50;
 
         public static final double HOOD_MIN_TICKS = 0;
         public static final double HOOD_MAX_TICKS = 1000;
 
-        public static final double SHOOTING_RPM = 6000;
+        public static final double BASE_SHOOTING_RPM = 5000;
 
         public static final double TURRET_kP = 0;
         public static final double TURRET_kD = 0;
@@ -116,8 +112,8 @@ public class Constants {
     }
 
     public static class SpindexerValues {
-        public static final int SPIN_MOTOR_CAN_ID = 6;
-        public static final int FEED_MOTOR_CAN_ID = 7;
+        public static final int SPIN_MOTOR_CAN_ID = 5;
+        public static final int FEED_MOTOR_CAN_ID = 6;
 
         public static final int SPIN_MOTOR_PDP_SLOT = 0;
 
@@ -146,12 +142,12 @@ public class Constants {
     }
 
     public static class ClimberValues {
-        public static final int WINCH_CAN_ID = 8;
+        public static final int WINCH_CAN_ID = 7;
         public static final double WINCH_POWER = .5;
     }
 
     public static class WOFValues {
-        public static final int SPINNER_CAN_ID = 9;
+        public static final int SPINNER_CAN_ID = 8;
         public static final double RevsToTicks = .0002;// 5000 encoder ticks = 1 color wheel revolution (just a guess)
         public static final double BASIC_SPIN_POW = 0.8;
     }

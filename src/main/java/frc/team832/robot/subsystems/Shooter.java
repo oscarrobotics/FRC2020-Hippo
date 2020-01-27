@@ -3,6 +3,7 @@ package frc.team832.robot.subsystems;
 import com.revrobotics.CANDigitalInput;
 import com.revrobotics.CANSparkMaxLowLevel;
 import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.team832.lib.driverstation.dashboard.DashboardManager;
@@ -13,6 +14,8 @@ import frc.team832.robot.Constants;
 import frc.team832.robot.accesories.ShooterCalculations;
 import frc.team832.robot.accesories.VisionProfile;
 
+import javax.swing.text.AbstractDocument;
+
 import static frc.team832.robot.Robot.shooter;
 import static frc.team832.robot.Robot.vision;
 
@@ -20,8 +23,9 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
 
     private boolean initSuccessful = false;
 
-    private CANSparkMax primaryMotor, secondaryMotor, hoodMotor, turretMotor; //if needed add hood motor
+    private CANSparkMax primaryMotor, secondaryMotor, turretMotor; //if needed add hood motor
     private NetworkTableEntry dashboard_wheelRPM, dashboard_PID, dashboard_hoodPos, dashboard_turretPos;
+    private Servo hoodServo;
 
     CANDigitalInput turretLimitInput;
 
@@ -39,34 +43,28 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
 
         primaryMotor = new CANSparkMax(Constants.ShooterValues.PRIMARY_CAN_ID, CANSparkMaxLowLevel.MotorType.kBrushless);
         secondaryMotor = new CANSparkMax(Constants.ShooterValues.SECONDARY_CAN_ID, CANSparkMaxLowLevel.MotorType.kBrushless);
-
-        hoodMotor = new CANSparkMax(Constants.ShooterValues.HOOD_CAN_ID, CANSparkMaxLowLevel.MotorType.kBrushless);
         turretMotor = new CANSparkMax(Constants.ShooterValues.TURRET_CAN_ID, CANSparkMaxLowLevel.MotorType.kBrushless);
+
+        hoodServo = new Servo(Constants.ShooterValues.HOOD_CHANNEL);
 
         primaryMotor.wipeSettings();
         secondaryMotor.wipeSettings();
+        turretMotor.wipeSettings();
 
         secondaryMotor.follow(primaryMotor);
-
-        hoodMotor.wipeSettings();
-        turretMotor.wipeSettings();
 
         NeutralMode flywheelMode = NeutralMode.kCoast;
         primaryMotor.setNeutralMode(flywheelMode);
         secondaryMotor.setNeutralMode(flywheelMode);
 
-        NeutralMode shooterMode = NeutralMode.kCoast;
-        hoodMotor.setNeutralMode(shooterMode);
-        turretMotor.setNeutralMode(shooterMode);
+        turretMotor.setNeutralMode(NeutralMode.kBrake);
 
         primaryMotor.setInverted(false);
         secondaryMotor.setInverted(false);
         primaryMotor.setSensorPhase(true);
         secondaryMotor.setSensorPhase(true);
 
-        hoodMotor.setInverted(false);
         turretMotor.setInverted(false);
-        hoodMotor.setSensorPhase(true);
         turretMotor.setSensorPhase(true);
 
         turretLimitInput = new CANDigitalInput(turretMotor.getBaseController(), CANDigitalInput.LimitSwitch.kForward, CANDigitalInput.LimitSwitchPolarity.kNormallyOpen);
@@ -88,7 +86,7 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
 
     @Override
     public void periodic() {
-        runShooter();
+        updatePIDMode();
     }
 
     @Override
@@ -97,20 +95,6 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
     }
 
     public boolean isInitSuccessful() { return initSuccessful; }
-
-    private void runShooter() {
-        updatePIDMode();
-        switch (mode) {
-            case SpinUp:
-                break;
-            case Shooting:
-                break;
-            case SpinDown:
-                break;
-            case Idle:
-                break;
-        }
-    }
 
     private void updatePIDMode() {
         switch (mode) {
@@ -139,7 +123,6 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
         setRPM(shooterCalcs.flywheelRPM);
         hoodTrackTarget();
         turretTrackTarget();
-
     }
 
     private void setRPM(double rpm) {
@@ -149,7 +132,7 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
     }
 
     private void hoodTrackTarget() {
-        hoodMotor.set(hoodPID.calculate(hoodMotor.getSensorPosition(), shooterCalcs.hoodPosition));
+        hoodServo.set(hoodPID.calculate(hoodServo.getPosition(), shooterCalcs.hoodPosition));
     }
 
     private void turretTrackTarget() {
@@ -169,7 +152,7 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
     }
 
     private boolean atHoodTarget() {
-        return Math.abs(hoodMotor.getSensorPosition() - shooterCalcs.hoodPosition) < 10;
+        return Math.abs(hoodServo.getPosition() - shooterCalcs.hoodPosition) < 0.05;
     }
 
     public void stopShooter() {
