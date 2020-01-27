@@ -91,6 +91,11 @@ public class Drivetrain extends SubsystemBase implements DashboardUpdatable {
         diffDrive.tankDrive(tankProfile.leftPow, tankProfile.rightPow, tankProfile.loopMode);
     }
 
+    public void arcadeDrive() {
+        arcadeProfile.calculateArcadeSpeeds();
+        diffDrive.arcadeDrive(arcadeProfile.xPow, arcadeProfile.rotPow, arcadeProfile.loopMode);
+    }
+
     public void xBoxDrive() {
         arcadeProfile.calculateArcadeSpeeds();
         diffDrive.arcadeDrive(arcadeProfile.xPow, arcadeProfile.rotPow, arcadeProfile.loopMode);

@@ -14,9 +14,7 @@ public class TankDriveProfile {
     public SmartDiffDrive.LoopMode loopMode;
 
     public TankDriveProfile(double leftPow, double rightPow, SmartDiffDrive.LoopMode mode) {
-       this.leftPow = leftPow;
-       this.rightPow = rightPow;
-       this.loopMode = mode;
+        setSpeeds(leftPow, rightPow, mode);
     }
 
     public TankDriveProfile() {
@@ -24,41 +22,39 @@ public class TankDriveProfile {
     }
 
     public void calculateTankSpeeds() {
-        DriveAxesSupplier axes = oi.driverOI.getTankDriveAxes();
-        boolean isRotate = ((SticksDriverOI) oi.driverOI).rightStick.two.get();
-        boolean driveStraight = ((SticksDriverOI) oi.driverOI).leftStick.trigger.get() || ((SticksDriverOI) oi.driverOI).rightStick.trigger.get();
+        DriveAxesSupplier axes = oi.driverOI.getGreenbergDriveAxes();
+        boolean isPreciseRotate = ((SticksDriverOI) oi.driverOI).rightStick.two.get();
+        boolean isRotate =  ((SticksDriverOI) oi.driverOI).rightStick.trigger.get();
+        boolean driveStraight = ((SticksDriverOI) oi.driverOI).leftStick.trigger.get();
 
         if (driveStraight) {
             TankDriveProfile straight = getTankStraightProfile();
-            if (isRotate) {
-                TankDriveProfile rotate = getTankRotateProfile();
-                this.leftPow = straight.leftPow + rotate.leftPow;
-                this.rightPow = straight.rightPow + rotate.rightPow;
-                this.loopMode = SmartDiffDrive.LoopMode.PERCENTAGE;
+            if (isPreciseRotate || isRotate) {
+                TankDriveProfile rotate;
+                if (isPreciseRotate) {
+                    rotate = getTankPreciseRotateProfile();
+                } else {
+                    rotate = getTankRotateProfile();
+                }
+                setSpeeds(straight.leftPow + rotate.leftPow, straight.rightPow + rotate.rightPow, SmartDiffDrive.LoopMode.PERCENTAGE);
             } else {
-                this.leftPow = straight.leftPow;
-                this.rightPow = straight.rightPow;
-                this.loopMode = SmartDiffDrive.LoopMode.PERCENTAGE;
+                setSpeeds(straight.leftPow, straight.rightPow, SmartDiffDrive.LoopMode.PERCENTAGE);
             }
         } else {
-            if (isRotate) {
+            if (isPreciseRotate) {
                 TankDriveProfile rotateOnCenter = getTankRotateOnCenterProfile();
-                this.leftPow = rotateOnCenter.leftPow;
-                this.rightPow = rotateOnCenter.rightPow;
-                this.loopMode = SmartDiffDrive.LoopMode.PERCENTAGE;
+                setSpeeds(rotateOnCenter.leftPow, rotateOnCenter.rightPow, SmartDiffDrive.LoopMode.PERCENTAGE);
             } else {
                 TankDriveProfile profile = getTankNormalProfile();
-                this.leftPow = profile.leftPow;
-                this.rightPow = profile.rightPow;
-                this.loopMode = SmartDiffDrive.LoopMode.PERCENTAGE;
+                setSpeeds(profile.leftPow, profile.rightPow, SmartDiffDrive.LoopMode.PERCENTAGE);
             }
         }
     }
 
     public TankDriveProfile getTankStraightProfile() {
-        DriveAxesSupplier axes = oi.driverOI.getTankDriveAxes();
-        double rightStick = axes.getRight();
-        double leftStick = axes.getLeft();
+        DriveAxesSupplier axes = oi.driverOI.getGreenbergDriveAxes();
+        double rightStick = axes.getRightY();
+        double leftStick = axes.getLeftY();
         double power;
         if (((SticksDriverOI) oi.driverOI).leftStick.trigger.get() && ((SticksDriverOI) oi.driverOI).rightStick.trigger.get()) {
             power = (OscarMath.signumPow(rightStick * Constants.DrivetrainValues.StickDriveMultiplier, 2) + OscarMath.signumPow(leftStick * Constants.DrivetrainValues.StickDriveMultiplier, 2)) / 2;
@@ -74,9 +70,9 @@ public class TankDriveProfile {
     public TankDriveProfile getTankNormalProfile() {
         double rightPower = 0;
         double leftPower = 0;
-        DriveAxesSupplier axes = oi.driverOI.getTankDriveAxes();
-        double rightStick = axes.getRight();
-        double leftStick = axes.getLeft();
+        DriveAxesSupplier axes = oi.driverOI.getGreenbergDriveAxes();
+        double rightStick = axes.getRightY();
+        double leftStick = axes.getLeftY();
 
         rightPower = OscarMath.signumPow(rightStick * Constants.DrivetrainValues.StickDriveMultiplier, 2);
         leftPower = OscarMath.signumPow(leftStick * Constants.DrivetrainValues.StickDriveMultiplier, 2);
@@ -87,17 +83,35 @@ public class TankDriveProfile {
     public TankDriveProfile getTankRotateProfile() {
         double rightPower = 0;
         double leftPower = 0;
-        DriveAxesSupplier axes = oi.driverOI.getTankDriveAxes();
+        DriveAxesSupplier axes = oi.driverOI.getGreenbergDriveAxes();
+
+        rightPower = OscarMath.signumPow(axes.getRightX() * Constants.DrivetrainValues.StickRotateMultiplier, 1.5);
+        leftPower = OscarMath.signumPow(axes.getRightX() * Constants.DrivetrainValues.StickRotateMultiplier, 1.5);
+
+        return new TankDriveProfile(leftPower, rightPower, SmartDiffDrive.LoopMode.PERCENTAGE);
+    }
+
+    TankDriveProfile getTankPreciseRotateProfile() {
+        double rightPower = 0;
+        double leftPower = 0;
+        DriveAxesSupplier axes = oi.driverOI.getGreenbergDriveAxes();
         rightPower = -OscarMath.signumPow(axes.getRotation() * Constants.DrivetrainValues.StickRotateMultiplier, 2);
         leftPower = OscarMath.signumPow(axes.getRotation() * Constants.DrivetrainValues.StickRotateMultiplier, 2);
+
 
         return new TankDriveProfile(leftPower, rightPower, SmartDiffDrive.LoopMode.PERCENTAGE);
     }
 
     public TankDriveProfile getTankRotateOnCenterProfile() {
-        DriveAxesSupplier axes = oi.driverOI.getTankDriveAxes();
+        DriveAxesSupplier axes = oi.driverOI.getGreenbergDriveAxes();
         double rotation = OscarMath.signumPow(axes.getRotation() * Constants.DrivetrainValues.StickRotateOnCenterMultiplier, 3);
 
         return new TankDriveProfile(-rotation, rotation, SmartDiffDrive.LoopMode.PERCENTAGE);
+    }
+
+    private void setSpeeds(double leftPow, double rightPow, SmartDiffDrive.LoopMode mode) {
+        this.leftPow = leftPow;
+        this.rightPow = rightPow;
+        this.loopMode = mode;
     }
 }

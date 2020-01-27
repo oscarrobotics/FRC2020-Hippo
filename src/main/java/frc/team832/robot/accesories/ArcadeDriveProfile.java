@@ -12,22 +12,12 @@ public class ArcadeDriveProfile {
     public double rotPow;
     public SmartDiffDrive.LoopMode loopMode;
 
-    public ArcadeDriveProfile(double xPow, double rotPow, SmartDiffDrive.LoopMode mode) {
-        this.xPow = xPow;
-        this.rotPow = rotPow;
-        this.loopMode = mode;
-    }
-
-    public ArcadeDriveProfile() {
-
-    }
-
     public void calculateArcadeSpeeds() {
         double xPower = 0;
         double rotPower = 0;
         DriveAxesSupplier axes = oi.driverOI.getArcadeDriveAxes();
-        xPower = OscarMath.signumPow(-axes.getRight() * Constants.DrivetrainValues.StickDriveMultiplier, 3);
-        rotPower = OscarMath.signumPow(axes.getLeft() * Constants.DrivetrainValues.StickDriveMultiplier, 3);
+        xPower = OscarMath.signumPow(-axes.getRightY() * Constants.DrivetrainValues.StickDriveMultiplier, 3);
+        rotPower = OscarMath.signumPow(axes.getLeftY() * Constants.DrivetrainValues.StickDriveMultiplier, 3);
 
         this.xPow = xPower;
         this.rotPow = rotPower;
