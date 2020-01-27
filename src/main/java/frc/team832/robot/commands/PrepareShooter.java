@@ -31,8 +31,6 @@ public class PrepareShooter extends CommandBase {
     }
 
     @Override
-    public void end(boolean interrupted) {
-        shooter.setMode(Shooter.ShootMode.Shooting);
-    }
+    public void end(boolean interrupted) { }
 }
 

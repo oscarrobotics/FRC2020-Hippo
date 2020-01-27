@@ -12,12 +12,6 @@ import frc.team832.lib.motorcontrol.NeutralMode;
 import frc.team832.lib.motorcontrol2.vendor.CANSparkMax;
 import frc.team832.robot.Constants;
 import frc.team832.robot.accesories.ShooterCalculations;
-import frc.team832.robot.accesories.VisionProfile;
-
-import javax.swing.text.AbstractDocument;
-
-import static frc.team832.robot.Robot.shooter;
-import static frc.team832.robot.Robot.vision;
 
 public class Shooter extends SubsystemBase implements DashboardUpdatable {
 

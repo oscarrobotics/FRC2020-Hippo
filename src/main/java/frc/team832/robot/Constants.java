@@ -1,10 +1,14 @@
 package frc.team832.robot;
 
 import edu.wpi.first.wpilibj.controller.SimpleMotorFeedforward;
+import edu.wpi.first.wpilibj.geometry.Pose2d;
+import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveKinematics;
+import edu.wpi.first.wpilibj.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryConfig;
 import edu.wpi.first.wpilibj.trajectory.constraint.DifferentialDriveVoltageConstraint;
 import edu.wpi.first.wpilibj.util.Units;
+import frc.team832.lib.motion.PathHelper;
 import frc.team832.lib.motors.WheeledPowerTrain;
 import frc.team832.lib.motors.Gearbox;
 import frc.team832.lib.motors.Motor;
@@ -100,6 +104,7 @@ public class Constants {
         public static final int INTAKE_MOTOR_CAN_ID = 1;
 
         public static final float IntakeReduction = 1f / (18f/36f);
+        public static final double INTAKE_RPM = 400;
         private static final Gearbox IntakeGearbox = new Gearbox(IntakeReduction);
         public static final WheeledPowerTrain IntakePowertrain = new WheeledPowerTrain(IntakeGearbox, Motor.kNEO550, 1, Units.inchesToMeters(2));
 
@@ -159,5 +164,13 @@ public class Constants {
         public static final int PROP_UP_SOLENOID_ID = 2;
         public static final int WHEEL_O_FORTUNE_SOLENOID_ID = 3;
         public static final int CLIMB_LOCK_SOLENOID_ID = 4;
+    }
+
+    public static class FieldPositions {
+        // positions are relative to driver station
+        public static final Pose2d StartCenter = new Pose2d(11.875, 3.05, Rotation2d.fromDegrees(0));
+        public static final Pose2d CloseSideTrench = new Pose2d(5.245, 7.505, Rotation2d.fromDegrees(0));
+        public static final Pose2d FarSideTrench = new Pose2d(10.735, 7.505, Rotation2d.fromDegrees(0));
+        public static final Pose2d ShieldGenCloseToTrench = new Pose2d(10.735-.5, 5.748, Rotation2d.fromDegrees(270)); // Needs to be changed
     }
 }
