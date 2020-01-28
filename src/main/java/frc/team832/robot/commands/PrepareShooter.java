@@ -1,11 +1,7 @@
 package frc.team832.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.team832.robot.SuperStructure;
-import frc.team832.robot.subsystems.Shooter;
-import frc.team832.robot.subsystems.Spindexer;
-
-import static frc.team832.robot.Robot.shooter;
+import frc.team832.robot.subsystems.SuperStructure;
 
 
 public class PrepareShooter extends CommandBase {

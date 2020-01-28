@@ -1,17 +1,14 @@
 package frc.team832.robot.commands.auto;
 
-import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.trajectory.Trajectory;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.team832.lib.motion.PathHelper;
 import frc.team832.robot.Constants;
 import frc.team832.robot.Robot;
-import frc.team832.robot.SuperStructure;
+import frc.team832.robot.subsystems.SuperStructure;
 import frc.team832.robot.subsystems.Drivetrain;
 import frc.team832.robot.subsystems.Spindexer;
-
-import javax.swing.plaf.basic.BasicTreeUI;
 
 public class ComplexAutonomous extends SequentialCommandGroup {
 	private Trajectory ToStart = PathHelper.generatePath(Robot.drivetrain.getLatestPose(), Constants.FieldPositions.StartCenter);

@@ -1,7 +1,7 @@
 package frc.team832.robot.commands.auto;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.team832.robot.SuperStructure;
+import frc.team832.robot.subsystems.SuperStructure;
 import frc.team832.robot.subsystems.Spindexer;
 
 public class SuperShoot extends CommandBase {

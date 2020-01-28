@@ -7,14 +7,11 @@
 
 package frc.team832.robot;
 
-import edu.wpi.first.wpilibj.I2C;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.TimedRobot;
 import frc.team832.lib.control.PDP;
 import frc.team832.lib.util.StallStatus;
 import frc.team832.robot.subsystems.*;
-
-import java.security.PublicKey;
 
 public class Robot extends TimedRobot {
 
@@ -27,7 +24,7 @@ public class Robot extends TimedRobot {
   public static final Climber climber = new Climber();
   public static final Pneumatics pneumatics = new Pneumatics();
   public static final WheelOfFortune wheelOfFortune = new WheelOfFortune();
-  public static final SuperStructure superStructure = new SuperStructure();
+  public static final SuperStructure superStructure = new SuperStructure(intake, shooter, spindexer, pneumatics);
   public static final PDP pdp = new PDP(0);
   public static final StallStatus stallStatus = new StallStatus(pdp);
 

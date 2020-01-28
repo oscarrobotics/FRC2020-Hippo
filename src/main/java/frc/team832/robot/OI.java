@@ -7,6 +7,7 @@ import frc.team832.lib.driverinput.controllers.*;
 import frc.team832.lib.driverinput.oi.DriverOI;
 import frc.team832.lib.driverinput.oi.SticksDriverOI;
 import frc.team832.lib.driverinput.oi.XboxDriverOI;
+import frc.team832.robot.subsystems.SuperStructure;
 
 import static frc.team832.robot.Robot.*;
 

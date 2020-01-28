@@ -1,17 +1,23 @@
-package frc.team832.robot;
+package frc.team832.robot.subsystems;
 
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.team832.lib.util.OscarMath;
-import frc.team832.robot.subsystems.Shooter;
-import frc.team832.robot.subsystems.Spindexer;
-
-
-import static frc.team832.robot.Robot.*;
+import frc.team832.robot.Constants;
 
 public class SuperStructure extends SubsystemBase {
 
 	private SuperstructureMode superstructureMode = SuperstructureMode.Idle, lastSuperstructureMode = SuperstructureMode.Idle;
+
+	private Intake intake;
+	private Shooter shooter;
+	private Spindexer spindexer;
+	private Pneumatics pneumatics;
+
+	public SuperStructure(Intake intake, Shooter shooter, Spindexer spindexer, Pneumatics pneumatics){
+		this.intake = intake;
+		this.shooter = shooter;
+		this.spindexer = spindexer;
+		this.pneumatics = pneumatics;
+	}
 
 	@Override
 	public void periodic() {
