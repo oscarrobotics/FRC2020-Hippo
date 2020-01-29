@@ -187,4 +187,8 @@ public class Constants {
         public static final Pose2d FarSideTrench = new Pose2d(10.735, 7.505, Rotation2d.fromDegrees(0));
         public static final Pose2d ShieldGenCloseToTrench = new Pose2d(10.735-.5, 5.748, Rotation2d.fromDegrees(270)); // Needs to be changed
     }
+
+    public class LEDValues {
+        public static final int LED_PWM_PORT = 0;
+    }
 }

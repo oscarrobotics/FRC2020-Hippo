@@ -22,32 +22,69 @@ public class Climber extends SubsystemBase implements DashboardUpdatable {
         rightWinch = new CANSparkMax(Constants.ClimberValues.RIGHT_WINCH_CAN_ID, Motor.kNEO);
 
         leftWinch.wipeSettings();
+        rightWinch.wipeSettings();
 
         leftWinch.setNeutralMode(NeutralMode.kBrake);
+        rightWinch.setNeutralMode(NeutralMode.kBrake);
 
         leftWinch.setInverted(false);
         leftWinch.setSensorPhase(true);
 
-        leftWinch.limitInputCurrent(40);
+        rightWinch.setInverted(false);
+        rightWinch.setSensorPhase(true);
+
+        setCurrentLimit(40);
 
         initSuccessful = true;
     }
 
+    private void setCurrentLimit (int limit) {
+        leftWinch.limitInputCurrent(limit);
+        rightWinch.limitInputCurrent(limit);
+    }
+
     public boolean isInitSuccessful() { return initSuccessful; }
+
+    public void unwindLeftWinch() {
+        leftWinch.set(-Constants.ClimberValues.WINCH_POWER);
+    }
+
+    public void unwindRightWinch() {
+        rightWinch.set(-Constants.ClimberValues.WINCH_POWER);
+    }
 
     public void unwindWinch() {
         pneumatics.unlockClimb();
-        leftWinch.set(-Constants.ClimberValues.WINCH_POWER);
+        unwindLeftWinch();
+        unwindRightWinch();
+    }
+
+    public void windLeftWinch() {
+        leftWinch.set(Constants.ClimberValues.WINCH_POWER);
+    }
+
+    public void windRightWinch() {
+        rightWinch.set(Constants.ClimberValues.WINCH_POWER);
     }
 
     public void windWinch() {
         pneumatics.unlockClimb();
-        leftWinch.set(Constants.ClimberValues.WINCH_POWER);
+        windLeftWinch();
+        windRightWinch();
+    }
+
+    public void stopLeftWinch() {
+        leftWinch.set(0);
+    }
+
+    public void stopRightWinch() {
+        rightWinch.set(0);
     }
 
     public void stopWinch() {
-        leftWinch.set(0);
         pneumatics.lockClimb();
+        stopLeftWinch();
+        stopRightWinch();
     }
 
     @Override

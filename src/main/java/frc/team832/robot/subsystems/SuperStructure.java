@@ -78,6 +78,6 @@ public class SuperStructure extends SubsystemBase {
 	}
 
 	public boolean isShooterPrepared() {
-		return shooter.readyToShoot() && shooter.atFeedRpm();
+		return shooter.readyToShoot();
 	}
 }

@@ -9,8 +9,9 @@ package frc.team832.robot;
 
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj2.AddressableLED;
+import edu.wpi.first.wpilibj2.AddressableLEDBuffer;
 import frc.team832.lib.power.GrouchPDP;
-import frc.team832.lib.power.PDPPortNumber;
 import frc.team832.robot.subsystems.*;
 
 public class Robot extends TimedRobot {
@@ -33,6 +34,9 @@ public class Robot extends TimedRobot {
     private static final Notifier drivetrainTelemetryNotifier = new Notifier(drivetrain::updateDashboardData);
     private static final Notifier shooterTelemetryNotifier = new Notifier(shooter::updateDashboardData);
 
+    AddressableLED led = new AddressableLED(Constants.LEDValues.LED_PWM_PORT);
+    AddressableLEDBuffer ledBuffer = new AddressableLEDBuffer(0);
+
     @Override
     public void robotInit() {
         if (!drivetrain.isInitSuccessful()) {
@@ -52,6 +56,13 @@ public class Robot extends TimedRobot {
         } else if (wheelOfFortune.isInitSuccessful()) {
             System.out.println("WheelOfFortune - init FAILED");
         }
+
+        led.setLength(ledBuffer.getLength());
+        for (int i = 0; i < ledBuffer.getLength(); i++)
+            ledBuffer.setRGB(i, 0, 255, 0);
+
+        led.setData(ledBuffer);
+        led.start();
     }
 
     @Override

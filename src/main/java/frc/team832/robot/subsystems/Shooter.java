@@ -1,7 +1,6 @@
 package frc.team832.robot.subsystems;
 
 import com.revrobotics.CANDigitalInput;
-import com.revrobotics.CANSparkMaxLowLevel;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.first.wpilibj.controller.PIDController;
@@ -12,7 +11,6 @@ import frc.team832.lib.motorcontrol.NeutralMode;
 import frc.team832.lib.motorcontrol2.vendor.CANSparkMax;
 import frc.team832.lib.motors.Motor;
 import frc.team832.robot.Constants;
-import frc.team832.robot.Robot;
 import frc.team832.robot.accesories.ShooterCalculations;
 
 public class Shooter extends SubsystemBase implements DashboardUpdatable {
@@ -91,7 +89,8 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
     @Override
     public void periodic() {
         updatePIDMode();
-//        shooterCalcs.calculate();
+        shooterCalcs.update();
+        trackTarget();
     }
 
     @Override
@@ -125,15 +124,21 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
 
     public void spinUp() {
         setMode(ShootMode.SpinUp);
-        setRPM(shooterCalcs.flywheelRPM);
-        hoodTrackTarget();
-        turretTrackTarget();
     }
 
     public void idle() {
         setMode(ShootMode.Idle);
     }
 
+    public void trackTarget() {
+        flywheelTrackTarget();
+        hoodTrackTarget();
+        turretTrackTarget();
+    }
+
+    public void flywheelTrackTarget() {
+        primaryMotor.set(flywheelPID.calculate(primaryMotor.getSensorVelocity(), shooterCalcs.flywheelRPM));
+    }
 
     private void setRPM(double rpm) {
         double power = flywheelPID.calculate(primaryMotor.getSensorVelocity(), rpm);
@@ -150,7 +155,7 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
     }
 
     public boolean readyToShoot() {
-        return atShootingRpm() && atTurretTarget() && atHoodTarget();
+        return atShootingRpm() && atTurretTarget() && atHoodTarget() && atFeedRpm();
     }
 
     private boolean atShootingRpm() {
@@ -197,5 +202,4 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
         SpinDown,
         Idle
     }
-
 }

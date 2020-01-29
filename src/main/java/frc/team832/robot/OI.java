@@ -1,5 +1,6 @@
 package frc.team832.robot;
 
+import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunEndCommand;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
@@ -36,18 +37,29 @@ public class OI {
 
 	private void configureButtonBindings() {
 		// do commands here
-		stratComInterface.getArcadeBlackLeft().whileHeld(new StartEndCommand(climber::windWinch, climber::stopWinch, Robot.climber));
-		stratComInterface.getArcadeWhiteLeft().whileHeld(new StartEndCommand(climber::unwindWinch, climber::stopWinch, Robot.climber));
+		stratComInterface.getSCPlus().whileHeld(new StartEndCommand(climber::windWinch, climber::stopWinch, Robot.climber));
+		stratComInterface.getSCMinus().whileHeld(new StartEndCommand(climber::unwindWinch, climber::stopWinch, Robot.climber));
 
-		stratComInterface.getSCSideTop().whileHeld(new StartEndCommand(superStructure::intake, superStructure::idleIntake));
+		stratComInterface.getArcadeWhiteLeft().whileHeld(new ConditionalCommand(
+				new StartEndCommand(climber::unwindLeftWinch, climber::stopLeftWinch, climber),
+				new StartEndCommand(climber::windLeftWinch, climber::stopLeftWinch, climber),
+				stratComInterface.getSCSideTop()::get)
+		);
+		stratComInterface.getArcadeWhiteRight().whileHeld(new ConditionalCommand(
+				new StartEndCommand(climber::unwindRightWinch, climber::stopRightWinch, climber),
+				new StartEndCommand(climber::windLeftWinch, climber::stopRightWinch, climber),
+				stratComInterface.getSCSideTop()::get)
+		);
+
+		stratComInterface.getSCSideMid().whileHeld(new StartEndCommand(superStructure::intake, superStructure::idleIntake));
 		stratComInterface.getSCSideBot().whileHeld(new StartEndCommand(superStructure::outtake, superStructure::idleIntake));
 
 		stratComInterface.getArcadeBlackRight().whenPressed(new PrepareShooter(superStructure));
-		stratComInterface.getArcadeWhiteRight().whileHeld(new ShootCommandGroup(superStructure));
+		stratComInterface.getArcadeBlackLeft().whileHeld(new ShootCommandGroup(superStructure));
 
 		stratComInterface.getSC2().whileHeld(new RunEndCommand(pneumatics::extendWOFManipulator, pneumatics::retractWOFManipulator, Robot.pneumatics));
 		stratComInterface.getSC1().whileHeld(new StartEndCommand(wheelOfFortune::spinCounterClockWise, wheelOfFortune::stopSpin, Robot.wheelOfFortune));
-		stratComInterface.getSC1().whileHeld(new StartEndCommand(wheelOfFortune::spinClockWise, wheelOfFortune::stopSpin, Robot.wheelOfFortune));
+		stratComInterface.getSC3().whileHeld(new StartEndCommand(wheelOfFortune::spinClockWise, wheelOfFortune::stopSpin, Robot.wheelOfFortune));
 		stratComInterface.getSC6().whenPressed(new InstantCommand(wheelOfFortune::spinThreeRot, Robot.wheelOfFortune));
 	}
 }
