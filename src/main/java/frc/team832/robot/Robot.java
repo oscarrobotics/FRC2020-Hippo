@@ -15,8 +15,10 @@ import frc.team832.robot.subsystems.*;
 
 public class Robot extends TimedRobot {
 
-    public static final OI oi = new OI();
-    public static final Drivetrain drivetrain = new Drivetrain();
+    public static final GrouchPDP pdp = new GrouchPDP(0);
+
+    // Subsystems
+    public static final Drivetrain drivetrain = new Drivetrain(pdp);
     public static final Intake intake = new Intake();
     public static final Shooter shooter = new Shooter();
     public static final Spindexer spindexer = new Spindexer();
@@ -25,17 +27,14 @@ public class Robot extends TimedRobot {
     public static final Pneumatics pneumatics = new Pneumatics();
     public static final WheelOfFortune wheelOfFortune = new WheelOfFortune();
     public static final SuperStructure superStructure = new SuperStructure(intake, shooter, spindexer, pneumatics);
-    public static final GrouchPDP pdp = new GrouchPDP(0);
+
+    public static final OI oi = new OI();
 
     private static final Notifier drivetrainTelemetryNotifier = new Notifier(drivetrain::updateDashboardData);
     private static final Notifier shooterTelemetryNotifier = new Notifier(shooter::updateDashboardData);
 
     @Override
     public void robotInit() {
-
-        // init PDP ports
-        pdp.addDevice(PDPPortNumber.k0);
-
         if (!drivetrain.isInitSuccessful()) {
             System.out.println("Drivetrain - init FAILED");
         } else if (intake.isInitSuccessful()) {

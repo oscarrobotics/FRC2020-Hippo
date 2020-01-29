@@ -10,6 +10,7 @@ import frc.team832.lib.driverstation.dashboard.DashboardManager;
 import frc.team832.lib.driverstation.dashboard.DashboardUpdatable;
 import frc.team832.lib.motorcontrol.NeutralMode;
 import frc.team832.lib.motorcontrol2.vendor.CANSparkMax;
+import frc.team832.lib.motors.Motor;
 import frc.team832.robot.Constants;
 import frc.team832.robot.accesories.ShooterCalculations;
 
@@ -35,9 +36,9 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
         DashboardManager.addTab(this);
         DashboardManager.getTab(this).add(this);
 
-        primaryMotor = new CANSparkMax(Constants.ShooterValues.PRIMARY_CAN_ID, CANSparkMaxLowLevel.MotorType.kBrushless);
-        secondaryMotor = new CANSparkMax(Constants.ShooterValues.SECONDARY_CAN_ID, CANSparkMaxLowLevel.MotorType.kBrushless);
-        turretMotor = new CANSparkMax(Constants.ShooterValues.TURRET_CAN_ID, CANSparkMaxLowLevel.MotorType.kBrushless);
+        primaryMotor = new CANSparkMax(Constants.ShooterValues.PRIMARY_CAN_ID, Motor.kNEO);
+        secondaryMotor = new CANSparkMax(Constants.ShooterValues.SECONDARY_CAN_ID, Motor.kNEO);
+        turretMotor = new CANSparkMax(Constants.ShooterValues.TURRET_CAN_ID, Motor.kNEO550);
 
         hoodServo = new Servo(Constants.ShooterValues.HOOD_CHANNEL);
 

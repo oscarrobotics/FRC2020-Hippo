@@ -1,11 +1,11 @@
 package frc.team832.robot.subsystems;
 
-import com.revrobotics.CANSparkMaxLowLevel;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.team832.lib.driverstation.dashboard.DashboardManager;
 import frc.team832.lib.driverstation.dashboard.DashboardUpdatable;
 import frc.team832.lib.motorcontrol.NeutralMode;
 import frc.team832.lib.motorcontrol2.vendor.CANSparkMax;
+import frc.team832.lib.motors.Motor;
 import frc.team832.robot.Constants;
 
 import static frc.team832.robot.Robot.pneumatics;
@@ -18,7 +18,7 @@ public class Climber extends SubsystemBase implements DashboardUpdatable {
         DashboardManager.addTab(this);
         DashboardManager.getTab(this).add(this);
 
-        winch = new CANSparkMax(Constants.ClimberValues.WINCH_CAN_ID, CANSparkMaxLowLevel.MotorType.kBrushless);
+        winch = new CANSparkMax(Constants.ClimberValues.WINCH_CAN_ID, Motor.kNEO);
 
         winch.wipeSettings();
 

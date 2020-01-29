@@ -12,11 +12,16 @@ import edu.wpi.first.wpilibj2.command.RunEndCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.team832.lib.drive.SmartDiffDrive;
 import frc.team832.lib.driverstation.dashboard.DashboardUpdatable;
+import frc.team832.lib.driverstation.dashboard.FalconDashboard;
 import frc.team832.lib.motorcontrol2.vendor.CANTalonFX;
 import frc.team832.lib.motors.Motor;
+import frc.team832.lib.power.GrouchPDP;
+import frc.team832.lib.power.PDPPortNumber;
+import frc.team832.lib.power.impl.SmartMCAttachedPDPSlot;
 import frc.team832.lib.sensors.NavXMicro;
 import frc.team832.robot.Constants;
 
+import frc.team832.robot.Robot;
 import frc.team832.robot.accesories.ArcadeDriveProfile;
 import frc.team832.robot.accesories.TankDriveProfile;
 
@@ -45,7 +50,9 @@ public class Drivetrain extends SubsystemBase implements DashboardUpdatable {
     private NetworkTableEntry falconPathYEntry = falconTable.getEntry("pathY");
     private NetworkTableEntry falconPathHeadingEntry = falconTable.getEntry("pathHeading");
 
-    public Drivetrain() {
+    private SmartMCAttachedPDPSlot leftMasterSlot, leftSlaveSlot, rightMasterSlot, rightSlaveSlot;
+
+    public Drivetrain(GrouchPDP pdp) {
         leftMaster = new CANTalonFX(Constants.DrivetrainValues.LEFT_MASTER_CAN_ID);
         leftSlave = new CANTalonFX(Constants.DrivetrainValues.LEFT_SLAVE_CAN_ID);
         rightMaster = new CANTalonFX(Constants.DrivetrainValues.RIGHT_MASTER_CAN_ID);
@@ -63,6 +70,11 @@ public class Drivetrain extends SubsystemBase implements DashboardUpdatable {
         leftSlave.setInverted(false);
         rightMaster.setInverted(false);
         leftSlave.setInverted(false);
+
+        leftMasterSlot = pdp.addDevice(PDPPortNumber.Port0, leftMaster);
+        leftSlaveSlot = pdp.addDevice(PDPPortNumber.Port0, leftSlave);
+        rightMasterSlot = pdp.addDevice(PDPPortNumber.Port0, rightMaster);
+        rightSlaveSlot = pdp.addDevice(PDPPortNumber.Port0, rightSlave);
 
         setCurrentLimit(40);
 

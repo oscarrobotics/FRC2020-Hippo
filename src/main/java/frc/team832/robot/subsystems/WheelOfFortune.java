@@ -8,6 +8,7 @@ import frc.team832.lib.driverinput.controllers.StratComInterface;
 import frc.team832.lib.driverstation.dashboard.DashboardUpdatable;
 import frc.team832.lib.motorcontrol.NeutralMode;
 import frc.team832.lib.motorcontrol2.vendor.CANSparkMax;
+import frc.team832.lib.motors.Motor;
 import frc.team832.robot.Constants;
 import frc.team832.robot.OI;
 import frc.team832.robot.accesories.ColorWheelPath;
@@ -23,7 +24,7 @@ public class WheelOfFortune extends SubsystemBase implements DashboardUpdatable 
     public ColorWheelPath path;
 
     public WheelOfFortune() {
-        spinner = new CANSparkMax(Constants.WOFValues.SPINNER_CAN_ID, CANSparkMaxLowLevel.MotorType.kBrushless);
+        spinner = new CANSparkMax(Constants.WOFValues.SPINNER_CAN_ID, Motor.kNEO550);
 
         spinner.wipeSettings();
         spinner.setNeutralMode(NeutralMode.kBrake);

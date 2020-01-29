@@ -1,9 +1,9 @@
 package frc.team832.robot.subsystems;
 
-import com.revrobotics.CANSparkMaxLowLevel;
-import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.team832.lib.motorcontrol2.vendor.CANSparkMax;
+import frc.team832.lib.motors.Motor;
+import frc.team832.lib.power.GrouchPDP;
 import frc.team832.lib.util.OscarMath;
 import frc.team832.robot.Constants;
 
@@ -16,7 +16,7 @@ public class Intake extends SubsystemBase {
 
 	public Intake() {
 		//Change Can ID
-		intakeMotor = new CANSparkMax(Constants.IntakeValues.INTAKE_MOTOR_CAN_ID, CANSparkMaxLowLevel.MotorType.kBrushless);
+		intakeMotor = new CANSparkMax(Constants.IntakeValues.INTAKE_MOTOR_CAN_ID, Motor.kNEO550);
 
 		intakeMotor.wipeSettings();
 
