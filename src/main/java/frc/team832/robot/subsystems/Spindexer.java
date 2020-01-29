@@ -7,14 +7,11 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.team832.lib.motorcontrol.NeutralMode;
 import frc.team832.lib.motorcontrol2.vendor.CANSparkMax;
 import frc.team832.lib.util.OscarMath;
-import frc.team832.lib.util.StallStatus;
 import frc.team832.robot.Constants;
 import frc.team832.robot.accesories.SpindexerStatus;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static frc.team832.robot.Robot.stallStatus;
 
 public class Spindexer extends SubsystemBase {
 	private boolean initSuccessful = false;
@@ -26,6 +23,8 @@ public class Spindexer extends SubsystemBase {
 	private final List<Boolean> ballStatus = new ArrayList<>();
 	public PIDController feedPID = new PIDController(Constants.SpindexerValues.FEED_kP, 0, Constants.SpindexerValues.FEED_kD);
 	public PIDController spinPID = new PIDController(Constants.SpindexerValues.SPIN_kP, 0, Constants.SpindexerValues.SPIN_kD);
+
+
 
 	public Spindexer() {
 		spinMotor = new CANSparkMax(Constants.SpindexerValues.SPIN_MOTOR_CAN_ID, CANSparkMaxLowLevel.MotorType.kBrushless);
@@ -115,7 +114,8 @@ public class Spindexer extends SubsystemBase {
 	}
 
 	public boolean isStalled() {
-		return stallStatus.isStalling(Constants.SpindexerValues.SPIN_MOTOR_PDP_SLOT, Constants.SpindexerValues.STALL_CURRENT, Constants.SpindexerValues.STALL_SEC) == StallStatus.StallState.STALLED;
+		// TODO: fix stall detection
+		return false;
 	}
 
 	public void setTargetPosition(int pos) {

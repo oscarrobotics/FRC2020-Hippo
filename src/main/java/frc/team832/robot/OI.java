@@ -11,6 +11,7 @@ import frc.team832.robot.subsystems.SuperStructure;
 
 import static frc.team832.robot.Robot.*;
 
+@SuppressWarnings("WeakerAccess")
 public class OI {
 	public final DriverOI driverOI;
 	public static final boolean isSticks = true;
@@ -28,6 +29,10 @@ public class OI {
 			driverOI = new XboxDriverOI();
 		}
 
+		configureButtonBindings();
+	}
+
+	private void configureButtonBindings() {
 		// do commands here
 		stratComInterface.getArcadeBlackLeft().whileHeld(new StartEndCommand(climber::windWinch, climber::stopWinch, Robot.climber));
 		stratComInterface.getArcadeWhiteLeft().whileHeld(new StartEndCommand(climber::unwindWinch, climber::stopWinch, Robot.climber));
