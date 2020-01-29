@@ -129,7 +129,7 @@ public class Drivetrain extends SubsystemBase implements DashboardUpdatable {
 
     @Override
     public void updateDashboardData () {
-
+        FalconDashboard.updateRobotPose2d(pose);
     }
 
     public double getRightDistanceMeters () {
@@ -161,17 +161,6 @@ public class Drivetrain extends SubsystemBase implements DashboardUpdatable {
 
         leftMaster.set(latestLeftWheelVolts);
         rightMaster.set(latestRightWheelVolts);
-    }
-
-    public void updateDashboardPose() {
-        var translation = pose.getTranslation();
-        var poseX = translation.getX();
-        var poseY = translation.getY();
-        var heading = pose.getRotation();
-
-        falconPoseXEntry.setDouble(Units.metersToFeet(poseX));
-        falconPoseYEntry.setDouble(Units.metersToFeet(poseY));
-        falconPoseHeadingEntry.setDouble(heading.getRadians());
     }
 
     public Pose2d getLatestPose() {
