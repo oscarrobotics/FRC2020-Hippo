@@ -1,6 +1,5 @@
 package frc.team832.robot.subsystems;
 
-import com.revrobotics.CANSparkMaxLowLevel;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -17,6 +16,8 @@ import java.util.List;
 public class Spindexer extends SubsystemBase {
 	private boolean initSuccessful = false;
 	private SpinnerDirection currentSpinDirection;
+	private int spindexerRotations = 0;
+	private int tempSpindexerRotations = 0;
 
 	private final CANSparkMax spinMotor, feedMotor;
 	private final DigitalInput hallEffect;
@@ -54,6 +55,8 @@ public class Spindexer extends SubsystemBase {
 	public void periodic() {
 		if(getHallEffect()) {
 			zeroSpindexer();
+			if (currentSpinDirection == SpinnerDirection.Clockwise) spindexerRotations++;
+			else spindexerRotations--;
 		}
 		spindexerStatus.update(ballStatus);
 	}
@@ -135,9 +138,11 @@ public class Spindexer extends SubsystemBase {
 		return hallEffect.get();
 	}
 
-	public double getFeederPosition() {
+	public double getRelativeFeederPosition() {
 		return feedMotor.getSensorPosition();
 	}
+
+	public double getAbsoluteFeederPosition() { return getRelativeFeederPosition() + spindexerRotations; }
 
 	public boolean isInitSuccessful() {
 		return initSuccessful;
@@ -148,7 +153,18 @@ public class Spindexer extends SubsystemBase {
 	public SpindexerStatus.SpindexerState getState() { return spindexerStatus.getState(); }
 
 	public boolean atFeedRpm() {
-		return Math.abs(spinMotor.getSensorVelocity() - Constants.SpindexerValues.FEED_RPM) < 100;
+		return Math.abs(feedMotor.getSensorVelocity() - Constants.SpindexerValues.FEED_RPM) < 100;
+	}
+
+	public boolean isUnloaded() {
+		if (tempSpindexerRotations == 0) {
+			tempSpindexerRotations = spindexerRotations;
+		}
+		if (Math.abs(tempSpindexerRotations - spindexerRotations) > 2) {
+			tempSpindexerRotations = 0;
+			return true;
+		}
+		return false;
 	}
 
 	public void setToEmpty() {

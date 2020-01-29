@@ -5,7 +5,11 @@ import frc.team832.lib.driverstation.dashboard.DashboardUpdatable;
 import frc.team832.lib.vision.VisionTarget;
 
 public class Vision extends SubsystemBase implements DashboardUpdatable {
-	public Vision() { super(); }
+	private boolean initSuccessful = false;
+	public Vision() {
+		super();
+		initSuccessful = true;
+	}
 
 	public void consumeTarget (VisionTarget target) {}
 
@@ -18,5 +22,9 @@ public class Vision extends SubsystemBase implements DashboardUpdatable {
 	public void updateDashboardData () {
 
 	}
+
+    public boolean isInitSuccessful() {
+		return initSuccessful;
+    }
 }
 

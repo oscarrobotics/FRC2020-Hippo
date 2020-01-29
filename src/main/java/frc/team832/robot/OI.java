@@ -7,6 +7,8 @@ import frc.team832.lib.driverinput.controllers.*;
 import frc.team832.lib.driverinput.oi.DriverOI;
 import frc.team832.lib.driverinput.oi.SticksDriverOI;
 import frc.team832.lib.driverinput.oi.XboxDriverOI;
+import frc.team832.robot.commands.PrepareShooter;
+import frc.team832.robot.commands.ShootCommandGroup;
 import frc.team832.robot.subsystems.SuperStructure;
 
 import static frc.team832.robot.Robot.*;
@@ -37,11 +39,11 @@ public class OI {
 		stratComInterface.getArcadeBlackLeft().whileHeld(new StartEndCommand(climber::windWinch, climber::stopWinch, Robot.climber));
 		stratComInterface.getArcadeWhiteLeft().whileHeld(new StartEndCommand(climber::unwindWinch, climber::stopWinch, Robot.climber));
 
-		stratComInterface.getSCSideTop().whileHeld(new StartEndCommand(() -> superStructure.setMode(SuperStructure.SuperstructureMode.Intake), () -> superStructure.setMode(SuperStructure.SuperstructureMode.Idle)));
-		stratComInterface.getSCSideBot().whileHeld(new StartEndCommand(() -> superStructure.setMode(SuperStructure.SuperstructureMode.Outtake), () -> superStructure.setMode(SuperStructure.SuperstructureMode.Idle)));
+		stratComInterface.getSCSideTop().whileHeld(new StartEndCommand(superStructure::intake, superStructure::idle));
+		stratComInterface.getSCSideBot().whileHeld(new StartEndCommand(superStructure::outtake, superStructure::idle));
 
-		stratComInterface.getArcadeBlackRight().whenPressed(new StartEndCommand(() -> superStructure.setMode(SuperStructure.SuperstructureMode.PrepareShoot), () -> superStructure.setMode(SuperStructure.SuperstructureMode.Idle)));
-		stratComInterface.getArcadeWhiteRight().whileHeld(new StartEndCommand(() -> superStructure.setMode(SuperStructure.SuperstructureMode.Shooting), () -> superStructure.setMode(SuperStructure.SuperstructureMode.Idle)));
+		stratComInterface.getArcadeBlackRight().whenPressed(new PrepareShooter(superStructure));
+		stratComInterface.getArcadeWhiteRight().whileHeld(new ShootCommandGroup(superStructure));
 
 		stratComInterface.getSC2().whileHeld(new RunEndCommand(pneumatics::extendWOFManipulator, pneumatics::retractWOFManipulator, Robot.pneumatics));
 		stratComInterface.getSC1().whileHeld(new StartEndCommand(wheelOfFortune::spinCounterClockWise, wheelOfFortune::stopSpin, Robot.wheelOfFortune));

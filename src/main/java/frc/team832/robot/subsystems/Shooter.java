@@ -82,6 +82,7 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
     @Override
     public void periodic() {
         updatePIDMode();
+//        shooterCalcs.calculate();
     }
 
     @Override

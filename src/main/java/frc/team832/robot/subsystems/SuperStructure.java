@@ -1,18 +1,19 @@
 package frc.team832.robot.subsystems;
 
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.team832.robot.Constants;
+import org.jetbrains.annotations.NotNull;
 
 public class SuperStructure extends SubsystemBase {
-
-	private SuperstructureMode superstructureMode = SuperstructureMode.Idle, lastSuperstructureMode = SuperstructureMode.Idle;
 
 	private Intake intake;
 	private Shooter shooter;
 	private Spindexer spindexer;
 	private Pneumatics pneumatics;
 
-	public SuperStructure(Intake intake, Shooter shooter, Spindexer spindexer, Pneumatics pneumatics){
+	public SuperStructure(@NotNull Intake intake, @NotNull Shooter shooter, @NotNull Spindexer spindexer, @NotNull Pneumatics pneumatics) {
 		this.intake = intake;
 		this.shooter = shooter;
 		this.spindexer = spindexer;
@@ -21,30 +22,10 @@ public class SuperStructure extends SubsystemBase {
 
 	@Override
 	public void periodic() {
-		runSuperStructure();
+
 	}
 
-	public void runSuperStructure () {
-		switch (superstructureMode) {
-			case Intake:
-				intake();
-				break;
-			case Outtake:
-				outtake();
-				break;
-			case PrepareShoot:
-				prepareShoot();
-				break;
-			case Shooting:
-				shooting();
-				break;
-			case Idle:
-				idle();
-				break;
-		}
-	}
-
-	private void intake() {
+	public void intake() {
 		if (spindexer.isStalled()) {
 			spindexer.setSpinRPM(Constants.SpindexerValues.SpinPowertrain.calculateMotorRpmFromWheelRpm(60), Spindexer.SpinnerDirection.Clockwise);
 		} else {
@@ -54,25 +35,25 @@ public class SuperStructure extends SubsystemBase {
 		pneumatics.extendIntake();
 	}
 
-	private void outtake() {
+	public void outtake() {
 		intake.outtake(Constants.IntakeValues.IntakePowertrain.calculateMotorRpmFromSurfaceSpeed(5));
 		spindexer.setSpinRPM(Constants.SpindexerValues.SpinPowertrain.calculateMotorRpmFromWheelRpm(60), Spindexer.SpinnerDirection.CounterClockwise);
 		pneumatics.extendIntake();
 	}
 
-	private void prepareShoot() {
+	public void prepareShoot() {
 		spindexer.stopSpin();
 		shooter.spinUp();
 		pneumatics.propUp();
 		spindexer.setFeedRPM(Constants.SpindexerValues.FEED_RPM);
 	}
 
-	private void shooting() {
+	public void shoot() {
 		shooter.setMode(Shooter.ShootMode.Shooting);
 		spindexer.setSpinRPM(Constants.SpindexerValues.SpinPowertrain.calculateMotorRpmFromWheelRpm(120), Spindexer.SpinnerDirection.CounterClockwise);
 	}
 
-	private void idle() {
+	public void idle() {
 		stopIntake();
 		pneumatics.retractProp();
 		idleSpindexer();
@@ -92,22 +73,11 @@ public class SuperStructure extends SubsystemBase {
 		spindexer.stopFeed();
 	}
 
-	public void setMode(SuperstructureMode mode) {
-		if (superstructureMode != SuperstructureMode.Shooting && superstructureMode != SuperstructureMode.PrepareShoot) {
-			lastSuperstructureMode = this.superstructureMode;
-			this.superstructureMode = mode;
-		}
+	public boolean isSpindexerUnloaded() {
+		return spindexer.isUnloaded();
 	}
 
 	public boolean isShooterPrepared() {
 		return shooter.readyToShoot() && spindexer.atFeedRpm();
-	}
-
-	public enum SuperstructureMode {
-		Intake,
-		Outtake,
-		PrepareShoot,
-		Shooting,
-		Idle
 	}
 }

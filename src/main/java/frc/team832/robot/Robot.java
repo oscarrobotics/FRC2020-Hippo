@@ -39,8 +39,8 @@ public class Robot extends TimedRobot {
             System.out.println("Drivetrain - init FAILED");
         } else if (intake.isInitSuccessful()) {
             System.out.println("Intake - init FAILED");
-//    } else if (vision.isInitSuccessful()) {
-//      System.out.println("Vision - init FAILED");
+        } else if (vision.isInitSuccessful()) {
+            System.out.println("Vision - init FAILED");
         } else if (shooter.isInitSuccessful()) {
             System.out.println("Shooter - init FAILED");
         } else if (spindexer.isInitSuccessful()) {

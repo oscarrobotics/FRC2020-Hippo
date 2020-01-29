@@ -6,6 +6,7 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.team832.lib.motion.PathHelper;
 import frc.team832.robot.Constants;
 import frc.team832.robot.Robot;
+import frc.team832.robot.commands.ShootCommandGroup;
 import frc.team832.robot.subsystems.SuperStructure;
 import frc.team832.robot.subsystems.Drivetrain;
 import frc.team832.robot.subsystems.Spindexer;
@@ -18,31 +19,19 @@ public class ComplexAutonomous extends SequentialCommandGroup {
 
 	public ComplexAutonomous(SuperStructure superStructure, Spindexer spindexer, Drivetrain drivetrain) {
 		addCommands(
-			new ShootCommandGroup(superStructure, spindexer),
+			new ShootCommandGroup(superStructure),
 			new FollowPath(ToFarSideTrench, drivetrain),
-			new InstantCommand(() -> Robot.superStructure.setMode(SuperStructure.SuperstructureMode.Intake)),
+			new InstantCommand(superStructure::intake),
 			new FollowPath(ToCloseSideTrench, drivetrain),
-			new InstantCommand(() -> Robot.superStructure.setMode(SuperStructure.SuperstructureMode.Idle)),
+			new InstantCommand(superStructure::idle),
 			new FollowPath(ToFarSideTrench, drivetrain),
-			new ShootCommandGroup(superStructure, spindexer),
-			new InstantCommand(() -> Robot.superStructure.setMode(SuperStructure.SuperstructureMode.Intake)),
+			new ShootCommandGroup(superStructure),
+			new InstantCommand(superStructure::intake),
 			new FollowPath(ToShieldGenCloseToTrench, drivetrain),
-			new InstantCommand(() -> Robot.superStructure.setMode(SuperStructure.SuperstructureMode.Idle)),
+			new InstantCommand(superStructure::idle),
 			new FollowPath(ToFarSideTrench, drivetrain),
-			new ShootCommandGroup(superStructure, spindexer)
+			new ShootCommandGroup(superStructure)
 			);
 		addRequirements(superStructure, spindexer, drivetrain);
-
-
-//		addCommands(
-//			new ShootCommandGroup(superStructure, spindexer),
-//			new FollowPath(ToFarSideTrench, drivetrain),
-//			new InstantCommand(() -> Robot.superStructure.setMode(SuperStructure.SuperstructureMode.Intake)),
-//			new FollowPath(ToCloseSideTrench, drivetrain),
-//			new InstantCommand(() -> Robot.superStructure.setMode(SuperStructure.SuperstructureMode.Idle)),
-//			new FollowPath(ToFarSideTrench, drivetrain),
-//			new ShootCommandGroup(superStructure, spindexer)
-//		);
-//		addRequirements(superStructure, spindexer, drivetrain);
 	}
 }
