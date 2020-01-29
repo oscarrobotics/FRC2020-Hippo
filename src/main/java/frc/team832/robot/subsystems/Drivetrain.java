@@ -71,10 +71,10 @@ public class Drivetrain extends SubsystemBase implements DashboardUpdatable {
         rightMaster.setInverted(false);
         leftSlave.setInverted(false);
 
-        leftMasterSlot = pdp.addDevice(PDPPortNumber.Port15, leftMaster);
-        leftSlaveSlot = pdp.addDevice(PDPPortNumber.Port14, leftSlave);
-        rightMasterSlot = pdp.addDevice(PDPPortNumber.Port0, rightMaster);
-        rightSlaveSlot = pdp.addDevice(PDPPortNumber.Port1, rightSlave);
+        leftMasterSlot = pdp.addDevice(Constants.DrivetrainValues.LEFT_MASTER_PDP_PORT, leftMaster);
+        leftSlaveSlot = pdp.addDevice(Constants.DrivetrainValues.LEFT_SLAVE_PDP_PORT, leftSlave);
+        rightMasterSlot = pdp.addDevice(Constants.DrivetrainValues.RIGHT_MASTER_PDP_PORT, rightMaster);
+        rightSlaveSlot = pdp.addDevice(Constants.DrivetrainValues.RIGHT_SLAVE_PDP_PORT, rightSlave);
 
         setCurrentLimit(40);
 

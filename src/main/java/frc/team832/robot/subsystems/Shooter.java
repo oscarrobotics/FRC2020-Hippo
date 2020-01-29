@@ -12,13 +12,14 @@ import frc.team832.lib.motorcontrol.NeutralMode;
 import frc.team832.lib.motorcontrol2.vendor.CANSparkMax;
 import frc.team832.lib.motors.Motor;
 import frc.team832.robot.Constants;
+import frc.team832.robot.Robot;
 import frc.team832.robot.accesories.ShooterCalculations;
 
 public class Shooter extends SubsystemBase implements DashboardUpdatable {
 
     private boolean initSuccessful = false;
 
-    private CANSparkMax primaryMotor, secondaryMotor, turretMotor; //if needed add hood motor
+    private CANSparkMax primaryMotor, secondaryMotor, turretMotor, feedMotor; //if needed add hood motor
     private NetworkTableEntry dashboard_wheelRPM, dashboard_PID, dashboard_hoodPos, dashboard_turretPos;
     private Servo hoodServo;
 
@@ -29,6 +30,7 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
     PIDController flywheelPID = new PIDController(Constants.ShooterValues.IDLE_kP,0, Constants.ShooterValues.IDLE_kD);
     PIDController turretPID = new PIDController(Constants.ShooterValues.SHOOTING_kP, 0, Constants.ShooterValues.TURRET_kD);
     PIDController hoodPID = new PIDController(Constants.ShooterValues.HOOD_kP, 0, Constants.ShooterValues.HOOD_kD);
+    public PIDController feedPID = new PIDController(Constants.SpindexerValues.FEED_kP, 0, Constants.SpindexerValues.FEED_kD);
 
     private ShooterCalculations shooterCalcs = new ShooterCalculations();
 
@@ -39,12 +41,14 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
         primaryMotor = new CANSparkMax(Constants.ShooterValues.PRIMARY_CAN_ID, Motor.kNEO);
         secondaryMotor = new CANSparkMax(Constants.ShooterValues.SECONDARY_CAN_ID, Motor.kNEO);
         turretMotor = new CANSparkMax(Constants.ShooterValues.TURRET_CAN_ID, Motor.kNEO550);
+        feedMotor = new CANSparkMax(Constants.SpindexerValues.FEED_MOTOR_CAN_ID, Motor.kNEO);
 
         hoodServo = new Servo(Constants.ShooterValues.HOOD_CHANNEL);
 
         primaryMotor.wipeSettings();
         secondaryMotor.wipeSettings();
         turretMotor.wipeSettings();
+        feedMotor.wipeSettings();
 
         secondaryMotor.follow(primaryMotor);
 
@@ -54,6 +58,8 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
 
         turretMotor.setNeutralMode(NeutralMode.kBrake);
 
+        feedMotor.setNeutralMode(NeutralMode.kCoast);
+
         primaryMotor.setInverted(false);
         secondaryMotor.setInverted(false);
         primaryMotor.setSensorPhase(true);
@@ -61,6 +67,9 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
 
         turretMotor.setInverted(false);
         turretMotor.setSensorPhase(true);
+
+        feedMotor.setInverted(false);
+        feedMotor.setSensorPhase(true);
 
         turretLimitInput = new CANDigitalInput(turretMotor.getBaseController(), CANDigitalInput.LimitSwitch.kForward, CANDigitalInput.LimitSwitchPolarity.kNormallyOpen);
 
@@ -163,6 +172,23 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
     public void setCurrentLimit(int limit) {
         primaryMotor.limitInputCurrent(limit);
         secondaryMotor.limitInputCurrent(limit);
+        feedMotor.limitInputCurrent(limit);
+    }
+
+    public void stopFeed() {
+        feedMotor.set(0);
+    }
+
+    public void feed(double pow) {
+        feedMotor.set(pow);
+    }
+
+    public void setFeedRPM(double rpm) {
+        feedPID.calculate(feedMotor.getSensorVelocity(), rpm);
+    }
+
+    public boolean atFeedRpm() {
+        return Math.abs(feedMotor.getSensorVelocity() - Constants.SpindexerValues.FEED_RPM) < 100;
     }
 
     public enum ShootMode {

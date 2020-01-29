@@ -1,5 +1,6 @@
 package frc.team832.robot.accesories;
 
+import edu.wpi.first.wpilibj.SlewRateLimiter;
 import frc.team832.lib.drive.SmartDiffDrive;
 import frc.team832.lib.driverinput.oi.DriveAxesSupplier;
 import frc.team832.lib.driverinput.oi.SticksDriverOI;
@@ -12,6 +13,8 @@ public class TankDriveProfile {
     public double leftPow;
     public double rightPow;
     public SmartDiffDrive.LoopMode loopMode;
+    public SlewRateLimiter rightStickLimiter = new SlewRateLimiter(4);
+    public SlewRateLimiter leftStickLimiter = new SlewRateLimiter(4);
 
     public TankDriveProfile(double leftPow, double rightPow, SmartDiffDrive.LoopMode mode) {
         setSpeeds(leftPow, rightPow, mode);
@@ -71,8 +74,8 @@ public class TankDriveProfile {
         double rightPower = 0;
         double leftPower = 0;
         DriveAxesSupplier axes = oi.driverOI.getGreenbergDriveAxes();
-        double rightStick = axes.getRightY();
-        double leftStick = axes.getLeftY();
+        double rightStick = rightStickLimiter.calculate(axes.getRightY());
+        double leftStick = leftStickLimiter.calculate(axes.getLeftY());
 
         rightPower = OscarMath.signumPow(rightStick * Constants.DrivetrainValues.StickDriveMultiplier, 2);
         leftPower = OscarMath.signumPow(leftStick * Constants.DrivetrainValues.StickDriveMultiplier, 2);
@@ -92,8 +95,8 @@ public class TankDriveProfile {
     }
 
     TankDriveProfile getTankPreciseRotateProfile() {
-        double rightPower = 0;
-        double leftPower = 0;
+        double rightPower;
+        double leftPower;
         DriveAxesSupplier axes = oi.driverOI.getGreenbergDriveAxes();
         rightPower = -OscarMath.signumPow(axes.getRotation() * Constants.DrivetrainValues.StickRotateMultiplier, 2);
         leftPower = OscarMath.signumPow(axes.getRotation() * Constants.DrivetrainValues.StickRotateMultiplier, 2);

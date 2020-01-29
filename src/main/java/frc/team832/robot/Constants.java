@@ -29,6 +29,11 @@ public class Constants {
         public static final double DriveWheelDiameter = Units.inchesToMeters(6);
         public static final float DriveGearReduction = 1f / (9f/84f);
 
+        public static final PDPPortNumber LEFT_MASTER_PDP_PORT = PDPPortNumber.Port15;
+        public static final PDPPortNumber LEFT_SLAVE_PDP_PORT = PDPPortNumber.Port14;
+        public static final PDPPortNumber RIGHT_MASTER_PDP_PORT = PDPPortNumber.Port0;
+        public static final PDPPortNumber RIGHT_SLAVE_PDP_PORT = PDPPortNumber.Port1;
+
         private static final Gearbox DriveGearbox = new Gearbox(DriveGearReduction);
         public static final WheeledPowerTrain DrivePowerTrain = new WheeledPowerTrain(DriveGearbox, Motor.kFalcon500, 2, DriveWheelDiameter);
         public static DifferentialDriveKinematics DriveKinematics = new DifferentialDriveKinematics(Units.inchesToMeters(29.0));
@@ -52,6 +57,10 @@ public class Constants {
     }
 
     public static class ShooterValues {
+        public static final PDPPortNumber PRIMARY_PDP_SLOT = PDPPortNumber.Port0;
+        public static final PDPPortNumber SECONDARY_PDP_SLOT = PDPPortNumber.Port0;
+        public static final PDPPortNumber TURRET_PDP_SLOT = PDPPortNumber.Port0;
+
         public static final int PRIMARY_CAN_ID = 2;
         public static final int SECONDARY_CAN_ID = 3;
         public static final int TURRET_CAN_ID = 4;
@@ -97,11 +106,11 @@ public class Constants {
         public static final double IDLE_kP = 0;
         public static final double IDLE_kD = 0;
         public static final double IDLE_kF = 0;
-
-
     }
 
     public static class IntakeValues {
+        public static final PDPPortNumber INTAKE_MOTOR_PDP_SLOT = PDPPortNumber.Port0;
+
         public static final int INTAKE_MOTOR_CAN_ID = 1;
 
         public static final float IntakeReduction = 1f / (18f/36f);
@@ -118,10 +127,11 @@ public class Constants {
     }
 
     public static class SpindexerValues {
+        public static final PDPPortNumber SPIN_MOTOR_PDP_SLOT = PDPPortNumber.Port0;
+        public static final PDPPortNumber FEED_MOTOR_PDP_SLOT = PDPPortNumber.Port0;
+
         public static final int SPIN_MOTOR_CAN_ID = 5;
         public static final int FEED_MOTOR_CAN_ID = 6;
-
-        public static final int SPIN_MOTOR_PDP_SLOT = 0;
 
         public static final int HALL_EFFECT_CHANNEL = 0;
 

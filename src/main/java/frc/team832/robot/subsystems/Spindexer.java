@@ -20,31 +20,25 @@ public class Spindexer extends SubsystemBase {
 	private int tempSpindexerRotations = 0;
 	private double lastSpinSpeed = 0;
 
-	private final CANSparkMax spinMotor, feedMotor;
+	private final CANSparkMax spinMotor;
 	private final DigitalInput hallEffect;
 	private SpindexerStatus spindexerStatus = new SpindexerStatus();
 	private final List<Boolean> ballStatus = new ArrayList<>();
-	public PIDController feedPID = new PIDController(Constants.SpindexerValues.FEED_kP, 0, Constants.SpindexerValues.FEED_kD);
 	public PIDController spinPID = new PIDController(Constants.SpindexerValues.SPIN_kP, 0, Constants.SpindexerValues.SPIN_kD);
 
 
 
 	public Spindexer() {
 		spinMotor = new CANSparkMax(Constants.SpindexerValues.SPIN_MOTOR_CAN_ID, Motor.kNEO);
-		feedMotor = new CANSparkMax(Constants.SpindexerValues.FEED_MOTOR_CAN_ID, Motor.kNEO);
 
 		spinMotor.wipeSettings();
-		feedMotor.wipeSettings();
 
 		setCurrentLimit(30); //this might change
 
 		spinMotor.setInverted(false); //these might change
-		feedMotor.setInverted(false);
 
 		spinMotor.setSensorPhase(true);
-		feedMotor.setSensorPhase(true);
 
-		feedMotor.setNeutralMode(NeutralMode.kCoast);
 		spinMotor.setNeutralMode(NeutralMode.kBrake);
 
 		hallEffect = new DigitalInput(Constants.SpindexerValues.HALL_EFFECT_CHANNEL);
@@ -64,20 +58,14 @@ public class Spindexer extends SubsystemBase {
 
 	public void setCurrentLimit(int currentLimit) {
 		spinMotor.limitInputCurrent(currentLimit);
-		feedMotor.limitInputCurrent(currentLimit);
 	}
 
 	public void stopAll() {
 		stopSpin();
-		stopFeed();
 	}
 
 	public void stopSpin() {
 		spinMotor.set(0);
-	}
-
-	public void stopFeed() {
-		feedMotor.set(0);
 	}
 
 	public void spinCounterclockwise(double pow) {
@@ -88,14 +76,6 @@ public class Spindexer extends SubsystemBase {
 	public void spinClockwise(double pow) {
 		spinMotor.set(OscarMath.clip(pow, 0, 1));
 		currentSpinDirection = SpinnerDirection.Clockwise;
-	}
-
-	public void feed(double pow) {
-		feedMotor.set(pow);
-	}
-
-	public void setFeedRPM(double rpm) {
-		feedPID.calculate(feedMotor.getSensorVelocity(), rpm);
 	}
 
 	public enum SpinnerDirection {
@@ -140,12 +120,6 @@ public class Spindexer extends SubsystemBase {
 		return hallEffect.get();
 	}
 
-	public double getRelativeFeederPosition() {
-		return feedMotor.getSensorPosition();
-	}
-
-	public double getAbsoluteFeederPosition() { return getRelativeFeederPosition() + spindexerRotations; }
-
 	public boolean isInitSuccessful() {
 		return initSuccessful;
 	}
@@ -154,9 +128,12 @@ public class Spindexer extends SubsystemBase {
 
 	public SpindexerStatus.SpindexerState getState() { return spindexerStatus.getState(); }
 
-	public boolean atFeedRpm() {
-		return Math.abs(feedMotor.getSensorVelocity() - Constants.SpindexerValues.FEED_RPM) < 100;
+	public double getRelativeSpinPosition () {
+		return spinMotor.getSensorPosition();
 	}
+
+	public double getAbsoluteSpinPosition () {
+		return getRelativeSpinPosition() + spindexerRotations; }
 
 	public void switchSpin() {
 		setSpinRPM(lastSpinSpeed, currentSpinDirection == SpinnerDirection.Clockwise ? SpinnerDirection.CounterClockwise : SpinnerDirection.Clockwise);

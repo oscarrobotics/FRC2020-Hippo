@@ -43,7 +43,7 @@ public class SuperStructure extends SubsystemBase {
 		spindexer.stopSpin();
 		shooter.spinUp();
 		pneumatics.propUp();
-		spindexer.setFeedRPM(Constants.SpindexerValues.FEED_RPM);
+		shooter.setFeedRPM(Constants.SpindexerValues.FEED_RPM);
 	}
 
 	public void shoot() {
@@ -78,6 +78,6 @@ public class SuperStructure extends SubsystemBase {
 	}
 
 	public boolean isShooterPrepared() {
-		return shooter.readyToShoot() && spindexer.atFeedRpm();
+		return shooter.readyToShoot() && shooter.atFeedRpm();
 	}
 }
