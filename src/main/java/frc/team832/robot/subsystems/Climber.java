@@ -12,22 +12,23 @@ import static frc.team832.robot.Robot.pneumatics;
 
 public class Climber extends SubsystemBase implements DashboardUpdatable {
     private boolean initSuccessful;
-    private CANSparkMax winch;
+    private final CANSparkMax leftWinch, rightWinch;
 
     public Climber() {
         DashboardManager.addTab(this);
         DashboardManager.getTab(this).add(this);
 
-        winch = new CANSparkMax(Constants.ClimberValues.WINCH_CAN_ID, Motor.kNEO);
+        leftWinch = new CANSparkMax(Constants.ClimberValues.LEFT_WINCH_CAN_ID, Motor.kNEO);
+        rightWinch = new CANSparkMax(Constants.ClimberValues.RIGHT_WINCH_CAN_ID, Motor.kNEO);
 
-        winch.wipeSettings();
+        leftWinch.wipeSettings();
 
-        winch.setNeutralMode(NeutralMode.kBrake);
+        leftWinch.setNeutralMode(NeutralMode.kBrake);
 
-        winch.setInverted(false);
-        winch.setSensorPhase(true);
+        leftWinch.setInverted(false);
+        leftWinch.setSensorPhase(true);
 
-        winch.limitInputCurrent(40);
+        leftWinch.limitInputCurrent(40);
 
         initSuccessful = true;
     }
@@ -36,16 +37,16 @@ public class Climber extends SubsystemBase implements DashboardUpdatable {
 
     public void unwindWinch() {
         pneumatics.unlockClimb();
-        winch.set(-Constants.ClimberValues.WINCH_POWER);
+        leftWinch.set(-Constants.ClimberValues.WINCH_POWER);
     }
 
     public void windWinch() {
         pneumatics.unlockClimb();
-        winch.set(Constants.ClimberValues.WINCH_POWER);
+        leftWinch.set(Constants.ClimberValues.WINCH_POWER);
     }
 
     public void stopWinch() {
-        winch.set(0);
+        leftWinch.set(0);
         pneumatics.lockClimb();
     }
 

@@ -121,6 +121,11 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
         turretTrackTarget();
     }
 
+    public void idle() {
+        setMode(ShootMode.Idle);
+    }
+
+
     private void setRPM(double rpm) {
         double power = flywheelPID.calculate(primaryMotor.getSensorVelocity(), rpm);
         dashboard_PID.setDouble(power);

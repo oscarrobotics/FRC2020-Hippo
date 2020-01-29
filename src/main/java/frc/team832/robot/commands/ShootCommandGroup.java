@@ -11,7 +11,7 @@ public class ShootCommandGroup extends SequentialCommandGroup {
     public ShootCommandGroup(SuperStructure superStructure) {
         addCommands(
                 new PrepareShooter(superStructure),
-                new FunctionalCommand(superStructure::shoot, () -> {} , ignoredBoolean -> {}, superStructure::isSpindexerUnloaded, superStructure)
+                new FunctionalCommand(superStructure::shoot, () -> {} , superStructure::idleShooter, superStructure::isSpindexerUnloaded, superStructure)
         );
         addRequirements(superStructure);
     }

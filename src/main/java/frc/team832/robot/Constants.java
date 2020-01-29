@@ -12,6 +12,7 @@ import frc.team832.lib.motion.PathHelper;
 import frc.team832.lib.motors.WheeledPowerTrain;
 import frc.team832.lib.motors.Gearbox;
 import frc.team832.lib.motors.Motor;
+import frc.team832.lib.power.PDPPortNumber;
 
 public class Constants {
     public static class DrivetrainValues {
@@ -147,12 +148,15 @@ public class Constants {
     }
 
     public static class ClimberValues {
-        public static final int WINCH_CAN_ID = 7;
+        public static final int LEFT_WINCH_CAN_ID = 7;
+        public static final PDPPortNumber LEFT_WINCH_PDP_PORT = PDPPortNumber.Port13;
+        public static final int RIGHT_WINCH_CAN_ID = 8;
+        public static final PDPPortNumber RIGHT_WINCH_PDP_PORT = PDPPortNumber.Port2;
         public static final double WINCH_POWER = .5;
     }
 
     public static class WOFValues {
-        public static final int SPINNER_CAN_ID = 8;
+        public static final int SPINNER_CAN_ID = 9;
         public static final double RevsToTicks = .0002;// 5000 encoder ticks = 1 color wheel revolution (just a guess)
         public static final double BASIC_SPIN_POW = 0.8;
     }

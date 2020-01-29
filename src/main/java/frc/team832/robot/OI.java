@@ -39,8 +39,8 @@ public class OI {
 		stratComInterface.getArcadeBlackLeft().whileHeld(new StartEndCommand(climber::windWinch, climber::stopWinch, Robot.climber));
 		stratComInterface.getArcadeWhiteLeft().whileHeld(new StartEndCommand(climber::unwindWinch, climber::stopWinch, Robot.climber));
 
-		stratComInterface.getSCSideTop().whileHeld(new StartEndCommand(superStructure::intake, superStructure::idle));
-		stratComInterface.getSCSideBot().whileHeld(new StartEndCommand(superStructure::outtake, superStructure::idle));
+		stratComInterface.getSCSideTop().whileHeld(new StartEndCommand(superStructure::intake, superStructure::idleIntake));
+		stratComInterface.getSCSideBot().whileHeld(new StartEndCommand(superStructure::outtake, superStructure::idleIntake));
 
 		stratComInterface.getArcadeBlackRight().whenPressed(new PrepareShooter(superStructure));
 		stratComInterface.getArcadeWhiteRight().whileHeld(new ShootCommandGroup(superStructure));

@@ -4,8 +4,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.team832.robot.Constants;
-import org.jetbrains.annotations.NotNull;
-
 public class SuperStructure extends SubsystemBase {
 
 	private Intake intake;
@@ -13,7 +11,7 @@ public class SuperStructure extends SubsystemBase {
 	private Spindexer spindexer;
 	private Pneumatics pneumatics;
 
-	public SuperStructure(@NotNull Intake intake, @NotNull Shooter shooter, @NotNull Spindexer spindexer, @NotNull Pneumatics pneumatics) {
+	public SuperStructure(Intake intake, Shooter shooter, Spindexer spindexer, Pneumatics pneumatics) {
 		this.intake = intake;
 		this.shooter = shooter;
 		this.spindexer = spindexer;
@@ -22,7 +20,7 @@ public class SuperStructure extends SubsystemBase {
 
 	@Override
 	public void periodic() {
-
+		spindexerAntiStall();
 	}
 
 	public void intake() {
@@ -53,10 +51,17 @@ public class SuperStructure extends SubsystemBase {
 		spindexer.setSpinRPM(Constants.SpindexerValues.SpinPowertrain.calculateMotorRpmFromWheelRpm(120), Spindexer.SpinnerDirection.CounterClockwise);
 	}
 
-	public void idle() {
+	public void idleIntake() {
 		stopIntake();
+	}
+
+	public void idleSpindexer() {
+		spindexer.setSpinRPM(Constants.SpindexerValues.SpinPowertrain.calculateMotorRpmFromWheelRpm(30), Spindexer.SpinnerDirection.CounterClockwise);
+	}
+
+	public void idleShooter(boolean interrupted) {
+		shooter.idle();
 		pneumatics.retractProp();
-		idleSpindexer();
 	}
 
 	public void stopIntake() {
@@ -64,13 +69,8 @@ public class SuperStructure extends SubsystemBase {
 		pneumatics.retractIntake();
 	}
 
-	public void idleSpindexer() {
-		if (spindexer.isStalled()) {
-			spindexer.setSpinRPM(Constants.SpindexerValues.SpinPowertrain.calculateMotorRpmFromWheelRpm(30), Spindexer.SpinnerDirection.CounterClockwise);
-		} else {
-			spindexer.setSpinRPM(Constants.SpindexerValues.SpinPowertrain.calculateMotorRpmFromWheelRpm(30), spindexer.getSpinnerDirection() == Spindexer.SpinnerDirection.Clockwise ? Spindexer.SpinnerDirection.CounterClockwise : Spindexer.SpinnerDirection.Clockwise);
-		}
-		spindexer.stopFeed();
+	public void spindexerAntiStall() {
+		if (spindexer.isStalled()) spindexer.switchSpin();
 	}
 
 	public boolean isSpindexerUnloaded() {

@@ -18,6 +18,7 @@ public class Spindexer extends SubsystemBase {
 	private SpinnerDirection currentSpinDirection;
 	private int spindexerRotations = 0;
 	private int tempSpindexerRotations = 0;
+	private double lastSpinSpeed = 0;
 
 	private final CANSparkMax spinMotor, feedMotor;
 	private final DigitalInput hallEffect;
@@ -107,6 +108,7 @@ public class Spindexer extends SubsystemBase {
 	}
 
 	public void setSpinRPM(double rpm, SpinnerDirection spinDirection) {
+		lastSpinSpeed = rpm;
 		if (spinDirection == SpinnerDirection.Clockwise) {
 			spinMotor.set(spinPID.calculate(spinMotor.getSensorVelocity(), rpm));
 			currentSpinDirection = SpinnerDirection.Clockwise;
@@ -154,6 +156,10 @@ public class Spindexer extends SubsystemBase {
 
 	public boolean atFeedRpm() {
 		return Math.abs(feedMotor.getSensorVelocity() - Constants.SpindexerValues.FEED_RPM) < 100;
+	}
+
+	public void switchSpin() {
+		setSpinRPM(lastSpinSpeed, currentSpinDirection == SpinnerDirection.Clockwise ? SpinnerDirection.CounterClockwise : SpinnerDirection.Clockwise);
 	}
 
 	public boolean isUnloaded() {
