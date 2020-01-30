@@ -7,9 +7,7 @@ import frc.team832.lib.motion.PathHelper;
 import frc.team832.robot.Constants;
 import frc.team832.robot.Robot;
 import frc.team832.robot.commands.ShootCommandGroup;
-import frc.team832.robot.subsystems.SuperStructure;
-import frc.team832.robot.subsystems.Drivetrain;
-import frc.team832.robot.subsystems.Spindexer;
+import frc.team832.robot.subsystems.*;
 
 public class ComplexAutonomous extends SequentialCommandGroup {
 	private Trajectory ToStart = PathHelper.generatePath(Robot.drivetrain.getLatestPose(), Constants.FieldPositions.StartCenter);
@@ -17,21 +15,21 @@ public class ComplexAutonomous extends SequentialCommandGroup {
 	private Trajectory ToFarSideTrench = PathHelper.generatePath(Robot.drivetrain.getLatestPose(), Constants.FieldPositions.FarSideTrench);
 	private Trajectory ToShieldGenCloseToTrench = PathHelper.generatePath(Robot.drivetrain.getLatestPose(), Constants.FieldPositions.ShieldGenCloseToTrench);
 
-	public ComplexAutonomous(SuperStructure superStructure, Spindexer spindexer, Drivetrain drivetrain) {
+	public ComplexAutonomous(SuperStructure superStructure, Drivetrain drivetrain, Pneumatics pneumatics, Shooter shooter, Spindexer spindexer) {
 		addCommands(
-			new ShootCommandGroup(superStructure),
+			new ShootCommandGroup(superStructure, pneumatics, shooter, spindexer),
 			new FollowPath(ToFarSideTrench, drivetrain),
 			new InstantCommand(superStructure::intake),
 			new FollowPath(ToCloseSideTrench, drivetrain),
 			new InstantCommand(superStructure::idleIntake),
 			new FollowPath(ToFarSideTrench, drivetrain),
-			new ShootCommandGroup(superStructure),
+			new ShootCommandGroup(superStructure, pneumatics, shooter, spindexer),
 			new InstantCommand(superStructure::intake),
 			new FollowPath(ToShieldGenCloseToTrench, drivetrain),
 			new InstantCommand(superStructure::idleIntake),
 			new FollowPath(ToFarSideTrench, drivetrain),
-			new ShootCommandGroup(superStructure)
+			new ShootCommandGroup(superStructure, pneumatics, shooter, spindexer)
 			);
-		addRequirements(superStructure, spindexer, drivetrain);
+		addRequirements(superStructure, drivetrain, pneumatics, shooter, spindexer);
 	}
 }

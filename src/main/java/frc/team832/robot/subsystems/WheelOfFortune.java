@@ -67,8 +67,8 @@ public class WheelOfFortune extends SubsystemBase implements DashboardUpdatable 
     }
 
     public void setColor(ColorWheelPath.ColorWheelColor targetColor) {
-        ColorWheelPath.ColorWheelColor currentColor = null;//path.getActualColor(colorSensor.getColor());
-        path = new ColorWheelPath(currentColor, targetColor);
+//        ColorWheelPath.ColorWheelColor currentColor = path.getActualColor(colorSensor.getColor());
+//        path = new ColorWheelPath(currentColor, targetColor);
 
         double rotations = path.rotations * (path.direction == ColorWheelPath.Direction.CLOCKWISE ? 1 : -1);//assuming that clockwise is positive
         spinner.set(rotations * Constants.WOFValues.RevsToTicks);

@@ -7,19 +7,17 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.team832.lib.motion.PathHelper;
 import frc.team832.robot.Robot;
 import frc.team832.robot.commands.ShootCommandGroup;
-import frc.team832.robot.subsystems.SuperStructure;
-import frc.team832.robot.subsystems.Drivetrain;
-import frc.team832.robot.subsystems.Spindexer;
+import frc.team832.robot.subsystems.*;
 
 public class BasicAutonomous extends SequentialCommandGroup {
 
     private Trajectory BackUp = PathHelper.generatePath(Robot.drivetrain.getLatestPose(), new Pose2d(-1.0, 0, Rotation2d.fromDegrees(0))); //TODO: Change coordinates
 
-    public BasicAutonomous(SuperStructure superStructure, Spindexer spindexer, Drivetrain drivetrain) {
+    public BasicAutonomous(SuperStructure superStructure, Drivetrain drivetrain, Pneumatics pneumatics, Shooter shooter, Spindexer spindexer, Intake intake) {
         addCommands(
-                new ShootCommandGroup(superStructure),
+                new ShootCommandGroup(superStructure, pneumatics, shooter, spindexer),
                 new FollowPath(BackUp, drivetrain)
         );
-        addRequirements(superStructure, spindexer, drivetrain);
+        addRequirements(superStructure, drivetrain, pneumatics, shooter, spindexer, intake);
     }
 }

@@ -52,7 +52,8 @@ public class SuperStructure extends SubsystemBase {
 	}
 
 	public void idleIntake() {
-		stopIntake();
+		intake.stop();
+		pneumatics.retractIntake();
 	}
 
 	public void idleSpindexer() {
@@ -62,11 +63,7 @@ public class SuperStructure extends SubsystemBase {
 	public void idleShooter(boolean interrupted) {
 		shooter.idle();
 		pneumatics.retractProp();
-	}
-
-	public void stopIntake() {
-		intake.stop();
-		pneumatics.retractIntake();
+		idleSpindexer();
 	}
 
 	public void spindexerAntiStall() {
