@@ -7,7 +7,6 @@ import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveWheelSpeeds;
-import edu.wpi.first.wpilibj.util.Units;
 import edu.wpi.first.wpilibj2.command.RunEndCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.team832.lib.drive.SmartDiffDrive;
@@ -16,12 +15,10 @@ import frc.team832.lib.driverstation.dashboard.FalconDashboard;
 import frc.team832.lib.motorcontrol2.vendor.CANTalonFX;
 import frc.team832.lib.motors.Motor;
 import frc.team832.lib.power.GrouchPDP;
-import frc.team832.lib.power.PDPPortNumber;
 import frc.team832.lib.power.impl.SmartMCAttachedPDPSlot;
 import frc.team832.lib.sensors.NavXMicro;
 import frc.team832.robot.Constants;
 
-import frc.team832.robot.Robot;
 import frc.team832.robot.accesories.ArcadeDriveProfile;
 import frc.team832.robot.accesories.TankDriveProfile;
 
@@ -76,6 +73,9 @@ public class Drivetrain extends SubsystemBase implements DashboardUpdatable {
         rightMasterSlot = pdp.addDevice(Constants.DrivetrainValues.RIGHT_MASTER_PDP_PORT, rightMaster);
         rightSlaveSlot = pdp.addDevice(Constants.DrivetrainValues.RIGHT_SLAVE_PDP_PORT, rightSlave);
 
+        rightMaster.setPIDF(Constants.DrivetrainValues.DriveClosedLoopConfig);
+        leftMaster.setPIDF(Constants.DrivetrainValues.DriveClosedLoopConfig);
+
         setCurrentLimit(40);
 
         diffDrive = new SmartDiffDrive(leftMaster, rightMaster, (int)Motor.kFalcon500.freeSpeed);
@@ -112,6 +112,8 @@ public class Drivetrain extends SubsystemBase implements DashboardUpdatable {
         arcadeProfile.calculateArcadeSpeeds();
         diffDrive.arcadeDrive(arcadeProfile.xPow, arcadeProfile.rotPow, arcadeProfile.loopMode);
     }
+
+
 
     public void stopDrive() {
         leftMaster.set(0);

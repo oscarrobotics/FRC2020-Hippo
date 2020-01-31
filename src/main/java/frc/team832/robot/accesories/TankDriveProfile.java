@@ -25,7 +25,6 @@ public class TankDriveProfile {
     }
 
     public void calculateTankSpeeds() {
-        DriveAxesSupplier axes = oi.driverOI.getGreenbergDriveAxes();
         boolean isPreciseRotate = ((SticksDriverOI) oi.driverOI).rightStick.two.get();
         boolean isRotate =  ((SticksDriverOI) oi.driverOI).rightStick.trigger.get();
         boolean driveStraight = ((SticksDriverOI) oi.driverOI).leftStick.trigger.get();

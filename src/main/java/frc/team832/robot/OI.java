@@ -47,7 +47,7 @@ public class OI {
 		);
 		stratComInterface.getArcadeWhiteRight().whileHeld(new ConditionalCommand(
 				new StartEndCommand(climber::unwindRightWinch, climber::stopRightWinch, climber),
-				new StartEndCommand(climber::windLeftWinch, climber::stopRightWinch, climber),
+				new StartEndCommand(climber::windRightWinch, climber::stopRightWinch, climber),
 				stratComInterface.getSCSideTop()::get)
 		);
 

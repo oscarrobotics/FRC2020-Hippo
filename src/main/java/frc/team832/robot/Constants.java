@@ -13,6 +13,7 @@ import frc.team832.lib.motors.WheeledPowerTrain;
 import frc.team832.lib.motors.Gearbox;
 import frc.team832.lib.motors.Motor;
 import frc.team832.lib.power.PDPPortNumber;
+import frc.team832.lib.util.ClosedLoopConfig;
 
 public class Constants {
     public static class DrivetrainValues {
@@ -27,7 +28,7 @@ public class Constants {
         public static final double StickRotateMultiplier = 0.85;
 
         public static final double DriveWheelDiameter = Units.inchesToMeters(6);
-        public static final float DriveGearReduction = 1f / (9f/84f);
+        public static final float DriveGearReduction = 1f / (8f/84f);
 
         public static final PDPPortNumber LEFT_MASTER_PDP_PORT = PDPPortNumber.Port15;
         public static final PDPPortNumber LEFT_SLAVE_PDP_PORT = PDPPortNumber.Port14;
@@ -37,6 +38,8 @@ public class Constants {
         private static final Gearbox DriveGearbox = new Gearbox(DriveGearReduction);
         public static final WheeledPowerTrain DrivePowerTrain = new WheeledPowerTrain(DriveGearbox, Motor.kFalcon500, 2, DriveWheelDiameter);
         public static DifferentialDriveKinematics DriveKinematics = new DifferentialDriveKinematics(Units.inchesToMeters(29.0));
+
+        public static final ClosedLoopConfig DriveClosedLoopConfig = new ClosedLoopConfig(0, 0, 0, 0);
 
         private static final double kDrive_kS = 0.0;
         private static final double kDrive_kV = 0.0;
