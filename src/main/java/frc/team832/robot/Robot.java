@@ -35,7 +35,7 @@ public class Robot extends TimedRobot {
     private static final Notifier shooterTelemetryNotifier = new Notifier(shooter::updateDashboardData);
 
     AddressableLED led = new AddressableLED(Constants.LEDValues.LED_PWM_PORT);
-    AddressableLEDBuffer ledBuffer = new AddressableLEDBuffer(0);
+    AddressableLEDBuffer ledBuffer = new AddressableLEDBuffer(16);
 
     @Override
     public void robotInit() {
@@ -67,6 +67,7 @@ public class Robot extends TimedRobot {
 
     @Override
     public void robotPeriodic() {
+
     }
 
     @Override

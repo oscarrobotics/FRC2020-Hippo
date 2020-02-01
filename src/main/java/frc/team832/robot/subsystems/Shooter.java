@@ -34,7 +34,6 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
 
     public Shooter(){
         DashboardManager.addTab(this);
-        DashboardManager.getTab(this).add(this);
 
         primaryMotor = new CANSparkMax(Constants.ShooterValues.PRIMARY_CAN_ID, Motor.kNEO);
         secondaryMotor = new CANSparkMax(Constants.ShooterValues.SECONDARY_CAN_ID, Motor.kNEO);

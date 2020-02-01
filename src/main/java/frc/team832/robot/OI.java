@@ -1,5 +1,6 @@
 package frc.team832.robot;
 
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunEndCommand;
@@ -17,11 +18,11 @@ import static frc.team832.robot.Robot.*;
 @SuppressWarnings("WeakerAccess")
 public class OI {
 	public final DriverOI driverOI;
-	public static final boolean isSticks = true;
+	public static final boolean isSticks = RobotBase.isReal();
 	public static final StratComInterface stratComInterface = new StratComInterface(isSticks ? 2 : 1);
 
-	public final Attack3 leftStick;
-	public final Extreme3DPro rightStick;
+	public Attack3 leftStick;
+	public Extreme3DPro rightStick;
 
 	public OI() {
 		if (isSticks) {

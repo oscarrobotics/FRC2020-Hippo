@@ -3,6 +3,7 @@ package frc.team832.robot.subsystems;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveOdometry;
@@ -78,11 +79,15 @@ public class Drivetrain extends SubsystemBase implements DashboardUpdatable {
 
         setCurrentLimit(40);
 
+        if (RobotBase.isReal()) {
+            navX = new NavXMicro(NavXMicro.NavXPort.I2C_onboard);
+        }
+
         diffDrive = new SmartDiffDrive(leftMaster, rightMaster, (int)Motor.kFalcon500.freeSpeed);
         driveOdometry = new DifferentialDriveOdometry(getDriveHeading(), startingPose);
         resetPose();
 
-        setDefaultCommand(new RunEndCommand(this::tankDrive, this::stopDrive));
+        setDefaultCommand(new RunEndCommand(this::tankDrive, this::stopDrive, this));
 
         initSuccessful = true;
     }
@@ -121,7 +126,8 @@ public class Drivetrain extends SubsystemBase implements DashboardUpdatable {
     }
 
     public Rotation2d getDriveHeading() {
-        return Rotation2d.fromDegrees(-navX.getYaw());
+//        return Rotation2d.fromDegrees(-navX.getYaw());
+        return Rotation2d.fromDegrees(0);
     }
 
     @Override
@@ -177,7 +183,9 @@ public class Drivetrain extends SubsystemBase implements DashboardUpdatable {
     public void resetPose(Pose2d pose) {
         resetEncoders();
         this.pose = pose;
-        navX.zero();
+        if (navX != null) {
+            navX.zero();
+        }
         driveOdometry.resetPosition(this.pose, getDriveHeading());
     }
 

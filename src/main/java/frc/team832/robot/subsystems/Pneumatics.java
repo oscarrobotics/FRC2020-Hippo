@@ -15,7 +15,6 @@ public class Pneumatics extends SubsystemBase implements DashboardUpdatable {
 
 	public Pneumatics() {
 		DashboardManager.addTab(this);
-		DashboardManager.getTab(this).add(this);
 
 		this.moveIntake = new Solenoid(Constants.PneumaticsValues.PCM_MODULE_NUM, Constants.PneumaticsValues.INTAKE_SOLENOID_ID);
 		this.propUpRobot = new Solenoid(Constants.PneumaticsValues.PCM_MODULE_NUM, Constants.PneumaticsValues.PROP_UP_SOLENOID_ID);
@@ -59,7 +58,7 @@ public class Pneumatics extends SubsystemBase implements DashboardUpdatable {
 
 	@Override
 	public String getDashboardTabName () {
-		return null;
+		return "Pneumatics";
 	}
 
 	@Override

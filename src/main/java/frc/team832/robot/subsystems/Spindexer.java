@@ -2,6 +2,7 @@ package frc.team832.robot.subsystems;
 
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.controller.PIDController;
+import edu.wpi.first.wpilibj.controller.ProfiledPIDController;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.team832.lib.motorcontrol.NeutralMode;
 import frc.team832.lib.motorcontrol2.vendor.CANSparkMax;
@@ -25,6 +26,7 @@ public class Spindexer extends SubsystemBase {
 	private SpindexerStatus spindexerStatus = new SpindexerStatus();
 	private final List<Boolean> ballStatus = new ArrayList<>();
 	public PIDController spinPID = new PIDController(Constants.SpindexerValues.SPIN_kP, 0, Constants.SpindexerValues.SPIN_kD);
+	public ProfiledPIDController positionPID = new ProfiledPIDController(Constants.SpindexerValues.POSITION_kP, 0, Constants.SpindexerValues.POSITION_kD, Constants.SpindexerValues.constraints);
 
 
 
@@ -105,7 +107,7 @@ public class Spindexer extends SubsystemBase {
 	}
 
 	public void setTargetPosition(int pos) {
-		spinMotor.set(spinPID.calculate(spinMotor.getSensorPosition(), Constants.SpindexerValues.SpinPowertrain.calculateTicksFromPosition(pos)));
+		spinMotor.set(positionPID.calculate(spinMotor.getSensorPosition(), Constants.SpindexerValues.SpinPowertrain.calculateTicksFromPosition(pos)));
 	}
 	
 	public double getPosition() {

@@ -6,6 +6,8 @@ import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.wpilibj.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryConfig;
+import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile;
+import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.wpilibj.trajectory.constraint.DifferentialDriveVoltageConstraint;
 import edu.wpi.first.wpilibj.util.Units;
 import frc.team832.lib.motion.PathHelper;
@@ -14,6 +16,8 @@ import frc.team832.lib.motors.Gearbox;
 import frc.team832.lib.motors.Motor;
 import frc.team832.lib.power.PDPPortNumber;
 import frc.team832.lib.util.ClosedLoopConfig;
+
+import javax.swing.*;
 
 public class Constants {
     public static class DrivetrainValues {
@@ -158,6 +162,11 @@ public class Constants {
         public static final double SPIN_kP = 0;
         public static final double SPIN_kD = 0;
         public static final double SPIN_kF = 0;
+
+        public static Constraints constraints = new Constraints(2, 8);
+        public static final double POSITION_kP = 0;
+        public static final double POSITION_kD = 0;
+        public static final double POSITION_kF = 0;
     }
 
     public static class ClimberValues {
@@ -192,6 +201,6 @@ public class Constants {
     }
 
     public class LEDValues {
-        public static final int LED_PWM_PORT = 0;
+        public static final int LED_PWM_PORT = 9;
     }
 }

@@ -1,27 +1,59 @@
 package frc.team832.robot.subsystems;
 
+import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.team832.lib.driverstation.dashboard.DashboardManager;
+import frc.team832.lib.driverstation.dashboard.DashboardUpdatable;
 import frc.team832.robot.Constants;
-public class SuperStructure extends SubsystemBase {
+public class SuperStructure extends SubsystemBase implements DashboardUpdatable {
 
 	private Intake intake;
 	private Shooter shooter;
 	private Spindexer spindexer;
 	private Pneumatics pneumatics;
+	private SuperStructureMode currentMode = SuperStructureMode.IDLE;
+
+	private NetworkTableEntry mode;
 
 	public SuperStructure(Intake intake, Shooter shooter, Spindexer spindexer, Pneumatics pneumatics) {
 		this.intake = intake;
 		this.shooter = shooter;
 		this.spindexer = spindexer;
 		this.pneumatics = pneumatics;
-	}
+
+        DashboardManager.addTab(this);
+
+//        DashboardManager.addTabItem(this, "Mode", )
+
+    }
 
 	@Override
 	public void periodic() {
 		spindexerAntiStall();
 	}
+
+	public void runSuperStructureMode(){
+        switch (currentMode) {
+            case IDLE:
+
+                break;
+            case INTAKING:
+
+                break;
+            case SPINUP:
+
+                break;
+            case SHOOTING:
+
+                break;
+            case SPINDOWN:
+
+                break;
+        }
+
+    }
 
 	public void intake() {
 		if (spindexer.isStalled()) {
@@ -77,4 +109,22 @@ public class SuperStructure extends SubsystemBase {
 	public boolean isShooterPrepared() {
 		return shooter.readyToShoot();
 	}
+
+    @Override
+    public String getDashboardTabName() {
+        return "Superstructure";
+    }
+
+    @Override
+    public void updateDashboardData() {
+
+    }
+
+    public enum SuperStructureMode {
+	    IDLE,
+        INTAKING,
+        SPINUP,
+        SHOOTING,
+        SPINDOWN
+    }
 }
