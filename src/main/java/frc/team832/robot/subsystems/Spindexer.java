@@ -7,8 +7,12 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.team832.lib.motorcontrol.NeutralMode;
 import frc.team832.lib.motorcontrol2.vendor.CANSparkMax;
 import frc.team832.lib.motors.Motor;
+import frc.team832.lib.power.PDPBreaker;
+import frc.team832.lib.power.PDPSlot;
+import frc.team832.lib.power.monitoring.StallDetector;
 import frc.team832.lib.util.OscarMath;
 import frc.team832.robot.Constants;
+import frc.team832.robot.Robot;
 import frc.team832.robot.accesories.SpindexerStatus;
 
 import java.util.ArrayList;
@@ -25,8 +29,9 @@ public class Spindexer extends SubsystemBase {
 	private final DigitalInput hallEffect;
 	private SpindexerStatus spindexerStatus = new SpindexerStatus();
 	private final List<Boolean> ballStatus = new ArrayList<>();
-	public PIDController spinPID = new PIDController(Constants.SpindexerValues.SPIN_kP, 0, Constants.SpindexerValues.SPIN_kD);
-	public ProfiledPIDController positionPID = new ProfiledPIDController(Constants.SpindexerValues.POSITION_kP, 0, Constants.SpindexerValues.POSITION_kD, Constants.SpindexerValues.constraints);
+	private PIDController spinPID = new PIDController(Constants.SpindexerValues.SPIN_kP, 0, Constants.SpindexerValues.SPIN_kD);
+	private ProfiledPIDController positionPID = new ProfiledPIDController(Constants.SpindexerValues.POSITION_kP, 0, Constants.SpindexerValues.POSITION_kD, Constants.SpindexerValues.Constraints);
+	private StallDetector spinStall = new StallDetector(new PDPSlot(Robot.pdp.getBasePDP(), Constants.SpindexerValues.SPIN_MOTOR_PDP_SLOT, PDPBreaker.ThirtyAmp));
 
 
 
@@ -45,6 +50,9 @@ public class Spindexer extends SubsystemBase {
 
 		hallEffect = new DigitalInput(Constants.SpindexerValues.HALL_EFFECT_CHANNEL);
 
+		spinStall.setMinStallMillis(500);
+		spinStall.setStallCurrent(30);
+
 		initSuccessful = true;
 	}
 
@@ -55,6 +63,7 @@ public class Spindexer extends SubsystemBase {
 			if (currentSpinDirection == SpinnerDirection.Clockwise) spindexerRotations++;
 			else spindexerRotations--;
 		}
+		spinStall.updateStallStatus();
 		spindexerStatus.update(ballStatus);
 	}
 
@@ -102,11 +111,10 @@ public class Spindexer extends SubsystemBase {
 	}
 
 	public boolean isStalled() {
-		// TODO: fix stall detection
-		return false;
+		return spinStall.getStallStatus().isStalled;
 	}
 
-	public void setTargetPosition(int pos) {
+	public void setTargetPosition(double pos) {
 		spinMotor.set(positionPID.calculate(spinMotor.getSensorPosition(), Constants.SpindexerValues.SpinPowertrain.calculateTicksFromPosition(pos)));
 	}
 	
@@ -156,7 +164,21 @@ public class Spindexer extends SubsystemBase {
 		int pos;
 		if(getState() != SpindexerStatus.SpindexerState.FULL){
 			pos = spindexerStatus.getFirstEmpty();
-			setTargetPosition((int)intToPosition(pos).getValue());
+			setTargetPosition(intToPosition(pos).value);
+		}
+	}
+
+	public SafePosition getNearestSafePosition() {
+		if (Math.abs(spinMotor.getSensorPosition() - Constants.SpindexerValues.SpinPowertrain.calculateTicksFromPosition(SafePosition.Position1.value)) < Constants.SpindexerValues.SpinPowertrain.calculateTicksFromPosition(0.1)) {
+			return SafePosition.Position1;
+		} else if (Math.abs(spinMotor.getSensorPosition() - Constants.SpindexerValues.SpinPowertrain.calculateTicksFromPosition(SafePosition.Position2.value)) < Constants.SpindexerValues.SpinPowertrain.calculateTicksFromPosition(0.1)) {
+			return SafePosition.Position2;
+		} else if (Math.abs(spinMotor.getSensorPosition() - Constants.SpindexerValues.SpinPowertrain.calculateTicksFromPosition(SafePosition.Position3.value)) < Constants.SpindexerValues.SpinPowertrain.calculateTicksFromPosition(0.1)) {
+			return SafePosition.Position3;
+		} else if (Math.abs(spinMotor.getSensorPosition() - Constants.SpindexerValues.SpinPowertrain.calculateTicksFromPosition(SafePosition.Position4.value)) < Constants.SpindexerValues.SpinPowertrain.calculateTicksFromPosition(0.1)) {
+			return SafePosition.Position4;
+		} else (Math.abs(spinMotor.getSensorPosition() - Constants.SpindexerValues.SpinPowertrain.calculateTicksFromPosition(SafePosition.Position5.value)) < Constants.SpindexerValues.SpinPowertrain.calculateTicksFromPosition(0.1)) {
+			return SafePosition.Position5;
 		}
 	}
 
@@ -175,19 +197,28 @@ public class Spindexer extends SubsystemBase {
 	}
 
 	public enum BallPosition {
-		Position1(Constants.SpindexerValues.SpinPowertrain.calculateTicksFromPosition(.2*0)),
-		Position2(Constants.SpindexerValues.SpinPowertrain.calculateTicksFromPosition(.2*1)),
-		Position3(Constants.SpindexerValues.SpinPowertrain.calculateTicksFromPosition(.2*2)),
-		Position4(Constants.SpindexerValues.SpinPowertrain.calculateTicksFromPosition(.2*3)),
-		Position5(Constants.SpindexerValues.SpinPowertrain.calculateTicksFromPosition(.2*4));
+		Position1(0.0),
+		Position2(0.2),
+		Position3(0.4),
+		Position4(0.6),
+		Position5(0.8);
 
 		double value;
-		private BallPosition(double value) {
+		BallPosition(double value) {
 			this.value = value;
 		}
+	}
 
-		public double getValue() {
-			return value;
+	public enum SafePosition {
+		Position1(0.1),
+		Position2(0.3),
+		Position3(0.5),
+		Position4(0.7),
+		Position5(0.9);
+
+		double value;
+		SafePosition(double value) {
+			this.value = value;
 		}
 	}
 }

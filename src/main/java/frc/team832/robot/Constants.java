@@ -67,6 +67,7 @@ public class Constants {
         public static final PDPPortNumber PRIMARY_PDP_SLOT = PDPPortNumber.Port0;
         public static final PDPPortNumber SECONDARY_PDP_SLOT = PDPPortNumber.Port0;
         public static final PDPPortNumber TURRET_PDP_SLOT = PDPPortNumber.Port0;
+        public static final PDPPortNumber FEED_MOTOR_PDP_SLOT = PDPPortNumber.Port0;
 
         public static final int PRIMARY_CAN_ID = 2;
         public static final int SECONDARY_CAN_ID = 3;
@@ -135,7 +136,6 @@ public class Constants {
 
     public static class SpindexerValues {
         public static final PDPPortNumber SPIN_MOTOR_PDP_SLOT = PDPPortNumber.Port0;
-        public static final PDPPortNumber FEED_MOTOR_PDP_SLOT = PDPPortNumber.Port0;
 
         public static final int SPIN_MOTOR_CAN_ID = 5;
         public static final int FEED_MOTOR_CAN_ID = 6;
@@ -163,7 +163,7 @@ public class Constants {
         public static final double SPIN_kD = 0;
         public static final double SPIN_kF = 0;
 
-        public static Constraints constraints = new Constraints(2, 8);
+        public static Constraints Constraints = new Constraints(2, 8);
         public static final double POSITION_kP = 0;
         public static final double POSITION_kD = 0;
         public static final double POSITION_kF = 0;

@@ -11,7 +11,6 @@ import static frc.team832.robot.Robot.pneumatics;
 
 public class Intake extends SubsystemBase {
 	private boolean initSuccessful = false;
-
 	private final CANSparkMax intakeMotor;
 
 	public Intake() {

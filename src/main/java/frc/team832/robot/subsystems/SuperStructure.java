@@ -78,7 +78,7 @@ public class SuperStructure extends SubsystemBase implements DashboardUpdatable 
 	}
 
 	private void prepareShoot() {
-		spindexer.stopSpin();
+		spindexer.setTargetPosition(spindexer.getNearestSafePosition().value);
 		shooter.spinUp();
 		pneumatics.propUp();
 		shooter.setFeedRPM(Constants.SpindexerValues.FEED_RPM);
