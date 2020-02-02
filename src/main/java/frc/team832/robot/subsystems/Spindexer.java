@@ -7,8 +7,10 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.team832.lib.motorcontrol.NeutralMode;
 import frc.team832.lib.motorcontrol2.vendor.CANSparkMax;
 import frc.team832.lib.motors.Motor;
+import frc.team832.lib.power.GrouchPDP;
 import frc.team832.lib.power.PDPBreaker;
-import frc.team832.lib.power.PDPSlot;
+import frc.team832.lib.power.PDPPortNumber;
+import frc.team832.lib.power.impl.SmartMCAttachedPDPSlot;
 import frc.team832.lib.power.monitoring.StallDetector;
 import frc.team832.lib.util.OscarMath;
 import frc.team832.robot.Constants;
@@ -31,11 +33,13 @@ public class Spindexer extends SubsystemBase {
 	private final List<Boolean> ballStatus = new ArrayList<>();
 	private PIDController spinPID = new PIDController(Constants.SpindexerValues.SPIN_kP, 0, Constants.SpindexerValues.SPIN_kD);
 	private ProfiledPIDController positionPID = new ProfiledPIDController(Constants.SpindexerValues.POSITION_kP, 0, Constants.SpindexerValues.POSITION_kD, Constants.SpindexerValues.Constraints);
-	private StallDetector spinStall = new StallDetector(new PDPSlot(Robot.pdp.getBasePDP(), Constants.SpindexerValues.SPIN_MOTOR_PDP_SLOT, PDPBreaker.ThirtyAmp));
+
+	private SmartMCAttachedPDPSlot spinSlot;
+	private StallDetector spinStall;
 
 
 
-	public Spindexer() {
+	public Spindexer(GrouchPDP pdp) {
 		spinMotor = new CANSparkMax(Constants.SpindexerValues.SPIN_MOTOR_CAN_ID, Motor.kNEO);
 
 		spinMotor.wipeSettings();
@@ -52,6 +56,9 @@ public class Spindexer extends SubsystemBase {
 
 		spinStall.setMinStallMillis(500);
 		spinStall.setStallCurrent(30);
+
+		spinSlot = pdp.addDevice(Constants.SpindexerValues.SPIN_MOTOR_PDP_SLOT, spinMotor);
+
 
 		initSuccessful = true;
 	}
