@@ -13,7 +13,7 @@ public class SuperStructure extends SubsystemBase implements DashboardUpdatable 
 	private Shooter shooter;
 	private Spindexer spindexer;
 	private Pneumatics pneumatics;
-	private SuperStructureMode currentMode = SuperStructureMode.IDLE;
+	private SuperStructureMode currentMode = SuperStructureMode.IDLEALL, lastMode = SuperStructureMode.IDLEALL;
 
 	private NetworkTableEntry mode;
 
@@ -26,36 +26,42 @@ public class SuperStructure extends SubsystemBase implements DashboardUpdatable 
         DashboardManager.addTab(this);
 
 //        DashboardManager.addTabItem(this, "Mode", )
-
     }
 
 	@Override
 	public void periodic() {
 		spindexerAntiStall();
+		if (currentMode != lastMode) {
+			updateSuperStructure();
+		}
+		lastMode = currentMode;
 	}
 
-	public void runSuperStructureMode(){
+	private void updateSuperStructure(){
         switch (currentMode) {
-            case IDLE:
-
+			case IDLEALL:
+				idle(true);
                 break;
+			case IDLELAST:
+				idle(false);
+				break;
             case INTAKING:
-
+				intake();
                 break;
             case SPINUP:
-
+				prepareShoot();
                 break;
             case SHOOTING:
-
-                break;
-            case SPINDOWN:
-
+				shoot();
                 break;
         }
-
     }
 
-	public void intake() {
+    public void setMode(SuperStructureMode mode) {
+		this.currentMode = mode;
+	}
+
+	private void intake() {
 		if (spindexer.isStalled()) {
 			spindexer.setSpinRPM(Constants.SpindexerValues.SpinPowertrain.calculateMotorRpmFromWheelRpm(60), Spindexer.SpinnerDirection.Clockwise);
 		} else {
@@ -65,40 +71,51 @@ public class SuperStructure extends SubsystemBase implements DashboardUpdatable 
 		pneumatics.extendIntake();
 	}
 
-	public void outtake() {
+	private void outtake() {
 		intake.outtake(Constants.IntakeValues.IntakePowertrain.calculateMotorRpmFromSurfaceSpeed(5));
 		spindexer.setSpinRPM(Constants.SpindexerValues.SpinPowertrain.calculateMotorRpmFromWheelRpm(60), Spindexer.SpinnerDirection.CounterClockwise);
 		pneumatics.extendIntake();
 	}
 
-	public void prepareShoot() {
+	private void prepareShoot() {
 		spindexer.stopSpin();
 		shooter.spinUp();
 		pneumatics.propUp();
 		shooter.setFeedRPM(Constants.SpindexerValues.FEED_RPM);
 	}
 
-	public void shoot() {
+	private void shoot() {
 		shooter.setMode(Shooter.ShootMode.Shooting);
 		spindexer.setSpinRPM(Constants.SpindexerValues.SpinPowertrain.calculateMotorRpmFromWheelRpm(120), Spindexer.SpinnerDirection.CounterClockwise);
 	}
 
-	public void idleIntake() {
+	public void idle(boolean idleAll) {
+		if (idleAll) {
+			setMode(SuperStructureMode.IDLEALL);
+			idleIntake();
+			idleSpindexer();
+			idleShooter();
+		} else {
+			handleIdle();
+		}
+	}
+
+	private void idleIntake() {
 		intake.stop();
 		pneumatics.retractIntake();
 	}
 
-	public void idleSpindexer() {
+	private void idleSpindexer() {
 		spindexer.setSpinRPM(Constants.SpindexerValues.SpinPowertrain.calculateMotorRpmFromWheelRpm(30), Spindexer.SpinnerDirection.CounterClockwise);
 	}
 
-	public void idleShooter(boolean interrupted) {
+	private void idleShooter(){
 		shooter.idle();
 		pneumatics.retractProp();
 		idleSpindexer();
 	}
 
-	public void spindexerAntiStall() {
+	private void spindexerAntiStall() {
 		if (spindexer.isStalled()) spindexer.switchSpin();
 	}
 
@@ -121,10 +138,27 @@ public class SuperStructure extends SubsystemBase implements DashboardUpdatable 
     }
 
     public enum SuperStructureMode {
-	    IDLE,
+	    IDLEALL,
+		IDLELAST,
         INTAKING,
         SPINUP,
-        SHOOTING,
-        SPINDOWN
+        SHOOTING
     }
+
+    private void handleIdle() {
+		switch (lastMode) {
+			case SPINUP:
+				idleShooter();
+				break;
+			case SHOOTING:
+				idleShooter();
+				break;
+			case INTAKING:
+				idleIntake();
+				break;
+			default:
+				break;
+		}
+		setMode(SuperStructureMode.IDLELAST);
+	}
 }

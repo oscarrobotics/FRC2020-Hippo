@@ -19,14 +19,14 @@ public class ComplexAutonomous extends SequentialCommandGroup {
 		addCommands(
 			new ShootCommandGroup(superStructure, pneumatics, shooter, spindexer),
 			new FollowPath(ToFarSideTrench, drivetrain),
-			new InstantCommand(superStructure::intake),
+			new InstantCommand(() -> superStructure.setMode(SuperStructure.SuperStructureMode.INTAKING)),
 			new FollowPath(ToCloseSideTrench, drivetrain),
-			new InstantCommand(superStructure::idleIntake),
+			new InstantCommand(() -> superStructure.setMode(SuperStructure.SuperStructureMode.IDLELAST)),
 			new FollowPath(ToFarSideTrench, drivetrain),
 			new ShootCommandGroup(superStructure, pneumatics, shooter, spindexer),
-			new InstantCommand(superStructure::intake),
+			new InstantCommand(() -> superStructure.setMode(SuperStructure.SuperStructureMode.INTAKING)),
 			new FollowPath(ToShieldGenCloseToTrench, drivetrain),
-			new InstantCommand(superStructure::idleIntake),
+			new InstantCommand(() -> superStructure.setMode(SuperStructure.SuperStructureMode.IDLELAST)),
 			new FollowPath(ToFarSideTrench, drivetrain),
 			new ShootCommandGroup(superStructure, pneumatics, shooter, spindexer)
 			);

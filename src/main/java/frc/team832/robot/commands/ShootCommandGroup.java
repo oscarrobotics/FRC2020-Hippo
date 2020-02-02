@@ -13,7 +13,7 @@ public class ShootCommandGroup extends SequentialCommandGroup {
     public ShootCommandGroup(SuperStructure superStructure, Pneumatics pneumatics, Shooter shooter, Spindexer spindexer) {
         addCommands(
                 new PrepareShooter(superStructure, pneumatics, shooter, spindexer),
-                new FunctionalCommand(superStructure::shoot, () -> {} , superStructure::idleShooter, superStructure::isSpindexerUnloaded, superStructure)
+                new FunctionalCommand(() -> superStructure.setMode(SuperStructure.SuperStructureMode.SHOOTING), () -> {} , superStructure::idle, superStructure::isSpindexerUnloaded, superStructure)//might be an edge case if command is interrupted
         );
         addRequirements(superStructure);
     }

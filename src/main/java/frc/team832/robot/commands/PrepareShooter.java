@@ -16,7 +16,7 @@ public class PrepareShooter extends CommandBase {
 
     @Override
     public void initialize() {
-        superStructure.prepareShoot();
+        superStructure.setMode(SuperStructure.SuperStructureMode.SPINUP);
     }
 
     @Override
