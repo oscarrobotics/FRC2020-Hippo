@@ -8,17 +8,18 @@ import frc.team832.lib.motorcontrol.NeutralMode;
 import frc.team832.lib.motorcontrol2.vendor.CANSparkMax;
 import frc.team832.lib.motors.Motor;
 import frc.team832.lib.power.GrouchPDP;
-import frc.team832.lib.power.PDPBreaker;
-import frc.team832.lib.power.PDPPortNumber;
 import frc.team832.lib.power.impl.SmartMCAttachedPDPSlot;
 import frc.team832.lib.power.monitoring.StallDetector;
 import frc.team832.lib.util.OscarMath;
 import frc.team832.robot.Constants;
-import frc.team832.robot.Robot;
+import frc.team832.robot.accesories.BallPosition;
+import frc.team832.robot.accesories.SafePosition;
 import frc.team832.robot.accesories.SpindexerStatus;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static frc.team832.robot.Constants.SpindexerValues.SpinPowertrain;
 
 public class Spindexer extends SubsystemBase {
 	private boolean initSuccessful = false;
@@ -122,7 +123,7 @@ public class Spindexer extends SubsystemBase {
 	}
 
 	public void setTargetPosition(double pos) {
-		spinMotor.set(positionPID.calculate(spinMotor.getSensorPosition(), Constants.SpindexerValues.SpinPowertrain.calculateTicksFromPosition(pos)));
+		spinMotor.set(positionPID.calculate(spinMotor.getSensorPosition(), SpinPowertrain.calculateTicksFromPosition(pos)));
 	}
 	
 	public double getPosition() {
@@ -171,21 +172,27 @@ public class Spindexer extends SubsystemBase {
 		int pos;
 		if(getState() != SpindexerStatus.SpindexerState.FULL){
 			pos = spindexerStatus.getFirstEmpty();
-			setTargetPosition(intToPosition(pos).value);
+			var smth = intToPosition(pos);
+			setTargetPosition(smth.);
 		}
 	}
 
 	public SafePosition getNearestSafePosition() {
-		if (Math.abs(spinMotor.getSensorPosition() - Constants.SpindexerValues.SpinPowertrain.calculateTicksFromPosition(SafePosition.Position1.value)) < Constants.SpindexerValues.SpinPowertrain.calculateTicksFromPosition(0.1)) {
+		double pos = spinMotor.getSensorPosition();
+		double tenthTurn = SpinPowertrain.calculateTicksFromPosition(0.2);
+
+		if (Math.abs(pos - SpinPowertrain.calculateTicksFromPosition(SafePosition.Position1.value)) < tenthTurn * 0) {
 			return SafePosition.Position1;
-		} else if (Math.abs(spinMotor.getSensorPosition() - Constants.SpindexerValues.SpinPowertrain.calculateTicksFromPosition(SafePosition.Position2.value)) < Constants.SpindexerValues.SpinPowertrain.calculateTicksFromPosition(0.1)) {
+		} else if (Math.abs(pos - SpinPowertrain.calculateTicksFromPosition(SafePosition.Position2.value)) < tenthTurn * 1) {
 			return SafePosition.Position2;
-		} else if (Math.abs(spinMotor.getSensorPosition() - Constants.SpindexerValues.SpinPowertrain.calculateTicksFromPosition(SafePosition.Position3.value)) < Constants.SpindexerValues.SpinPowertrain.calculateTicksFromPosition(0.1)) {
+		} else if (Math.abs(pos - SpinPowertrain.calculateTicksFromPosition(SafePosition.Position3.value)) < tenthTurn * 2) {
 			return SafePosition.Position3;
-		} else if (Math.abs(spinMotor.getSensorPosition() - Constants.SpindexerValues.SpinPowertrain.calculateTicksFromPosition(SafePosition.Position4.value)) < Constants.SpindexerValues.SpinPowertrain.calculateTicksFromPosition(0.1)) {
+		} else if (Math.abs(pos - SpinPowertrain.calculateTicksFromPosition(SafePosition.Position4.value)) < tenthTurn * 3) {
 			return SafePosition.Position4;
-		} else (Math.abs(spinMotor.getSensorPosition() - Constants.SpindexerValues.SpinPowertrain.calculateTicksFromPosition(SafePosition.Position5.value)) < Constants.SpindexerValues.SpinPowertrain.calculateTicksFromPosition(0.1)) {
+		} else if (Math.abs(pos - SpinPowertrain.calculateTicksFromPosition(SafePosition.Position5.value)) < tenthTurn * 4) {
 			return SafePosition.Position5;
+		} else {
+			return SafePosition.Position1;
 		}
 	}
 
@@ -200,32 +207,6 @@ public class Spindexer extends SubsystemBase {
 			return BallPosition.Position4;
 		} else {
 			return BallPosition.Position5;
-		}
-	}
-
-	public enum BallPosition {
-		Position1(0.0),
-		Position2(0.2),
-		Position3(0.4),
-		Position4(0.6),
-		Position5(0.8);
-
-		double value;
-		BallPosition(double value) {
-			this.value = value;
-		}
-	}
-
-	public enum SafePosition {
-		Position1(0.1),
-		Position2(0.3),
-		Position3(0.5),
-		Position4(0.7),
-		Position5(0.9);
-
-		double value;
-		SafePosition(double value) {
-			this.value = value;
 		}
 	}
 }
