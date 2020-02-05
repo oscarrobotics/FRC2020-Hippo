@@ -8,8 +8,6 @@ import frc.team832.lib.motorcontrol.NeutralMode;
 import frc.team832.lib.motorcontrol2.vendor.CANSparkMax;
 import frc.team832.lib.motors.Motor;
 import frc.team832.lib.power.GrouchPDP;
-import frc.team832.lib.power.impl.SmartMCAttachedPDPSlot;
-import frc.team832.lib.power.monitoring.StallDetector;
 import frc.team832.lib.util.OscarMath;
 import frc.team832.robot.Constants;
 import frc.team832.robot.accesories.BallPosition;
@@ -20,25 +18,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static frc.team832.robot.Constants.SpindexerValues.SpinPowertrain;
+import static frc.team832.robot.Constants.SpindexerValues.SpinReduction;
 
 public class Spindexer extends SubsystemBase {
 	private boolean initSuccessful = false;
-	private SpinnerDirection currentSpinDirection;
-	private int spindexerRotations = 0;
-	private int tempSpindexerRotations = 0;
+	private double tempSpindexerRotations = 0;
 	private double lastSpinSpeed = 0;
 
 	private final CANSparkMax spinMotor;
 	private final DigitalInput hallEffect;
-	private SpindexerStatus spindexerStatus = new SpindexerStatus();
+	private SpindexerStatus spindexerStatus;
 	private final List<Boolean> ballStatus = new ArrayList<>();
 	private PIDController spinPID = new PIDController(Constants.SpindexerValues.SPIN_kP, 0, Constants.SpindexerValues.SPIN_kD);
 	private ProfiledPIDController positionPID = new ProfiledPIDController(Constants.SpindexerValues.POSITION_kP, 0, Constants.SpindexerValues.POSITION_kD, Constants.SpindexerValues.Constraints);
-
-	private SmartMCAttachedPDPSlot spinSlot;
-	private StallDetector spinStall;
-
-
 
 	public Spindexer(GrouchPDP pdp) {
 		spinMotor = new CANSparkMax(Constants.SpindexerValues.SPIN_MOTOR_CAN_ID, Motor.kNEO);
@@ -55,32 +47,18 @@ public class Spindexer extends SubsystemBase {
 
 		hallEffect = new DigitalInput(Constants.SpindexerValues.HALL_EFFECT_CHANNEL);
 
-		spinStall.setMinStallMillis(500);
-		spinStall.setStallCurrent(30);
-
-		spinSlot = pdp.addDevice(Constants.SpindexerValues.SPIN_MOTOR_PDP_SLOT, spinMotor);
-
+		spindexerStatus = new SpindexerStatus(pdp, this, spinMotor);
 
 		initSuccessful = true;
 	}
 
 	@Override
 	public void periodic() {
-		if(getHallEffect()) {
-			zeroSpindexer();
-			if (currentSpinDirection == SpinnerDirection.Clockwise) spindexerRotations++;
-			else spindexerRotations--;
-		}
-		spinStall.updateStallStatus();
-		spindexerStatus.update(ballStatus);
+		spindexerStatus.update(ballStatus, getHallEffect(), spinMotor.getSensorVelocity());
 	}
 
 	public void setCurrentLimit(int currentLimit) {
 		spinMotor.limitInputCurrent(currentLimit);
-	}
-
-	public void stopAll() {
-		stopSpin();
 	}
 
 	public void stopSpin() {
@@ -89,12 +67,10 @@ public class Spindexer extends SubsystemBase {
 
 	public void spinCounterclockwise(double pow) {
 		spinMotor.set(-OscarMath.clip(pow, 0, 1));
-		currentSpinDirection = SpinnerDirection.CounterClockwise;
 	}
 
 	public void spinClockwise(double pow) {
 		spinMotor.set(OscarMath.clip(pow, 0, 1));
-		currentSpinDirection = SpinnerDirection.Clockwise;
 	}
 
 	public enum SpinnerDirection {
@@ -103,23 +79,21 @@ public class Spindexer extends SubsystemBase {
 	}
 
 	public SpinnerDirection getSpinnerDirection() {
-		return currentSpinDirection;
+		return spindexerStatus.getSpinDirection();
 	}
 
 	public void setSpinRPM(double rpm, SpinnerDirection spinDirection) {
 		lastSpinSpeed = rpm;
 		if (spinDirection == SpinnerDirection.Clockwise) {
 			spinMotor.set(spinPID.calculate(spinMotor.getSensorVelocity(), rpm));
-			currentSpinDirection = SpinnerDirection.Clockwise;
 		}
 		else {
 			spinMotor.set(spinPID.calculate(spinMotor.getSensorVelocity(), -rpm));
-			currentSpinDirection = SpinnerDirection.CounterClockwise;
 		}
 	}
 
 	public boolean isStalled() {
-		return spinStall.getStallStatus().isStalled;
+		return spindexerStatus.isStalling();
 	}
 
 	public void setTargetPosition(double pos) {
@@ -142,54 +116,64 @@ public class Spindexer extends SubsystemBase {
 		return initSuccessful;
 	}
 
-	public List<Boolean> getBallPositions() { return spindexerStatus.getBooleanList(); }
-
 	public SpindexerStatus.SpindexerState getState() { return spindexerStatus.getState(); }
 
-	public double getRelativeSpinPosition () {
-		return spinMotor.getSensorPosition();
+	public double getRelativeRotations() {
+		return spinMotor.getSensorPosition() * SpinReduction;
 	}
 
-	public double getAbsoluteSpinPosition () {
-		return getRelativeSpinPosition() + spindexerRotations; }
+	public double getAbsoluteRotations() {
+		return spindexerStatus.getAbsoluteRotations() + getRelativeRotations(); }
 
 	public void switchSpin() {
-		setSpinRPM(lastSpinSpeed, currentSpinDirection == SpinnerDirection.Clockwise ? SpinnerDirection.CounterClockwise : SpinnerDirection.Clockwise);
+		setSpinRPM(lastSpinSpeed, spindexerStatus.getSpinDirection() == SpinnerDirection.Clockwise ? SpinnerDirection.CounterClockwise : SpinnerDirection.Clockwise);
 	}
 
 	public boolean isUnloaded() {
 		if (tempSpindexerRotations == 0) {
-			tempSpindexerRotations = spindexerRotations;
+			tempSpindexerRotations = getAbsoluteRotations();
 		}
-		if (Math.abs(tempSpindexerRotations - spindexerRotations) > 2) {
+		if (Math.abs(tempSpindexerRotations - getAbsoluteRotations()) > 2) {
 			tempSpindexerRotations = 0;
 			return true;
 		}
 		return false;
 	}
 
+	public void setToPocket(BallPosition position) {
+		double target = SpinPowertrain.calculateTicksFromPosition(position.value);
+		spinMotor.set(positionPID.calculate(spinMotor.getSensorPosition(), target));
+	}
+
+	public void setToSafeSpot() {
+		double target = SpinPowertrain.calculateTicksFromPosition(getNearestSafePosition().value);
+		spinMotor.set(positionPID.calculate(spinMotor.getSensorPosition(), target));
+	}
+
 	public void setToEmpty() {
 		int pos;
 		if(getState() != SpindexerStatus.SpindexerState.FULL){
 			pos = spindexerStatus.getFirstEmpty();
-			var smth = intToPosition(pos);
-			setTargetPosition(smth.);
+			var empty = intToPosition(pos);
+			setTargetPosition(empty.value);
 		}
 	}
 
+
+
 	public SafePosition getNearestSafePosition() {
 		double pos = spinMotor.getSensorPosition();
-		double tenthTurn = SpinPowertrain.calculateTicksFromPosition(0.2);
+		double nearestDistance = SpinPowertrain.calculateTicksFromPosition(0.1);
 
-		if (Math.abs(pos - SpinPowertrain.calculateTicksFromPosition(SafePosition.Position1.value)) < tenthTurn * 0) {
+		if (Math.abs(pos - SpinPowertrain.calculateTicksFromPosition(SafePosition.Position1.value)) < nearestDistance) {
 			return SafePosition.Position1;
-		} else if (Math.abs(pos - SpinPowertrain.calculateTicksFromPosition(SafePosition.Position2.value)) < tenthTurn * 1) {
+		} else if (Math.abs(pos - SpinPowertrain.calculateTicksFromPosition(SafePosition.Position2.value)) < nearestDistance) {
 			return SafePosition.Position2;
-		} else if (Math.abs(pos - SpinPowertrain.calculateTicksFromPosition(SafePosition.Position3.value)) < tenthTurn * 2) {
+		} else if (Math.abs(pos - SpinPowertrain.calculateTicksFromPosition(SafePosition.Position3.value)) < nearestDistance) {
 			return SafePosition.Position3;
-		} else if (Math.abs(pos - SpinPowertrain.calculateTicksFromPosition(SafePosition.Position4.value)) < tenthTurn * 3) {
+		} else if (Math.abs(pos - SpinPowertrain.calculateTicksFromPosition(SafePosition.Position4.value)) < nearestDistance) {
 			return SafePosition.Position4;
-		} else if (Math.abs(pos - SpinPowertrain.calculateTicksFromPosition(SafePosition.Position5.value)) < tenthTurn * 4) {
+		} else if (Math.abs(pos - SpinPowertrain.calculateTicksFromPosition(SafePosition.Position5.value)) < nearestDistance) {
 			return SafePosition.Position5;
 		} else {
 			return SafePosition.Position1;

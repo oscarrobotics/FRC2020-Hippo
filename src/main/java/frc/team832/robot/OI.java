@@ -42,8 +42,8 @@ public class OI {
 		stratComInterface.getSCMinus().whileHeld(new StartEndCommand(climber::unwindWinch, climber::stopWinch, Robot.climber));
 
 		stratComInterface.getArcadeWhiteLeft().whileHeld(new ConditionalCommand(
-				new StartEndCommand(climber::unwindLeftWinch, climber::stopLeftWinch, climber),
-				new StartEndCommand(climber::windLeftWinch, climber::stopLeftWinch, climber),
+				new StartEndCommand(climber::unwindLeftWinch, climber::stopLeftWinch, superStructure, climber),
+				new StartEndCommand(climber::windLeftWinch, climber::stopLeftWinch, superStructure, climber),
 				stratComInterface.getSCSideTop()::get)
 		);
 		stratComInterface.getArcadeWhiteRight().whileHeld(new ConditionalCommand(
@@ -52,8 +52,8 @@ public class OI {
 				stratComInterface.getSCSideTop()::get)
 		);
 
-		stratComInterface.getSCSideMid().whileHeld(new StartEndCommand(superStructure::intake, superStructure::idleIntake));
-		stratComInterface.getSCSideBot().whileHeld(new StartEndCommand(superStructure::outtake, superStructure::idleIntake));
+		stratComInterface.getSCSideMid().whileHeld(new StartEndCommand(() -> superStructure.setMode(SuperStructure.SuperStructureMode.INTAKING), () -> superStructure.setMode(SuperStructure.SuperStructureMode.IDLELAST), superStructure, intake, spindexer));
+		stratComInterface.getSCSideBot().whileHeld(new StartEndCommand(() -> superStructure.setMode(SuperStructure.SuperStructureMode.OUTTAKING), () -> superStructure.setMode(SuperStructure.SuperStructureMode.IDLELAST), superStructure, intake, spindexer));
 
 		stratComInterface.getArcadeBlackRight().whenPressed(new PrepareShooter(superStructure, pneumatics, shooter, spindexer));
 		stratComInterface.getArcadeBlackLeft().whileHeld(new ShootCommandGroup(superStructure, pneumatics, shooter, spindexer));

@@ -48,6 +48,9 @@ public class SuperStructure extends SubsystemBase implements DashboardUpdatable 
             case INTAKING:
 				intake();
                 break;
+			case OUTTAKING:
+				outtake();
+				break;
             case SPINUP:
 				prepareShoot();
                 break;
@@ -58,16 +61,17 @@ public class SuperStructure extends SubsystemBase implements DashboardUpdatable 
     }
 
     public void setMode(SuperStructureMode mode) {
-		this.currentMode = mode;
+		if (mode != currentMode) {
+			currentMode = mode;
+			lastMode = currentMode;
+		}
+
+
 	}
 
 	private void intake() {
-		if (spindexer.isStalled()) {
-			spindexer.setSpinRPM(Constants.SpindexerValues.SpinPowertrain.calculateMotorRpmFromWheelRpm(60), Spindexer.SpinnerDirection.Clockwise);
-		} else {
-			spindexer.setSpinRPM(Constants.SpindexerValues.SpinPowertrain.calculateMotorRpmFromWheelRpm(60), spindexer.getSpinnerDirection() == Spindexer.SpinnerDirection.Clockwise ? Spindexer.SpinnerDirection.CounterClockwise : Spindexer.SpinnerDirection.Clockwise);
-		}
 		intake.intake(Constants.IntakeValues.IntakePowertrain.calculateMotorRpmFromSurfaceSpeed(10));
+		spindexer.setSpinRPM(Constants.SpindexerValues.SpinPowertrain.calculateMotorRpmFromWheelRpm(60), Spindexer.SpinnerDirection.Clockwise);
 		pneumatics.extendIntake();
 	}
 
@@ -141,6 +145,7 @@ public class SuperStructure extends SubsystemBase implements DashboardUpdatable 
 	    IDLEALL,
 		IDLELAST,
         INTAKING,
+		OUTTAKING,
         SPINUP,
         SHOOTING
     }
@@ -155,6 +160,11 @@ public class SuperStructure extends SubsystemBase implements DashboardUpdatable 
 				break;
 			case INTAKING:
 				idleIntake();
+				idleSpindexer();
+				break;
+			case OUTTAKING:
+				idleIntake();
+				idleSpindexer();
 				break;
 			default:
 				break;
