@@ -79,9 +79,15 @@ public class Constants {
         private static final Gearbox FlywheelGearbox = new Gearbox(FlywheelReduction);
         public static final WheeledPowerTrain FlywheelPowerTrain = new WheeledPowerTrain(FlywheelGearbox, Motor.kNEO, 2, Units.inchesToMeters(4));
 
-        public static final float TurretReduction = 1f / (30f/1f);
+        public static final float TurretReduction = 1f / (200f/1f);
         private static final Gearbox TurretGearbox = new Gearbox(TurretReduction);
         public static final WheeledPowerTrain TurretPowerTrain = new WheeledPowerTrain(TurretGearbox, Motor.kNEO550, 1, Units.inchesToMeters(10));
+
+        public static final float FeedReduction = 1f;
+        private static final Gearbox FeedGearbox = new Gearbox(FeedReduction);
+        public static final WheeledPowerTrain FeedPowertrain = new WheeledPowerTrain(FeedGearbox, Motor.kNEO, 1, Units.inchesToMeters(4));
+
+        public static final double FEED_RPM = FeedPowertrain.calculateMotorRpmFromWheelRpm(3000);
 
         public static final double HOOD_MIN_ANGLE = 0;
         public static final double HOOD_MAX_ANGLE = 50;
@@ -145,15 +151,9 @@ public class Constants {
         public static final int STALL_CURRENT = 20;
         public static final double STALL_SEC = 5;
 
-        public static final float FeedReduction = 1f;
-        private static final Gearbox FeedGearbox = new Gearbox(FeedReduction);
-        public static final WheeledPowerTrain FeedPowertrain = new WheeledPowerTrain(FeedGearbox, Motor.kNEO, 1, Units.inchesToMeters(4));
-
-        public static final float SpinReduction = 1f / (100f/1f);
+        public static final float SpinReduction = 1f / (56f/1f);
         private static final Gearbox SpinGearbox = new Gearbox(SpinReduction);
         public static final WheeledPowerTrain SpinPowertrain = new WheeledPowerTrain(SpinGearbox, Motor.kNEO, 1, Units.inchesToMeters(20));
-
-        public static final double FEED_RPM = FeedPowertrain.calculateMotorRpmFromWheelRpm(3000);
 
         public static final double FEED_kP = 0;
         public static final double FEED_kD = 0;

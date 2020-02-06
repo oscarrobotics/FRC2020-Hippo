@@ -1,12 +1,11 @@
 package frc.team832.robot.subsystems;
 
 import edu.wpi.first.networktables.NetworkTableEntry;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.team832.lib.driverstation.dashboard.DashboardManager;
 import frc.team832.lib.driverstation.dashboard.DashboardUpdatable;
 import frc.team832.robot.Constants;
+
 public class SuperStructure extends SubsystemBase implements DashboardUpdatable {
 
 	private Intake intake;
@@ -31,9 +30,8 @@ public class SuperStructure extends SubsystemBase implements DashboardUpdatable 
 	@Override
 	public void periodic() {
 		spindexerAntiStall();
-		if (currentMode != lastMode) {
-			updateSuperStructure();
-		}
+		if (spindexer.isFull()) spindexer.setTargetPosition(spindexer.getNearestSafeSpotRelativeToFeeder());
+		if (currentMode != lastMode) updateSuperStructure();
 		lastMode = currentMode;
 	}
 
@@ -82,10 +80,10 @@ public class SuperStructure extends SubsystemBase implements DashboardUpdatable 
 	}
 
 	private void prepareShoot() {
-		spindexer.setTargetPosition(spindexer.getNearestSafePosition().value);
+		spindexer.setTargetPosition(spindexer.getNearestSafeSpotRelativeToFeeder());
 		shooter.spinUp();
 		pneumatics.propUp();
-		shooter.setFeedRPM(Constants.SpindexerValues.FEED_RPM);
+//		shooter.setFeedRPM(Constants.SpindexerValues.FEED_RPM);
 	}
 
 	private void shoot() {
@@ -117,6 +115,18 @@ public class SuperStructure extends SubsystemBase implements DashboardUpdatable 
 		shooter.idle();
 		pneumatics.retractProp();
 		idleSpindexer();
+	}
+
+	public double getFeederRotationRelativeToSpindexer() {
+		return -getSpindexerRotationRelativeToFeeder();
+	}
+
+	public double getSpindexerRotationRelativeToFeeder() {
+		return spindexer.getRelativeRotations() - shooter.getTurretRotations();
+	}
+
+	public double calculateSpindexerPosRelativeToFeeder(double targetPos) {
+		return targetPos - shooter.getTurretRotations();
 	}
 
 	private void spindexerAntiStall() {

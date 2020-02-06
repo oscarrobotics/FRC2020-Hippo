@@ -10,6 +10,7 @@ import frc.team832.robot.Constants;
 import static frc.team832.robot.Robot.oi;
 
 public class TankDriveProfile {
+    private boolean isClosedLoop = true;
     public double leftPow;
     public double rightPow;
     public SmartDiffDrive.LoopMode loopMode;
@@ -20,9 +21,7 @@ public class TankDriveProfile {
         setSpeeds(leftPow, rightPow, mode);
     }
 
-    public TankDriveProfile() {
-
-    }
+    public TankDriveProfile() {}
 
     public void calculateTankSpeeds() {
         boolean isPreciseRotate = ((SticksDriverOI) oi.driverOI).rightStick.two.get();
@@ -38,17 +37,17 @@ public class TankDriveProfile {
                 } else {
                     rotate = getTankRotateProfile();
                 }
-                setSpeeds(straight.leftPow + rotate.leftPow, straight.rightPow + rotate.rightPow, SmartDiffDrive.LoopMode.PERCENTAGE);
+                setSpeeds(straight.leftPow + rotate.leftPow, straight.rightPow + rotate.rightPow, rotate.loopMode);
             } else {
-                setSpeeds(straight.leftPow, straight.rightPow, SmartDiffDrive.LoopMode.PERCENTAGE);
+                setSpeeds(straight.leftPow, straight.rightPow, straight.loopMode);
             }
         } else {
             if (isPreciseRotate) {
                 TankDriveProfile rotateOnCenter = getTankRotateOnCenterProfile();
-                setSpeeds(rotateOnCenter.leftPow, rotateOnCenter.rightPow, SmartDiffDrive.LoopMode.PERCENTAGE);
+                setSpeeds(rotateOnCenter.leftPow, rotateOnCenter.rightPow, rotateOnCenter.loopMode);
             } else {
                 TankDriveProfile profile = getTankNormalProfile();
-                setSpeeds(profile.leftPow, profile.rightPow, SmartDiffDrive.LoopMode.PERCENTAGE);
+                setSpeeds(profile.leftPow, profile.rightPow, profile.loopMode);
             }
         }
     }
@@ -66,7 +65,7 @@ public class TankDriveProfile {
             power = (OscarMath.signumPow(leftStick * Constants.DrivetrainValues.StickDriveMultiplier, 2));
         }
 
-        return new TankDriveProfile(power, power, SmartDiffDrive.LoopMode.PERCENTAGE);
+        return new TankDriveProfile(power, power, isClosedLoop ? SmartDiffDrive.LoopMode.VELOCITY : SmartDiffDrive.LoopMode.PERCENTAGE);
     }
 
     public TankDriveProfile getTankNormalProfile() {
@@ -79,7 +78,7 @@ public class TankDriveProfile {
         rightPower = OscarMath.signumPow(rightStick * Constants.DrivetrainValues.StickDriveMultiplier, 2);
         leftPower = OscarMath.signumPow(leftStick * Constants.DrivetrainValues.StickDriveMultiplier, 2);
 
-        return new TankDriveProfile(leftPower, rightPower, SmartDiffDrive.LoopMode.PERCENTAGE);
+        return new TankDriveProfile(leftPower, rightPower, isClosedLoop ? SmartDiffDrive.LoopMode.VELOCITY : SmartDiffDrive.LoopMode.PERCENTAGE);
     }
 
     public TankDriveProfile getTankRotateProfile() {
@@ -90,7 +89,7 @@ public class TankDriveProfile {
         rightPower = OscarMath.signumPow(axes.getRightX() * Constants.DrivetrainValues.StickRotateMultiplier, 1.5);
         leftPower = OscarMath.signumPow(axes.getRightX() * Constants.DrivetrainValues.StickRotateMultiplier, 1.5);
 
-        return new TankDriveProfile(leftPower, rightPower, SmartDiffDrive.LoopMode.PERCENTAGE);
+        return new TankDriveProfile(leftPower, rightPower, isClosedLoop ? SmartDiffDrive.LoopMode.VELOCITY : SmartDiffDrive.LoopMode.PERCENTAGE);
     }
 
     TankDriveProfile getTankPreciseRotateProfile() {
@@ -101,14 +100,14 @@ public class TankDriveProfile {
         leftPower = OscarMath.signumPow(axes.getRotation() * Constants.DrivetrainValues.StickRotateMultiplier, 2);
 
 
-        return new TankDriveProfile(leftPower, rightPower, SmartDiffDrive.LoopMode.PERCENTAGE);
+        return new TankDriveProfile(leftPower, rightPower, isClosedLoop ? SmartDiffDrive.LoopMode.VELOCITY: SmartDiffDrive.LoopMode.PERCENTAGE);
     }
 
     public TankDriveProfile getTankRotateOnCenterProfile() {
         DriveAxesSupplier axes = oi.driverOI.getGreenbergDriveAxes();
         double rotation = OscarMath.signumPow(axes.getRotation() * Constants.DrivetrainValues.StickRotateOnCenterMultiplier, 3);
 
-        return new TankDriveProfile(-rotation, rotation, SmartDiffDrive.LoopMode.PERCENTAGE);
+        return new TankDriveProfile(-rotation, rotation, isClosedLoop ? SmartDiffDrive.LoopMode.VELOCITY : SmartDiffDrive.LoopMode.PERCENTAGE);
     }
 
     private void setSpeeds(double leftPow, double rightPow, SmartDiffDrive.LoopMode mode) {

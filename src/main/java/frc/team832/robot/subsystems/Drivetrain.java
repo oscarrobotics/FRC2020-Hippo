@@ -177,7 +177,6 @@ public class Drivetrain extends SubsystemBase implements DashboardUpdatable {
     }
 
     private void updatePose() {
-
         pose = driveOdometry.update(getDriveHeading(), getLeftDistanceMeters(), getRightDistanceMeters());
     }
 

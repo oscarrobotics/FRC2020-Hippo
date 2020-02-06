@@ -13,6 +13,9 @@ import frc.team832.lib.motors.Motor;
 import frc.team832.robot.Constants;
 import frc.team832.robot.accesories.ShooterCalculations;
 
+import static frc.team832.robot.Constants.ShooterValues.TurretPowerTrain;
+import static frc.team832.robot.Constants.ShooterValues.TurretReduction;
+
 public class Shooter extends SubsystemBase implements DashboardUpdatable {
 
     private boolean initSuccessful = false;
@@ -164,12 +167,27 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
         return Math.abs(turretMotor.getSensorPosition() - shooterCalcs.turretPosition) < 10;
     }
 
+    public void setHeadingRotation(double rotation) {
+        double power = turretPID.calculate(turretMotor.getSensorPosition(), TurretPowerTrain.calculateTicksFromPosition(rotation));
+        turretMotor.set(power);
+    }
+
+    public void spin() {
+        turretMotor.set(0.7);
+    }
+
     private boolean atHoodTarget() {
         return Math.abs(hoodServo.getPosition() - shooterCalcs.hoodPosition) < 0.05;
     }
 
     public void stopShooter() {
         primaryMotor.set(0);
+    }
+
+    public void stopAll() {
+        primaryMotor.set(0);
+        secondaryMotor.set(0);
+        turretMotor.set(0);
     }
 
     public void setCurrentLimit(int limit) {
@@ -191,7 +209,14 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
     }
 
     public boolean atFeedRpm() {
-        return Math.abs(feedMotor.getSensorVelocity() - Constants.SpindexerValues.FEED_RPM) < 100;
+        return Math.abs(feedMotor.getSensorVelocity() - Constants.ShooterValues.FEED_RPM) < 100;
+    }
+
+    public double getTurretRotations() {
+        return turretMotor.getSensorPosition() * TurretReduction;
+    }
+
+    public void stop() {
     }
 
     public enum ShootMode {

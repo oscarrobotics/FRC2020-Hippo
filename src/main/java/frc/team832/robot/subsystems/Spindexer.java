@@ -19,6 +19,7 @@ import java.util.List;
 
 import static frc.team832.robot.Constants.SpindexerValues.SpinPowertrain;
 import static frc.team832.robot.Constants.SpindexerValues.SpinReduction;
+import static frc.team832.robot.Robot.*;
 
 public class Spindexer extends SubsystemBase {
 	private boolean initSuccessful = false;
@@ -61,6 +62,10 @@ public class Spindexer extends SubsystemBase {
 		spinMotor.limitInputCurrent(currentLimit);
 	}
 
+	public boolean isSafe() {
+		return Math.abs(shooter.getTurretRotations() - spindexer.getRelativeRotations()) <= .05;
+	}
+
 	public void stopSpin() {
 		spinMotor.set(0);
 	}
@@ -71,6 +76,10 @@ public class Spindexer extends SubsystemBase {
 
 	public void spinClockwise(double pow) {
 		spinMotor.set(OscarMath.clip(pow, 0, 1));
+	}
+
+	public boolean isFull() {
+		return spindexerStatus.isFull();
 	}
 
 	public enum SpinnerDirection {
@@ -146,7 +155,7 @@ public class Spindexer extends SubsystemBase {
 	}
 
 	public void setToSafeSpot() {
-		double target = SpinPowertrain.calculateTicksFromPosition(getNearestSafePosition().value);
+		double target = SpinPowertrain.calculateTicksFromPosition(getNearestSafeSpotRelativeToFeeder());
 		spinMotor.set(positionPID.calculate(spinMotor.getSensorPosition(), target));
 	}
 
@@ -159,25 +168,28 @@ public class Spindexer extends SubsystemBase {
 		}
 	}
 
+	public double getNearestSafeSpotRelativeToFeeder() {
+		return superStructure.calculateSpindexerPosRelativeToFeeder(getNearestSafePosition().value);
+	}
 
-
-	public SafePosition getNearestSafePosition() {
+	private SafePosition getNearestSafePosition() {
 		double pos = spinMotor.getSensorPosition();
 		double nearestDistance = SpinPowertrain.calculateTicksFromPosition(0.1);
+		SafePosition safePosition = SafePosition.Position1;
 
 		if (Math.abs(pos - SpinPowertrain.calculateTicksFromPosition(SafePosition.Position1.value)) < nearestDistance) {
-			return SafePosition.Position1;
+			safePosition = SafePosition.Position1;
 		} else if (Math.abs(pos - SpinPowertrain.calculateTicksFromPosition(SafePosition.Position2.value)) < nearestDistance) {
-			return SafePosition.Position2;
+			safePosition = SafePosition.Position2;
 		} else if (Math.abs(pos - SpinPowertrain.calculateTicksFromPosition(SafePosition.Position3.value)) < nearestDistance) {
-			return SafePosition.Position3;
+			safePosition = SafePosition.Position3;
 		} else if (Math.abs(pos - SpinPowertrain.calculateTicksFromPosition(SafePosition.Position4.value)) < nearestDistance) {
-			return SafePosition.Position4;
+			safePosition = SafePosition.Position4;
 		} else if (Math.abs(pos - SpinPowertrain.calculateTicksFromPosition(SafePosition.Position5.value)) < nearestDistance) {
-			return SafePosition.Position5;
-		} else {
-			return SafePosition.Position1;
+			safePosition = SafePosition.Position5;
 		}
+
+		return safePosition;
 	}
 
 	private BallPosition intToPosition(int i) {
