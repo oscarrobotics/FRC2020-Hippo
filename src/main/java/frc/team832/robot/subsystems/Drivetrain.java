@@ -4,16 +4,19 @@ import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveWheelSpeeds;
 import edu.wpi.first.wpilibj2.command.RunEndCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.team832.lib.drive.ClosedLoopDT;
 import frc.team832.lib.drive.SmartDiffDrive;
 import frc.team832.lib.driverstation.dashboard.DashboardManager;
 import frc.team832.lib.driverstation.dashboard.DashboardUpdatable;
 import frc.team832.lib.driverstation.dashboard.FalconDashboard;
+import frc.team832.lib.motorcontrol.NeutralMode;
 import frc.team832.lib.motorcontrol2.vendor.CANTalonFX;
 import frc.team832.lib.motors.Motor;
 import frc.team832.lib.power.GrouchPDP;
@@ -37,8 +40,13 @@ public class Drivetrain extends SubsystemBase implements DashboardUpdatable {
 
     private double latestLeftWheelVolts, latestRightWheelVolts;
 
-    private TankDriveProfile tankProfile = new TankDriveProfile(true, true);
+    private TankDriveProfile tankProfile = new TankDriveProfile(false, true);
     private ArcadeDriveProfile arcadeProfile = new ArcadeDriveProfile();
+
+    private PIDController rightPID = new PIDController(Constants.DrivetrainValues.kRight_kP, 0, Constants.DrivetrainValues.kRight_kD);
+    private PIDController leftPID = new PIDController(Constants.DrivetrainValues.kLeft_kP, 0, Constants.DrivetrainValues.kLeft_kD);
+
+    private ClosedLoopDT config = new ClosedLoopDT(Constants.DrivetrainValues.kDriveFF, Constants.DrivetrainValues.kDriveFF, leftPID, rightPID, Constants.DrivetrainValues.DrivePowerTrain);
 
     private NetworkTable falconTable = NetworkTableInstance.getDefault().getTable("Live_Dashboard");
     private NetworkTableEntry falconPoseXEntry = falconTable.getEntry("robotX");
@@ -75,8 +83,11 @@ public class Drivetrain extends SubsystemBase implements DashboardUpdatable {
         rightMasterSlot = pdp.addDevice(Constants.DrivetrainValues.RIGHT_MASTER_PDP_PORT, rightMaster);
         rightSlaveSlot = pdp.addDevice(Constants.DrivetrainValues.RIGHT_SLAVE_PDP_PORT, rightSlave);
 
-        rightMaster.setPIDF(Constants.DrivetrainValues.DriveClosedLoopConfig);
-        leftMaster.setPIDF(Constants.DrivetrainValues.DriveClosedLoopConfig);
+        NeutralMode idleMode = NeutralMode.kBrake;
+        leftMaster.setNeutralMode(idleMode);
+        leftSlave.setNeutralMode(idleMode);
+        rightMaster.setNeutralMode(idleMode);
+        rightSlave.setNeutralMode(idleMode);
 
         setCurrentLimit(40);
 
@@ -84,9 +95,11 @@ public class Drivetrain extends SubsystemBase implements DashboardUpdatable {
             navX = new NavXMicro(NavXMicro.NavXPort.I2C_onboard);
         }
 
+        config.setFFAccel(0.1);
+
         DashboardManager.addTab(this, this);
 
-        diffDrive = new SmartDiffDrive(leftMaster, rightMaster, (int)Motor.kFalcon500.freeSpeed);
+        diffDrive = new SmartDiffDrive(leftMaster, rightMaster, config, Constants.DrivetrainValues.MAX_RPM);
         driveOdometry = new DifferentialDriveOdometry(getDriveHeading(), startingPose);
         resetPose();
 

@@ -81,13 +81,14 @@ public class TankDriveProfile {
 	public StoreDriveSpeeds getTankRotateProfile() {
 		DriveAxesSupplier axes = oi.driverOI.getGreenbergDriveAxes();
 		double rightPow, leftPow;
+		double powerMultiplier = OscarMath.map(Math.abs(axes.getLeftY()), 0, 1, Constants.DrivetrainValues.StickRotateMultiplier, Constants.DrivetrainValues.StickRotateMultiplier * 2);
 
 		if (useFF) {
-			rightPow = -OscarMath.signumPow(getPower(axes.getRightX(), 0.1) * Constants.DrivetrainValues.StickRotateMultiplier, 1.5);
-			leftPow = OscarMath.signumPow(getPower(axes.getRightX(), 0.1) * Constants.DrivetrainValues.StickRotateMultiplier, 1.5);
+			rightPow = -OscarMath.signumPow(getPower(axes.getRightX(), 0.1) * powerMultiplier, 2);
+			leftPow = OscarMath.signumPow(getPower(axes.getRightX(), 0.1) * powerMultiplier, 2);
 		} else {
-			rightPow = -OscarMath.signumPow(axes.getRightX() * Constants.DrivetrainValues.StickRotateMultiplier, 1.5);
-			leftPow = OscarMath.signumPow(axes.getRightX() * Constants.DrivetrainValues.StickRotateMultiplier, 1.5);
+			rightPow = -OscarMath.signumPow(axes.getRightX() * powerMultiplier, 2);
+			leftPow = OscarMath.signumPow(axes.getRightX() * powerMultiplier, 2);
 		}
 
 		return new StoreDriveSpeeds(leftPow, rightPow);
@@ -98,11 +99,11 @@ public class TankDriveProfile {
 		double rightPow, leftPow;
 
 		if (useFF) {
-			rightPow = -OscarMath.signumPow(getPower(axes.getRotation(), 0.1) * Constants.DrivetrainValues.StickRotateMultiplier, 2);
-			leftPow = OscarMath.signumPow(getPower(axes.getRotation(), 0.1) * Constants.DrivetrainValues.StickRotateMultiplier, 2);
+			rightPow = OscarMath.signumPow(getPower(axes.getRotation(), 0.1) * Constants.DrivetrainValues.StickRotateMultiplier, 2);
+			leftPow = -OscarMath.signumPow(getPower(axes.getRotation(), 0.1) * Constants.DrivetrainValues.StickRotateMultiplier, 2);
 		} else {
-			rightPow = -OscarMath.signumPow(axes.getRotation() * Constants.DrivetrainValues.StickRotateMultiplier, 2);
-			leftPow = OscarMath.signumPow(axes.getRotation() * Constants.DrivetrainValues.StickRotateMultiplier, 2);
+			rightPow = OscarMath.signumPow(axes.getRotation() * Constants.DrivetrainValues.StickRotateMultiplier, 2);
+			leftPow = -OscarMath.signumPow(axes.getRotation() * Constants.DrivetrainValues.StickRotateMultiplier, 2);
 		}
 
 		return new StoreDriveSpeeds(leftPow, rightPow);

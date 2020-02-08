@@ -30,7 +30,7 @@ public class Constants {
 
         public static final double StickDriveMultiplier = 1.0;
         public static final double StickRotateOnCenterMultiplier = 0.6;
-        public static final double StickRotateMultiplier = 0.85;
+        public static final double StickRotateMultiplier = 0.8;
 
         public static final double DriveWheelDiameter = Units.inchesToMeters(6);
         public static final float DriveGearReduction = 1f / (8f/84f);
@@ -40,18 +40,21 @@ public class Constants {
         public static final PDPPortNumber RIGHT_MASTER_PDP_PORT = PDPPortNumber.Port0;
         public static final PDPPortNumber RIGHT_SLAVE_PDP_PORT = PDPPortNumber.Port1;
 
+        public static final int MAX_RPM = (int)Motor.kFalcon500.freeSpeed;
+
         private static final Gearbox DriveGearbox = new Gearbox(DriveGearReduction);
         public static final WheeledPowerTrain DrivePowerTrain = new WheeledPowerTrain(DriveGearbox, Motor.kFalcon500, 2, DriveWheelDiameter);
         public static DifferentialDriveKinematics DriveKinematics = new DifferentialDriveKinematics(Units.inchesToMeters(29.0));
-
-        public static final ClosedLoopConfig DriveClosedLoopConfig = new ClosedLoopConfig(0, 0, 0, 0);
         
         private static final double kDrive_kS = 0.0;
         private static final double kDrive_kV = 0.0;
         private static final double kDrive_kA = 0.0;
 
-        public static final double kLeft_kP = 0.0;
-        public static final double kRight_kP = 0.0;
+        public static final double kLeft_kP = 1.0;
+        public static final double kLeft_kD = 0.1;
+
+        public static final double kRight_kP = 0.1;
+        public static double kRight_kD = 0.01;
 
         public static final SimpleMotorFeedforward kDriveFF = new SimpleMotorFeedforward(kDrive_kS, kDrive_kV, kDrive_kA);
 

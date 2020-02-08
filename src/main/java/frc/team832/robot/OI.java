@@ -63,8 +63,8 @@ public class OI {
 		stratComInterface.getSC3().whileHeld(new StartEndCommand(wheelOfFortune::spinClockWise, wheelOfFortune::stopSpin, Robot.wheelOfFortune));
 		stratComInterface.getSC6().whenPressed(new InstantCommand(wheelOfFortune::spinThreeRot, Robot.wheelOfFortune));
 
-		stratComInterface.getSC4().whileHeld(new StartEndCommand(() -> spindexer.spinClockwise(0.3), spindexer::stopSpin, spindexer));
+		stratComInterface.getSC4().whileHeld(new StartEndCommand(() -> spindexer.spinClockwise(1), spindexer::stopSpin, spindexer));
 		stratComInterface.getSC5().whileHeld(new RunEndCommand(shooter::spin, shooter::stopAll, shooter));
-		stratComInterface.getSCSideMid().whileHeld(new StartEndCommand(() -> intake.intake(0.95), intake::stop, intake));
+		stratComInterface.getSCSideMid().whileHeld(new StartEndCommand(() -> intake.intake(0.9), intake::stop, intake));
 	}
 }

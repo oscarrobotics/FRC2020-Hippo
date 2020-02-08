@@ -14,7 +14,7 @@ public class SuperStructure extends SubsystemBase implements DashboardUpdatable 
 	private Pneumatics pneumatics;
 	private SuperStructureMode currentMode = SuperStructureMode.IDLEALL, lastMode = SuperStructureMode.IDLEALL;
 
-	private NetworkTableEntry dashboard_mode;
+	private NetworkTableEntry dashboard_mode, dashboard_lastMode;
 
 	public SuperStructure(Intake intake, Shooter shooter, Spindexer spindexer, Pneumatics pneumatics) {
 		this.intake = intake;
@@ -22,12 +22,11 @@ public class SuperStructure extends SubsystemBase implements DashboardUpdatable 
 		this.spindexer = spindexer;
 		this.pneumatics = pneumatics;
 
-//		dashboard_mode = DashboardManager.addTabItem();
-
         DashboardManager.addTab(this, this);
 
-//        DashboardManager.addTabItem(this, "Mode", )
-    }
+		dashboard_mode = DashboardManager.addTabItem(this, "Mode", "Default");
+		dashboard_lastMode = DashboardManager.addTabItem(this, "Last Mode", "Default");
+	}
 
 	@Override
 	public void periodic() {
@@ -84,7 +83,6 @@ public class SuperStructure extends SubsystemBase implements DashboardUpdatable 
 		spindexer.setTargetPosition(spindexer.getNearestSafeSpotRelativeToFeeder());
 		shooter.spinUp();
 		pneumatics.propUp();
-//		shooter.setFeedRPM(Constants.SpindexerValues.FEED_RPM);
 	}
 
 	private void shoot() {
@@ -94,7 +92,6 @@ public class SuperStructure extends SubsystemBase implements DashboardUpdatable 
 
 	public void idle(boolean idleAll) {
 		if (idleAll) {
-			setMode(SuperStructureMode.IDLEALL);
 			idleIntake();
 			idleSpindexer();
 			idleShooter();
@@ -149,7 +146,8 @@ public class SuperStructure extends SubsystemBase implements DashboardUpdatable 
 
     @Override
     public void updateDashboardData() {
-
+		dashboard_mode.setString(getModeString());
+		dashboard_lastMode.setString(getLastModeString());
     }
 
     public enum SuperStructureMode {
@@ -180,6 +178,35 @@ public class SuperStructure extends SubsystemBase implements DashboardUpdatable 
 			default:
 				break;
 		}
-		setMode(SuperStructureMode.IDLELAST);
+	}
+
+	private String getModeString() {
+		switch (currentMode) {
+			case INTAKING:
+				return "Intaking";
+			case OUTTAKING:
+				return "Outtaking";
+			case IDLEALL:
+				return "Idle All";
+			case IDLELAST:
+				return "Idle Last";
+			default:
+				return "AHHHHHH";
+		}
+	}
+
+	private String getLastModeString() {
+		switch (lastMode) {
+			case INTAKING:
+				return "Intaking";
+			case OUTTAKING:
+				return "Outtaking";
+			case IDLEALL:
+				return "Idle All";
+			case IDLELAST:
+				return "Idle Last";
+			default:
+				return "AHHHHHH";
+		}
 	}
 }
