@@ -36,7 +36,7 @@ public class Drivetrain extends SubsystemBase implements DashboardUpdatable {
 
     private double latestLeftWheelVolts, latestRightWheelVolts;
 
-    private TankDriveProfile tankProfile = new TankDriveProfile();
+    private TankDriveProfile tankProfile = new TankDriveProfile(true, true);
     private ArcadeDriveProfile arcadeProfile = new ArcadeDriveProfile();
 
     private NetworkTable falconTable = NetworkTableInstance.getDefault().getTable("Live_Dashboard");
@@ -105,7 +105,7 @@ public class Drivetrain extends SubsystemBase implements DashboardUpdatable {
 
     public void tankDrive() {
         tankProfile.calculateTankSpeeds();
-        diffDrive.tankDrive(tankProfile.leftPow, tankProfile.rightPow, tankProfile.loopMode);
+        diffDrive.tankDrive(tankProfile.leftPower, tankProfile.rightPower, tankProfile.loopMode);
     }
 
     public void arcadeDrive() {
@@ -117,8 +117,6 @@ public class Drivetrain extends SubsystemBase implements DashboardUpdatable {
         arcadeProfile.calculateArcadeSpeeds();
         diffDrive.arcadeDrive(arcadeProfile.xPow, arcadeProfile.rotPow, arcadeProfile.loopMode);
     }
-
-
 
     public void stopDrive() {
         leftMaster.set(0);

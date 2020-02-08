@@ -1,5 +1,6 @@
 package frc.team832.robot;
 
+import edu.wpi.first.wpilibj.controller.ProfiledPIDController;
 import edu.wpi.first.wpilibj.controller.SimpleMotorFeedforward;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
@@ -44,7 +45,7 @@ public class Constants {
         public static DifferentialDriveKinematics DriveKinematics = new DifferentialDriveKinematics(Units.inchesToMeters(29.0));
 
         public static final ClosedLoopConfig DriveClosedLoopConfig = new ClosedLoopConfig(0, 0, 0, 0);
-
+        
         private static final double kDrive_kS = 0.0;
         private static final double kDrive_kV = 0.0;
         private static final double kDrive_kA = 0.0;
@@ -100,6 +101,8 @@ public class Constants {
         public static final double TURRET_kP = 0;
         public static final double TURRET_kD = 0;
         public static final double TURRET_kF = 0;
+        public static final Constraints TURRET_CONSTRAINTS = new Constraints(TurretPowerTrain.calculateMotorRpmFromWheelRpm(90),
+                                                                            TurretPowerTrain.calculateMotorRpmFromWheelRpm(450));
 
         public static final double HOOD_kP = 0;
         public static final double HOOD_kD = 0;
