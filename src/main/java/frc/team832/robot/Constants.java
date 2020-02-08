@@ -73,6 +73,7 @@ public class Constants {
         public static final int PRIMARY_CAN_ID = 2;
         public static final int SECONDARY_CAN_ID = 3;
         public static final int TURRET_CAN_ID = 4;
+        public static final int FEED_MOTOR_CAN_ID = 6;
 
         public static final int HOOD_CHANNEL = 0;
 
@@ -147,7 +148,6 @@ public class Constants {
         public static final PDPPortNumber SPIN_MOTOR_PDP_SLOT = PDPPortNumber.Port0;
 
         public static final int SPIN_MOTOR_CAN_ID = 5;
-        public static final int FEED_MOTOR_CAN_ID = 6;
 
         public static final int HALL_EFFECT_CHANNEL = 0;
 

@@ -24,7 +24,7 @@ public class WheelOfFortune extends SubsystemBase implements DashboardUpdatable 
     public ColorWheelPath path;
 
     public WheelOfFortune() {
-        spinner = new CANSparkMax(Constants.WOFValues.SPINNER_CAN_ID, Motor.kNEO550);
+        spinner = new CANSparkMax(Constants.WOFValues.SPINNER_CAN_ID, Motor.kNEO550, false);
 
         spinner.wipeSettings();
         spinner.setNeutralMode(NeutralMode.kBrake);

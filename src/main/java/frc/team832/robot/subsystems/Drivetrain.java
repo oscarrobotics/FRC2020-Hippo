@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.kinematics.DifferentialDriveWheelSpeeds;
 import edu.wpi.first.wpilibj2.command.RunEndCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.team832.lib.drive.SmartDiffDrive;
+import frc.team832.lib.driverstation.dashboard.DashboardManager;
 import frc.team832.lib.driverstation.dashboard.DashboardUpdatable;
 import frc.team832.lib.driverstation.dashboard.FalconDashboard;
 import frc.team832.lib.motorcontrol2.vendor.CANTalonFX;
@@ -82,6 +83,8 @@ public class Drivetrain extends SubsystemBase implements DashboardUpdatable {
         if (RobotBase.isReal()) {
             navX = new NavXMicro(NavXMicro.NavXPort.I2C_onboard);
         }
+
+        DashboardManager.addTab(this, this);
 
         diffDrive = new SmartDiffDrive(leftMaster, rightMaster, (int)Motor.kFalcon500.freeSpeed);
         driveOdometry = new DifferentialDriveOdometry(getDriveHeading(), startingPose);
@@ -182,7 +185,7 @@ public class Drivetrain extends SubsystemBase implements DashboardUpdatable {
         resetEncoders();
         this.pose = pose;
         if (navX != null) {
-            navX.zero();
+//            navX.zero();
         }
         driveOdometry.resetPosition(this.pose, getDriveHeading());
     }

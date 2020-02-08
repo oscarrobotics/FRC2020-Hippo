@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.AddressableLED;
 import edu.wpi.first.wpilibj2.AddressableLEDBuffer;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.team832.lib.power.GrouchPDP;
 import frc.team832.robot.subsystems.*;
 
@@ -41,19 +42,33 @@ public class Robot extends TimedRobot {
     public void robotInit() {
         if (!drivetrain.isInitSuccessful()) {
             System.out.println("Drivetrain - init FAILED");
-        } else if (intake.isInitSuccessful()) {
+        }
+
+        if (intake.isInitSuccessful()) {
             System.out.println("Intake - init FAILED");
-        } else if (vision.isInitSuccessful()) {
+        }
+
+        if (vision.isInitSuccessful()) {
             System.out.println("Vision - init FAILED");
-        } else if (shooter.isInitSuccessful()) {
+        }
+
+        if (shooter.isInitSuccessful()) {
             System.out.println("Shooter - init FAILED");
-        } else if (spindexer.isInitSuccessful()) {
+        }
+
+        if (spindexer.isInitSuccessful()) {
             System.out.println("Spindexer - init FAILED");
-        } else if (climber.isInitSuccessful()) {
+        }
+
+        if (climber.isInitSuccessful()) {
             System.out.println("Climber - init FAILED");
-        } else if (pneumatics.isInitSuccessful()) {
+        }
+
+        if (pneumatics.isInitSuccessful()) {
             System.out.println("Pneumatics - init FAILED");
-        } else if (wheelOfFortune.isInitSuccessful()) {
+        }
+
+        if (wheelOfFortune.isInitSuccessful()) {
             System.out.println("WheelOfFortune - init FAILED");
         }
 
@@ -67,7 +82,7 @@ public class Robot extends TimedRobot {
 
     @Override
     public void robotPeriodic() {
-
+        CommandScheduler.getInstance().run();
     }
 
     @Override

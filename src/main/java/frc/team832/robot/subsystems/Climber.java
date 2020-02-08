@@ -15,11 +15,10 @@ public class Climber extends SubsystemBase implements DashboardUpdatable {
     private final CANSparkMax leftWinch, rightWinch;
 
     public Climber() {
-        DashboardManager.addTab(this);
-        DashboardManager.getTab(this).add(this);
+        DashboardManager.addTab(this, this);
 
-        leftWinch = new CANSparkMax(Constants.ClimberValues.LEFT_WINCH_CAN_ID, Motor.kNEO);
-        rightWinch = new CANSparkMax(Constants.ClimberValues.RIGHT_WINCH_CAN_ID, Motor.kNEO);
+        leftWinch = new CANSparkMax(Constants.ClimberValues.LEFT_WINCH_CAN_ID, Motor.kNEO, false);
+        rightWinch = new CANSparkMax(Constants.ClimberValues.RIGHT_WINCH_CAN_ID, Motor.kNEO, false);
 
         leftWinch.wipeSettings();
         rightWinch.wipeSettings();

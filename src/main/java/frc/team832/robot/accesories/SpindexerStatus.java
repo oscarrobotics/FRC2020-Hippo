@@ -8,6 +8,7 @@ import frc.team832.lib.util.OscarMath;
 import frc.team832.robot.Constants;
 import frc.team832.robot.subsystems.Spindexer;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static frc.team832.robot.Robot.pdp;
@@ -16,14 +17,14 @@ public class SpindexerStatus {
     private final Spindexer spindexer;
     private final CANSparkMax spinMotor;
     private final GrouchPDP pdp;
+    private final SmartMCAttachedPDPSlot spinSlot;
+    private final StallDetector spinStall;
 
-    private List<Boolean> ballPositions;
+    private List<Boolean> ballPositions = new ArrayList<>();
     private double absoluteRotations = 0;
     public SpindexerState state;
     private Spindexer.SpinnerDirection spinDirection;
 
-    private SmartMCAttachedPDPSlot spinSlot;
-    private StallDetector spinStall;
 
 
     public SpindexerStatus(GrouchPDP pdp, Spindexer spindexer, CANSparkMax spinMotor) {
@@ -32,28 +33,29 @@ public class SpindexerStatus {
         this.pdp = pdp;
 
         spinSlot = pdp.addDevice(Constants.SpindexerValues.SPIN_MOTOR_PDP_SLOT, spinMotor);
+        spinStall = new StallDetector(spinSlot);
         spinStall.setMinStallMillis(500);
         spinStall.setStallCurrent(30);
     }
 
     public void update(List<Boolean> sensorData, boolean hallEffect, double currentVelocity) {
-        this.ballPositions = sensorData;
-        if (isFull())
-            state = SpindexerState.FULL;
-        else if (!isEmpty())
-            state = SpindexerState.FILLING;
-        else
-            state = SpindexerState.EMPTY;
+//        this.ballPositions = sensorData;
+//        if (isFull())
+//            state = SpindexerState.FULL;
+//        else if (!isEmpty())
+//            state = SpindexerState.FILLING;
+//        else
+//            state = SpindexerState.EMPTY;
 
-        spinStall.updateStallStatus();
+//        spinStall.updateStallStatus();
 
-        if (hallEffect) {
-            spindexer.zeroSpindexer();
-            if (spindexer.getSpinnerDirection() == Spindexer.SpinnerDirection.Clockwise) absoluteRotations++;
-            else absoluteRotations--;
-        }
-
-        spinDirection = Math.signum(currentVelocity) == 1 ? Spindexer.SpinnerDirection.Clockwise : Spindexer.SpinnerDirection.CounterClockwise;
+//        if (hallEffect) {
+//            spindexer.zeroSpindexer();
+//            if (spindexer.getSpinnerDirection() == Spindexer.SpinnerDirection.Clockwise) absoluteRotations++;
+//            else absoluteRotations--;
+//        }
+//
+//        spinDirection = Math.signum(currentVelocity) == 1 ? Spindexer.SpinnerDirection.Clockwise : Spindexer.SpinnerDirection.CounterClockwise;
     }
 
     public boolean getPosition(int pos) {

@@ -36,12 +36,12 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
     private ShooterCalculations shooterCalcs = new ShooterCalculations();
 
     public Shooter(){
-        DashboardManager.addTab(this);
+        DashboardManager.addTab(this, this);
 
-        primaryMotor = new CANSparkMax(Constants.ShooterValues.PRIMARY_CAN_ID, Motor.kNEO);
-        secondaryMotor = new CANSparkMax(Constants.ShooterValues.SECONDARY_CAN_ID, Motor.kNEO);
+        primaryMotor = new CANSparkMax(Constants.ShooterValues.PRIMARY_CAN_ID, Motor.kNEO, false);
+        secondaryMotor = new CANSparkMax(Constants.ShooterValues.SECONDARY_CAN_ID, Motor.kNEO, false);
         turretMotor = new CANSparkMax(Constants.ShooterValues.TURRET_CAN_ID, Motor.kNEO550);
-        feedMotor = new CANSparkMax(Constants.SpindexerValues.FEED_MOTOR_CAN_ID, Motor.kNEO);
+        feedMotor = new CANSparkMax(Constants.ShooterValues.FEED_MOTOR_CAN_ID, Motor.kNEO, false);
 
         hoodServo = new Servo(Constants.ShooterValues.HOOD_CHANNEL);
 
@@ -92,7 +92,7 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
     public void periodic() {
         updatePIDMode();
         shooterCalcs.update();
-        trackTarget();
+//        trackTarget();
     }
 
     @Override
@@ -173,8 +173,9 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
         turretMotor.set(power);
     }
 
-    public void spin() {
-        turretMotor.set(0.7);
+    public void
+    spin() {
+        turretMotor.set(0.6);
     }
 
     private boolean atHoodTarget() {

@@ -46,12 +46,12 @@ public class Intake extends SubsystemBase {
 	}
 
 	public void setIntakeRPM(double rpm) {
-		OscarMath.clip(rpm, 0, 15000);
+		OscarMath.clip(rpm, 0, 12000);
 		intakeMotor.set(Constants.IntakeValues.FF.calculate(rpm));
 	}
 
 	public void setOuttakeRPM(double rpm) {
-		OscarMath.clip(rpm, 0, 15000);
+		OscarMath.clip(rpm, 0, 12000);
 		intakeMotor.set(Constants.IntakeValues.FF.calculate(-rpm));
 	}
 

@@ -79,7 +79,8 @@ public class Spindexer extends SubsystemBase {
 	}
 
 	public boolean isFull() {
-		return spindexerStatus.isFull();
+//		return spindexerStatus.isFull();
+		return false;
 	}
 
 	public enum SpinnerDirection {

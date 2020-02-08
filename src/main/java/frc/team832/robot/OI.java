@@ -11,7 +11,6 @@ import frc.team832.lib.driverinput.oi.SticksDriverOI;
 import frc.team832.lib.driverinput.oi.XboxDriverOI;
 import frc.team832.robot.commands.PrepareShooter;
 import frc.team832.robot.commands.ShootCommandGroup;
-import frc.team832.robot.subsystems.Spindexer;
 import frc.team832.robot.subsystems.SuperStructure;
 
 import static frc.team832.robot.Robot.*;
@@ -64,7 +63,8 @@ public class OI {
 		stratComInterface.getSC3().whileHeld(new StartEndCommand(wheelOfFortune::spinClockWise, wheelOfFortune::stopSpin, Robot.wheelOfFortune));
 		stratComInterface.getSC6().whenPressed(new InstantCommand(wheelOfFortune::spinThreeRot, Robot.wheelOfFortune));
 
-		stratComInterface.getSC4().whileHeld(new StartEndCommand(() -> spindexer.spinClockwise(0.5), spindexer::stopSpin, spindexer));
-		stratComInterface.getSC5().whileHeld(new StartEndCommand(shooter::spin, shooter::stopAll, spindexer));
+		stratComInterface.getSC4().whileHeld(new StartEndCommand(() -> spindexer.spinClockwise(0.3), spindexer::stopSpin, spindexer));
+		stratComInterface.getSC5().whileHeld(new RunEndCommand(shooter::spin, shooter::stopAll, shooter));
+		stratComInterface.getSCSideMid().whileHeld(new StartEndCommand(() -> intake.intake(0.95), intake::stop, intake));
 	}
 }

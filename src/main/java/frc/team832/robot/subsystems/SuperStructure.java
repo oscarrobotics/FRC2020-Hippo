@@ -14,7 +14,7 @@ public class SuperStructure extends SubsystemBase implements DashboardUpdatable 
 	private Pneumatics pneumatics;
 	private SuperStructureMode currentMode = SuperStructureMode.IDLEALL, lastMode = SuperStructureMode.IDLEALL;
 
-	private NetworkTableEntry mode;
+	private NetworkTableEntry dashboard_mode;
 
 	public SuperStructure(Intake intake, Shooter shooter, Spindexer spindexer, Pneumatics pneumatics) {
 		this.intake = intake;
@@ -22,16 +22,18 @@ public class SuperStructure extends SubsystemBase implements DashboardUpdatable 
 		this.spindexer = spindexer;
 		this.pneumatics = pneumatics;
 
-        DashboardManager.addTab(this);
+//		dashboard_mode = DashboardManager.addTabItem();
+
+        DashboardManager.addTab(this, this);
 
 //        DashboardManager.addTabItem(this, "Mode", )
     }
 
 	@Override
 	public void periodic() {
+		if (currentMode != lastMode) updateSuperStructure();
 		spindexerAntiStall();
 		if (spindexer.isFull()) spindexer.setTargetPosition(spindexer.getNearestSafeSpotRelativeToFeeder());
-		if (currentMode != lastMode) updateSuperStructure();
 		lastMode = currentMode;
 	}
 
@@ -63,7 +65,6 @@ public class SuperStructure extends SubsystemBase implements DashboardUpdatable 
 			currentMode = mode;
 			lastMode = currentMode;
 		}
-
 
 	}
 
@@ -130,7 +131,7 @@ public class SuperStructure extends SubsystemBase implements DashboardUpdatable 
 	}
 
 	private void spindexerAntiStall() {
-		if (spindexer.isStalled()) spindexer.switchSpin();
+//		if (spindexer.isStalled()) spindexer.switchSpin();
 	}
 
 	public boolean isSpindexerUnloaded() {
