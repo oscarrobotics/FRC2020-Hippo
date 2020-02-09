@@ -69,10 +69,10 @@ public class Constants {
         public static final int TURRET_CAN_ID = 4;
         public static final int FEED_MOTOR_CAN_ID = 6;
 
-        public static final PDPPortNumber PRIMARY_PDP_SLOT = PDPPortNumber.Port0;
-        public static final PDPPortNumber SECONDARY_PDP_SLOT = PDPPortNumber.Port0;
-        public static final PDPPortNumber TURRET_PDP_SLOT = PDPPortNumber.Port0;
-        public static final PDPPortNumber FEEDER_PDP_SLOT = PDPPortNumber.Port0;
+        public static final PDPPortNumber PRIMARY_PDP_SLOT = PDPPortNumber.Port3;
+        public static final PDPPortNumber SECONDARY_PDP_SLOT = PDPPortNumber.Port12;
+        public static final PDPPortNumber TURRET_PDP_SLOT = PDPPortNumber.Port4;
+        public static final PDPPortNumber FEEDER_PDP_SLOT = PDPPortNumber.Port12;
 
         public static final int HOOD_CHANNEL = 0;
 
@@ -116,7 +116,7 @@ public class Constants {
     public static class IntakeValues {
         public static final int INTAKE_MOTOR_CAN_ID = 1;
 
-        public static final PDPPortNumber INTAKE_MOTOR_PDP_SLOT = PDPPortNumber.Port0;
+        public static final PDPPortNumber INTAKE_MOTOR_PDP_SLOT = PDPPortNumber.Port11;
 
         public static final float IntakeReduction = 1f / (18f/36f);
         private static final Gearbox IntakeGearbox = new Gearbox(IntakeReduction);
@@ -133,7 +133,7 @@ public class Constants {
     public static class SpindexerValues {
         public static final int SPIN_MOTOR_CAN_ID = 5;
 
-        public static final PDPPortNumber SPIN_MOTOR_PDP_SLOT = PDPPortNumber.Port0;
+        public static final PDPPortNumber SPIN_MOTOR_PDP_SLOT = PDPPortNumber.Port5;
 
         public static final int HALL_EFFECT_CHANNEL = 0;
 
@@ -160,8 +160,7 @@ public class Constants {
         public static final int LEFT_WINCH_CAN_ID = 7;
         public static final int RIGHT_WINCH_CAN_ID = 8;
 
-        public static final PDPPortNumber LEFT_WINCH_PDP_PORT = PDPPortNumber.Port13;
-        public static final PDPPortNumber RIGHT_WINCH_PDP_PORT = PDPPortNumber.Port2;
+        public static final PDPPortNumber WINCH_PDP_PORT = PDPPortNumber.Port13;
     }
 
     public static class WOFValues {
