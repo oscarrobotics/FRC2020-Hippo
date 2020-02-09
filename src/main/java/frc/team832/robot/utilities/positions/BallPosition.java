@@ -1,4 +1,4 @@
-package frc.team832.robot.accesories;
+package frc.team832.robot.utilities.positions;
 
 public enum BallPosition {
 	Position1(0.0),

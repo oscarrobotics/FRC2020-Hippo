@@ -30,10 +30,8 @@ public class SuperStructure extends SubsystemBase implements DashboardUpdatable 
 
 	@Override
 	public void periodic() {
-		if (currentMode != lastMode) updateSuperStructure();
 		spindexerAntiStall();
 		if (spindexer.isFull()) spindexer.setTargetPosition(spindexer.getNearestSafeSpotRelativeToFeeder());
-		lastMode = currentMode;
 	}
 
 	private void updateSuperStructure(){
@@ -60,11 +58,11 @@ public class SuperStructure extends SubsystemBase implements DashboardUpdatable 
     }
 
     public void setMode(SuperStructureMode mode) {
-		if (mode != currentMode) {
+		if (currentMode != mode) {
 			currentMode = mode;
 			lastMode = currentMode;
+			updateSuperStructure();
 		}
-
 	}
 
 	private void intake() {

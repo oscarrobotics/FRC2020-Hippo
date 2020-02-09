@@ -1,6 +1,4 @@
-package frc.team832.robot.accesories;
-
-import frc.team832.robot.Constants;
+package frc.team832.robot.utilities.positions;
 
 public class ColorWheelPath {
    public final Direction direction;

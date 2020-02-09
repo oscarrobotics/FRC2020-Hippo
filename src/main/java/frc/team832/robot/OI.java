@@ -38,7 +38,7 @@ public class OI {
 
 	private void configureButtonBindings() {
 		// do commands here
-		stratComInterface.getSCPlus().whileHeld(new StartEndCommand(climber::windWinch, climber::stopWinch, Robot.climber));
+		stratComInterface.getSCPlus().whileHeld(new StartEndCommand(climber::winchUp, climber::stopWinch, Robot.climber));
 		stratComInterface.getSCMinus().whileHeld(new StartEndCommand(climber::unwindWinch, climber::stopWinch, Robot.climber));
 
 		stratComInterface.getArcadeWhiteLeft().whileHeld(new ConditionalCommand(
@@ -59,9 +59,9 @@ public class OI {
 		stratComInterface.getArcadeBlackLeft().whileHeld(new ShootCommandGroup(superStructure, pneumatics, shooter, spindexer));
 
 		stratComInterface.getSC2().whileHeld(new StartEndCommand(pneumatics::extendWOFManipulator, pneumatics::retractWOFManipulator, Robot.pneumatics));
-		stratComInterface.getSC1().whileHeld(new StartEndCommand(wheelOfFortune::spinCounterClockWise, wheelOfFortune::stopSpin, Robot.wheelOfFortune));
-		stratComInterface.getSC3().whileHeld(new StartEndCommand(wheelOfFortune::spinClockWise, wheelOfFortune::stopSpin, Robot.wheelOfFortune));
-		stratComInterface.getSC6().whenPressed(new InstantCommand(wheelOfFortune::spinThreeRot, Robot.wheelOfFortune));
+		stratComInterface.getSC1().whileHeld(new StartEndCommand(wheelOfFortune::spinCounterclockwise, wheelOfFortune::stopSpin, Robot.wheelOfFortune));
+		stratComInterface.getSC3().whileHeld(new StartEndCommand(wheelOfFortune::spinClockwise, wheelOfFortune::stopSpin, Robot.wheelOfFortune));
+		stratComInterface.getSC6().whenPressed(new InstantCommand(wheelOfFortune::spinThreeTimes, Robot.wheelOfFortune));
 
 		stratComInterface.getSC4().whileHeld(new StartEndCommand(() -> spindexer.spinClockwise(1), spindexer::stopSpin, spindexer));
 		stratComInterface.getSC5().whileHeld(new RunEndCommand(shooter::spin, shooter::stopAll, shooter));

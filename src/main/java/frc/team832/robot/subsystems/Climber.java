@@ -45,11 +45,11 @@ public class Climber extends SubsystemBase implements DashboardUpdatable {
     public boolean isInitSuccessful() { return initSuccessful; }
 
     public void unwindLeftWinch() {
-        leftWinch.set(-Constants.ClimberValues.WINCH_POWER);
+        leftWinch.set(-0.25);
     }
 
     public void unwindRightWinch() {
-        rightWinch.set(-Constants.ClimberValues.WINCH_POWER);
+        rightWinch.set(-0.25);
     }
 
     public void unwindWinch() {
@@ -59,14 +59,14 @@ public class Climber extends SubsystemBase implements DashboardUpdatable {
     }
 
     public void windLeftWinch() {
-        leftWinch.set(Constants.ClimberValues.WINCH_POWER);
+        leftWinch.set(0.75);
     }
 
     public void windRightWinch() {
-        rightWinch.set(Constants.ClimberValues.WINCH_POWER);
+        rightWinch.set(0.75);
     }
 
-    public void windWinch() {
+    public void winchUp() {
         pneumatics.unlockClimb();
         windLeftWinch();
         windRightWinch();

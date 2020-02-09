@@ -10,9 +10,9 @@ import frc.team832.lib.motors.Motor;
 import frc.team832.lib.power.GrouchPDP;
 import frc.team832.lib.util.OscarMath;
 import frc.team832.robot.Constants;
-import frc.team832.robot.accesories.BallPosition;
-import frc.team832.robot.accesories.SafePosition;
-import frc.team832.robot.accesories.SpindexerStatus;
+import frc.team832.robot.utilities.positions.BallPosition;
+import frc.team832.robot.utilities.positions.SafePosition;
+import frc.team832.robot.utilities.state.SpindexerStatus;
 
 import java.util.ArrayList;
 import java.util.List;

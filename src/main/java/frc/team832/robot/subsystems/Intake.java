@@ -4,6 +4,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.team832.lib.motorcontrol2.vendor.CANSparkMax;
 import frc.team832.lib.motors.Motor;
 import frc.team832.lib.power.GrouchPDP;
+import frc.team832.lib.power.impl.SmartMCAttachedPDPSlot;
 import frc.team832.lib.util.OscarMath;
 import frc.team832.robot.Constants;
 
@@ -13,9 +14,13 @@ public class Intake extends SubsystemBase {
 	private boolean initSuccessful = false;
 	private final CANSparkMax intakeMotor;
 
-	public Intake() {
+	private SmartMCAttachedPDPSlot intakeSlot;
+
+	public Intake(GrouchPDP pdp) {
 		//Change Can ID
 		intakeMotor = new CANSparkMax(Constants.IntakeValues.INTAKE_MOTOR_CAN_ID, Motor.kNEO550);
+
+		intakeSlot = pdp.addDevice(Constants.IntakeValues.INTAKE_MOTOR_PDP_SLOT, intakeMotor);
 
 		intakeMotor.wipeSettings();
 
@@ -46,12 +51,12 @@ public class Intake extends SubsystemBase {
 	}
 
 	public void setIntakeRPM(double rpm) {
-		OscarMath.clip(rpm, 0, 12000);
+		OscarMath.clip(rpm, 0, Motor.kNEO550.freeSpeed);
 		intakeMotor.set(Constants.IntakeValues.FF.calculate(rpm));
 	}
 
 	public void setOuttakeRPM(double rpm) {
-		OscarMath.clip(rpm, 0, 12000);
+		OscarMath.clip(rpm, 0, Motor.kNEO550.freeSpeed);
 		intakeMotor.set(Constants.IntakeValues.FF.calculate(-rpm));
 	}
 

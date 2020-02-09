@@ -1,17 +1,14 @@
 package frc.team832.robot.subsystems;
 
-import com.revrobotics.CANSparkMaxLowLevel;
 import edu.wpi.first.wpilibj.I2C;
-import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.team832.lib.driverinput.controllers.StratComInterface;
 import frc.team832.lib.driverstation.dashboard.DashboardUpdatable;
 import frc.team832.lib.motorcontrol.NeutralMode;
 import frc.team832.lib.motorcontrol2.vendor.CANSparkMax;
 import frc.team832.lib.motors.Motor;
 import frc.team832.robot.Constants;
 import frc.team832.robot.OI;
-import frc.team832.robot.accesories.ColorWheelPath;
+import frc.team832.robot.utilities.positions.ColorWheelPath;
 
 public class WheelOfFortune extends SubsystemBase implements DashboardUpdatable {
     private boolean initSuccessful = false;
@@ -48,21 +45,20 @@ public class WheelOfFortune extends SubsystemBase implements DashboardUpdatable 
 //        int proximity = m_colorSensor.getProximity();
     }
 
-    public void spinClockWise() {
-        if (OI.stratComInterface.getSC2().get()) spinner.set(Constants.WOFValues.BASIC_SPIN_POW);
+    public void spinClockwise() {
+        if (OI.stratComInterface.getSC2().get()) spinner.set(0.5);
     }
 
-    public void spinCounterClockWise() {
-        if (OI.stratComInterface.getSC2().get()) spinner.set(-Constants.WOFValues.BASIC_SPIN_POW);
+    public void spinCounterclockwise() {
+        if (OI.stratComInterface.getSC2().get()) spinner.set(-0.5);
     }
 
-    public void spinThreeRot() {
-        double additionalTicks = 3 / Constants.WOFValues.RevsToTicks;
-        if (OI.stratComInterface.getSC2().get()) spinner.set(spinner.getSensorPosition() + additionalTicks);
+    public void spinThreeTimes() {
+        spinWheel(3);
     }
 
     public void spinWheel(double revolutions) {
-        double additionalTicks = revolutions / Constants.WOFValues.RevsToTicks;
+        double additionalTicks = Constants.WOFValues.SpinPowertrain.calculateTicksFromPosition(revolutions);
         spinner.set(spinner.getSensorPosition() + additionalTicks);
     }
 
@@ -71,7 +67,7 @@ public class WheelOfFortune extends SubsystemBase implements DashboardUpdatable 
 //        path = new ColorWheelPath(currentColor, targetColor);
 
         double rotations = path.rotations * (path.direction == ColorWheelPath.Direction.CLOCKWISE ? 1 : -1);//assuming that clockwise is positive
-        spinner.set(rotations * Constants.WOFValues.RevsToTicks);
+        spinner.set(Constants.WOFValues.SpinPowertrain.calculateTicksFromPosition(rotations));
     }
 
     public void stopSpin() {

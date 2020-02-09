@@ -1,4 +1,4 @@
-package frc.team832.robot.accesories;
+package frc.team832.robot.utilities.state;
 
 import frc.team832.lib.motorcontrol2.vendor.CANSparkMax;
 import frc.team832.lib.power.GrouchPDP;
@@ -10,8 +10,6 @@ import frc.team832.robot.subsystems.Spindexer;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static frc.team832.robot.Robot.pdp;
 
 public class SpindexerStatus {
     private final Spindexer spindexer;

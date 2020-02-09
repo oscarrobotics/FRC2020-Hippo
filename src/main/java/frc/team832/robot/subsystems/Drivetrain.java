@@ -18,14 +18,13 @@ import frc.team832.lib.driverstation.dashboard.DashboardUpdatable;
 import frc.team832.lib.driverstation.dashboard.FalconDashboard;
 import frc.team832.lib.motorcontrol.NeutralMode;
 import frc.team832.lib.motorcontrol2.vendor.CANTalonFX;
-import frc.team832.lib.motors.Motor;
 import frc.team832.lib.power.GrouchPDP;
 import frc.team832.lib.power.impl.SmartMCAttachedPDPSlot;
 import frc.team832.lib.sensors.NavXMicro;
 import frc.team832.robot.Constants;
 
-import frc.team832.robot.accesories.ArcadeDriveProfile;
-import frc.team832.robot.accesories.TankDriveProfile;
+import frc.team832.robot.utilities.ArcadeDriveProfile;
+import frc.team832.robot.utilities.TankDriveProfile;
 
 public class Drivetrain extends SubsystemBase implements DashboardUpdatable {
     private boolean initSuccessful = false;
@@ -43,10 +42,10 @@ public class Drivetrain extends SubsystemBase implements DashboardUpdatable {
     private TankDriveProfile tankProfile = new TankDriveProfile(false, true);
     private ArcadeDriveProfile arcadeProfile = new ArcadeDriveProfile();
 
-    private PIDController rightPID = new PIDController(Constants.DrivetrainValues.kRight_kP, 0, Constants.DrivetrainValues.kRight_kD);
-    private PIDController leftPID = new PIDController(Constants.DrivetrainValues.kLeft_kP, 0, Constants.DrivetrainValues.kLeft_kD);
+    private PIDController rightPID = new PIDController(Constants.DrivetrainValues.RightkP, 0, Constants.DrivetrainValues.RightkD);
+    private PIDController leftPID = new PIDController(Constants.DrivetrainValues.LeftkP, 0, Constants.DrivetrainValues.LeftkD);
 
-    private ClosedLoopDT config = new ClosedLoopDT(Constants.DrivetrainValues.kDriveFF, Constants.DrivetrainValues.kDriveFF, leftPID, rightPID, Constants.DrivetrainValues.DrivePowerTrain);
+    private ClosedLoopDT driveConfig = new ClosedLoopDT(Constants.DrivetrainValues.LeftFF, Constants.DrivetrainValues.RightFF, leftPID, rightPID, Constants.DrivetrainValues.DrivePowerTrain);
 
     private NetworkTable falconTable = NetworkTableInstance.getDefault().getTable("Live_Dashboard");
     private NetworkTableEntry falconPoseXEntry = falconTable.getEntry("robotX");
@@ -95,11 +94,11 @@ public class Drivetrain extends SubsystemBase implements DashboardUpdatable {
             navX = new NavXMicro(NavXMicro.NavXPort.I2C_onboard);
         }
 
-        config.setFFAccel(0.1);
+        driveConfig.setFFAccel(0.1);
 
         DashboardManager.addTab(this, this);
 
-        diffDrive = new SmartDiffDrive(leftMaster, rightMaster, config, Constants.DrivetrainValues.MAX_RPM);
+        diffDrive = new SmartDiffDrive(leftMaster, rightMaster, driveConfig, Constants.DrivetrainValues.MaxRpm);
         driveOdometry = new DifferentialDriveOdometry(getDriveHeading(), startingPose);
         resetPose();
 

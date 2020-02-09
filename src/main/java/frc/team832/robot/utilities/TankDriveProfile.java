@@ -1,9 +1,8 @@
-package frc.team832.robot.accesories;
+package frc.team832.robot.utilities;
 
 import frc.team832.lib.drive.SmartDiffDrive;
 import frc.team832.lib.driverinput.oi.DriveAxesSupplier;
 import frc.team832.lib.driverinput.oi.SticksDriverOI;
-import frc.team832.lib.motors.Motor;
 import frc.team832.lib.util.OscarMath;
 import frc.team832.robot.Constants;
 
@@ -54,11 +53,7 @@ public class TankDriveProfile {
 		DriveAxesSupplier axes = oi.driverOI.getGreenbergDriveAxes();
 		double power;
 
-		if (useFF) {
-			power = OscarMath.signumPow(getPower(axes.getLeftY(), 0.1) * Constants.DrivetrainValues.StickDriveMultiplier, 2);
-		} else {
-			power = OscarMath.signumPow(axes.getLeftY() * Constants.DrivetrainValues.StickDriveMultiplier, 2);
-		}
+		power = OscarMath.signumPow(axes.getLeftY() * Constants.DrivetrainValues.StickDriveMultiplier, 2);
 
 		return new StoreDriveSpeeds(power, power);
 	}
@@ -67,13 +62,8 @@ public class TankDriveProfile {
 		DriveAxesSupplier axes = oi.driverOI.getGreenbergDriveAxes();
 		double rightPow, leftPow;
 
-		if (useFF) {
-			rightPow = OscarMath.signumPow(getPower(axes.getRightY(), 0.1) * Constants.DrivetrainValues.StickDriveMultiplier, 2);
-			leftPow = OscarMath.signumPow(getPower(axes.getLeftY(), 0.1) * Constants.DrivetrainValues.StickDriveMultiplier, 2);
-		} else {
-			rightPow = OscarMath.signumPow(axes.getRightY() * Constants.DrivetrainValues.StickDriveMultiplier, 2);
-			leftPow = OscarMath.signumPow(axes.getLeftY() * Constants.DrivetrainValues.StickDriveMultiplier, 2);
-		}
+		rightPow = OscarMath.signumPow(axes.getRightY() * Constants.DrivetrainValues.StickDriveMultiplier, 2);
+		leftPow = OscarMath.signumPow(axes.getLeftY() * Constants.DrivetrainValues.StickDriveMultiplier, 2);
 
 		return new StoreDriveSpeeds(leftPow, rightPow);
 	}
@@ -83,13 +73,8 @@ public class TankDriveProfile {
 		double rightPow, leftPow;
 		double powerMultiplier = OscarMath.map(Math.abs(axes.getLeftY()), 0, 1, Constants.DrivetrainValues.StickRotateMultiplier, Constants.DrivetrainValues.StickRotateMultiplier * 2);
 
-		if (useFF) {
-			rightPow = -OscarMath.signumPow(getPower(axes.getRightX(), 0.1) * powerMultiplier, 2);
-			leftPow = OscarMath.signumPow(getPower(axes.getRightX(), 0.1) * powerMultiplier, 2);
-		} else {
-			rightPow = -OscarMath.signumPow(axes.getRightX() * powerMultiplier, 2);
-			leftPow = OscarMath.signumPow(axes.getRightX() * powerMultiplier, 2);
-		}
+		rightPow = -OscarMath.signumPow(axes.getRightX() * powerMultiplier, 2);
+		leftPow = OscarMath.signumPow(axes.getRightX() * powerMultiplier, 2);
 
 		return new StoreDriveSpeeds(leftPow, rightPow);
 	}
@@ -98,13 +83,8 @@ public class TankDriveProfile {
 		DriveAxesSupplier axes = oi.driverOI.getGreenbergDriveAxes();
 		double rightPow, leftPow;
 
-		if (useFF) {
-			rightPow = OscarMath.signumPow(getPower(axes.getRotation(), 0.1) * Constants.DrivetrainValues.StickRotateMultiplier, 2);
-			leftPow = -OscarMath.signumPow(getPower(axes.getRotation(), 0.1) * Constants.DrivetrainValues.StickRotateMultiplier, 2);
-		} else {
-			rightPow = OscarMath.signumPow(axes.getRotation() * Constants.DrivetrainValues.StickRotateMultiplier, 2);
-			leftPow = -OscarMath.signumPow(axes.getRotation() * Constants.DrivetrainValues.StickRotateMultiplier, 2);
-		}
+		rightPow = OscarMath.signumPow(axes.getRotation() * Constants.DrivetrainValues.StickRotateMultiplier, 2);
+		leftPow = -OscarMath.signumPow(axes.getRotation() * Constants.DrivetrainValues.StickRotateMultiplier, 2);
 
 		return new StoreDriveSpeeds(leftPow, rightPow);
 	}
@@ -113,11 +93,7 @@ public class TankDriveProfile {
 		DriveAxesSupplier axes = oi.driverOI.getGreenbergDriveAxes();
 		double rotation;
 
-		if (useFF) {
-			rotation = OscarMath.signumPow(getPower(axes.getRotation(), 0.1) * Constants.DrivetrainValues.StickRotateOnCenterMultiplier, 3);
-		} else {
-			rotation = OscarMath.signumPow(axes.getRotation() * Constants.DrivetrainValues.StickRotateOnCenterMultiplier, 3);
-		}
+		rotation = OscarMath.signumPow(axes.getRotation() * Constants.DrivetrainValues.StickRotateOnCenterMultiplier, 3);
 
 		return new StoreDriveSpeeds(-rotation, rotation);
 	}
@@ -125,15 +101,6 @@ public class TankDriveProfile {
 	private void setSpeeds(double leftPower, double rightPower) {
 		this.leftPower = leftPower;
 		this.rightPower = rightPower;
-	}
-
-	/**
-	 * @param acceleration = seconds to max velocity
-	 **/
-	private double getPower(double stick, double acceleration) {
-		double velocity = OscarMath.map(stick, -1, 1, -Motor.kFalcon500.freeSpeed, Motor.kFalcon500.freeSpeed);
-
-		return Constants.DrivetrainValues.kDriveFF.calculate(velocity, velocity/acceleration);
 	}
 
 	public class StoreDriveSpeeds {
