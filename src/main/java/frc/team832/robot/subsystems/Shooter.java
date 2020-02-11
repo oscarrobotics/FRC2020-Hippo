@@ -13,6 +13,7 @@ import frc.team832.lib.motorcontrol2.vendor.CANSparkMax;
 import frc.team832.lib.motors.Motor;
 import frc.team832.lib.power.GrouchPDP;
 import frc.team832.lib.power.impl.SmartMCAttachedPDPSlot;
+import frc.team832.lib.util.OscarMath;
 import frc.team832.robot.Constants;
 import frc.team832.robot.utilities.state.ShooterCalculations;
 
@@ -158,11 +159,11 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
     }
 
     private void hoodTrackTarget() {
-        hoodServo.set(hoodPID.calculate(hoodServo.getPosition(), shooterCalcs.hoodPosition));
+        setExitAngle(shooterCalcs.exitAngle);
     }
 
     private void turretTrackTarget() {
-        turretMotor.set(turretPID.calculate(turretMotor.getSensorPosition(), shooterCalcs.turretPosition));
+        setHeadingRotation(shooterCalcs.turretRotation);
     }
 
     public boolean readyToShoot() {
@@ -174,16 +175,26 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
     }
 
     private boolean atTurretTarget() {
-        return Math.abs(turretMotor.getSensorPosition() - shooterCalcs.turretPosition) < 5;
+        return Math.abs(turretMotor.getSensorPosition() - shooterCalcs.turretRotation) < 5;
     }
 
     private boolean atHoodTarget() {
-        return Math.abs(hoodServo.getPosition() - shooterCalcs.hoodPosition) < 0.05;
+        return Math.abs(hoodServo.getPosition() - shooterCalcs.exitAngle) < 0.05;
     }
 
-    public void setHeadingRotation(double rotation) {
-        double power = turretPID.calculate(turretMotor.getSensorPosition(), TurretPowerTrain.calculateTicksFromPosition(rotation));
-        turretMotor.set(power);
+    public void setHeadingRotation(double rotations) {
+        double targetRotation = OscarMath.clip(rotations, -0.5, 0.5);
+        turretMotor.set(turretPID.calculate(turretMotor.getSensorPosition(), TurretPowerTrain.calculateTicksFromPosition(targetRotation)));
+    }
+
+    public void setHeadingDegrees(double degrees) {
+        double rotations = OscarMath.clipMap(degrees, -90, 90, -0.5, 0.5);
+        setHeadingRotation(rotations);
+    }
+
+    public void setExitAngle(double degrees) {
+        double position = OscarMath.clipMap(degrees, 10.0, 80.0, 5, 495);//tune outmin and outmax for servo
+        hoodServo.set(hoodPID.calculate(hoodServo.getPosition(), position));
     }
 
     public void spin() {

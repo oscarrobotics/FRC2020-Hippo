@@ -71,7 +71,7 @@ public class TankDriveProfile {
 	public StoreDriveSpeeds getTankRotateProfile() {
 		DriveAxesSupplier axes = oi.driverOI.getGreenbergDriveAxes();
 		double rightPow, leftPow;
-		double powerMultiplier = OscarMath.map(Math.abs(axes.getLeftY()), 0, 1, Constants.DrivetrainValues.StickRotateMultiplier, Constants.DrivetrainValues.StickRotateMultiplier * 2);
+		double powerMultiplier = OscarMath.clipMap(Math.abs(axes.getLeftY()), 0, 1, Constants.DrivetrainValues.StickRotateMultiplier, Constants.DrivetrainValues.StickRotateMultiplier * 2);
 
 		rightPow = -OscarMath.signumPow(axes.getRightX() * powerMultiplier, 2);
 		leftPow = OscarMath.signumPow(axes.getRightX() * powerMultiplier, 2);

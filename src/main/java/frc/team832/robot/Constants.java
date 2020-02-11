@@ -38,8 +38,8 @@ public class Constants {
         public static final WheeledPowerTrain DrivePowerTrain = new WheeledPowerTrain(DriveGearbox, Motor.kFalcon500, 2, DriveWheelDiameter);
         public static DifferentialDriveKinematics DriveKinematics = new DifferentialDriveKinematics(Units.inchesToMeters(29.0));
 
-        public static final double LeftkP = 1.0;
-        public static final double LeftkD = 0.1;
+        public static final double LeftkP = 0.1;
+        public static final double LeftkD = 0.01;
 
         public static final double RightkP = 0.1;
         public static final double RightkD = 0.01;
