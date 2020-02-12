@@ -15,10 +15,12 @@ import frc.team832.lib.power.GrouchPDP;
 import frc.team832.lib.power.impl.SmartMCAttachedPDPSlot;
 import frc.team832.lib.util.OscarMath;
 import frc.team832.robot.Constants;
+import frc.team832.robot.OI;
 import frc.team832.robot.utilities.state.ShooterCalculations;
 
 import static frc.team832.robot.Constants.ShooterValues.TurretPowerTrain;
 import static frc.team832.robot.Constants.ShooterValues.TurretReduction;
+import static frc.team832.robot.Robot.oi;
 
 public class Shooter extends SubsystemBase implements DashboardUpdatable {
 
@@ -152,6 +154,10 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
         double power = flywheelPID.calculate(primaryMotor.getSensorVelocity(), rpm);
         dashboard_PID.setDouble(power);
         primaryMotor.set(power);
+    }
+
+    public void setDumbRPM(double rpm) {
+        setRPM(rpm);
     }
 
     public void flywheelTrackTarget() {

@@ -21,8 +21,8 @@ public class Robot extends TimedRobot {
 
     // Subsystems
     public static final Drivetrain drivetrain = new Drivetrain(pdp);
-    public static final Intake intake = new Intake();
-    public static final Shooter shooter = new Shooter();
+    public static final Intake intake = new Intake(pdp);
+    public static final Shooter shooter = new Shooter(pdp);
     public static final Spindexer spindexer = new Spindexer(pdp);
     public static final Vision vision = new Vision();
     public static final Climber climber = new Climber();
