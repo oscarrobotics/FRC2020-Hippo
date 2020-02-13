@@ -25,7 +25,7 @@ public class Robot extends TimedRobot {
     public static final Shooter shooter = new Shooter(pdp);
     public static final Spindexer spindexer = new Spindexer(pdp);
     public static final Vision vision = new Vision();
-    public static final Climber climber = new Climber();
+    public static final Climber climber = new Climber(pdp);
     public static final Pneumatics pneumatics = new Pneumatics();
     public static final WheelOfFortune wheelOfFortune = new WheelOfFortune();
     public static final SuperStructure superStructure = new SuperStructure(intake, shooter, spindexer, pneumatics);

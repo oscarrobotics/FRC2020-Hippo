@@ -3,16 +3,12 @@ package frc.team832.robot;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.RunEndCommand;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import frc.team832.lib.driverinput.controllers.*;
 import frc.team832.lib.driverinput.oi.DriverOI;
 import frc.team832.lib.driverinput.oi.SticksDriverOI;
 import frc.team832.lib.driverinput.oi.XboxDriverOI;
 import frc.team832.lib.util.OscarMath;
-import frc.team832.robot.commands.PrepareShooter;
-import frc.team832.robot.commands.ShootCommandGroup;
-import frc.team832.robot.subsystems.SuperStructure;
 
 import static frc.team832.robot.Robot.*;
 
@@ -39,38 +35,32 @@ public class OI {
 
 	private void configureButtonBindings() {
 		// do commands here
-		stratComInterface.getSCPlus().whileHeld(new StartEndCommand(climber::winchUp, climber::stopWinch, Robot.climber));
-		stratComInterface.getSCMinus().whileHeld(new StartEndCommand(climber::unwindWinch, climber::stopWinch, Robot.climber));
+		stratComInterface.getSCPlus().whileHeld(new StartEndCommand(climber::climbUp, climber::stopClimb, Robot.climber));
+		stratComInterface.getSCMinus().whileHeld(new StartEndCommand(climber::climbDown, climber::stopClimb, Robot.climber));
 
-		stratComInterface.getArcadeWhiteLeft().whileHeld(new ConditionalCommand(
-				new StartEndCommand(climber::unwindLeftWinch, climber::stopLeftWinch, superStructure, climber),
-				new StartEndCommand(climber::windLeftWinch, climber::stopLeftWinch, superStructure, climber),
-				stratComInterface.getSCSideTop()::get)
-		);
-		stratComInterface.getArcadeWhiteRight().whileHeld(new ConditionalCommand(
-				new StartEndCommand(climber::unwindRightWinch, climber::stopRightWinch, climber),
-				new StartEndCommand(climber::windRightWinch, climber::stopRightWinch, climber),
-				stratComInterface.getSCSideTop()::get)
-		);
+//		stratComInterface.getSCSideMid().whileHeld(new StartEndCommand(() -> superStructure.setMode(SuperStructure.SuperStructureMode.INTAKING), () -> superStructure.setMode(SuperStructure.SuperStructureMode.IDLELAST), superStructure, intake, spindexer));
+//		stratComInterface.getSCSideBot().whileHeld(new StartEndCommand(() -> superStructure.setMode(SuperStructure.SuperStructureMode.OUTTAKING), () -> superStructure.setMode(SuperStructure.SuperStructureMode.IDLELAST), superStructure, intake, spindexer));
 
-		stratComInterface.getSCSideMid().whileHeld(new StartEndCommand(() -> superStructure.setMode(SuperStructure.SuperStructureMode.INTAKING), () -> superStructure.setMode(SuperStructure.SuperStructureMode.IDLELAST), superStructure, intake, spindexer));
-		stratComInterface.getSCSideBot().whileHeld(new StartEndCommand(() -> superStructure.setMode(SuperStructure.SuperStructureMode.OUTTAKING), () -> superStructure.setMode(SuperStructure.SuperStructureMode.IDLELAST), superStructure, intake, spindexer));
+//		stratComInterface.getArcadeBlackRight().whenPressed(new PrepareShooter(superStructure, pneumatics, shooter, spindexer));
+//		stratComInterface.getArcadeBlackLeft().whileHeld(new ShootCommandGroup(superStructure, pneumatics, shooter, spindexer));
 
-		stratComInterface.getArcadeBlackRight().whenPressed(new PrepareShooter(superStructure, pneumatics, shooter, spindexer));
-		stratComInterface.getArcadeBlackLeft().whileHeld(new ShootCommandGroup(superStructure, pneumatics, shooter, spindexer));
-
-		stratComInterface.getSC2().whileHeld(new StartEndCommand(pneumatics::extendWOFManipulator, pneumatics::retractWOFManipulator, Robot.pneumatics));
-		stratComInterface.getSC1().whileHeld(new StartEndCommand(wheelOfFortune::spinCounterclockwise, wheelOfFortune::stopSpin, Robot.wheelOfFortune));
-		stratComInterface.getSC3().whileHeld(new StartEndCommand(wheelOfFortune::spinClockwise, wheelOfFortune::stopSpin, Robot.wheelOfFortune));
-		stratComInterface.getSC6().whenPressed(new InstantCommand(wheelOfFortune::spinThreeTimes, Robot.wheelOfFortune));
+//		stratComInterface.getSC2().whileHeld(new StartEndCommand(pneumatics::extendWOFManipulator, pneumatics::retractWOFManipulator, Robot.pneumatics));
+//		stratComInterface.getSC1().whileHeld(new StartEndCommand(wheelOfFortune::spinCounterclockwise, wheelOfFortune::stopSpin, Robot.wheelOfFortune));
+//		stratComInterface.getSC3().whileHeld(new StartEndCommand(wheelOfFortune::spinClockwise, wheelOfFortune::stopSpin, Robot.wheelOfFortune));
+//		stratComInterface.getSC6().whenPressed(new InstantCommand(wheelOfFortune::spinThreeTimes, Robot.wheelOfFortune));
 
 
 		//Dumb testing commands
-		stratComInterface.getSC4().whenHeld(new StartEndCommand(() -> spindexer.spinClockwise(1), spindexer::stopSpin, spindexer));//All 3 of these could be being set to idle by superstructure every loop
+		stratComInterface.getSC4().whenHeld(new StartEndCommand(() -> spindexer.spinClockwise(0.25), spindexer::stopSpin, spindexer));//All 3 of these could be being set to idle by superstructure every loop
 		stratComInterface.getSC5().whenHeld(new StartEndCommand(shooter::spin, shooter::stopAll, shooter));
 		stratComInterface.getSCSideMid().whenHeld(new StartEndCommand(() -> intake.intake(0.9), intake::stop, intake));
 
-		stratComInterface.getSingleToggle().whileHeld(new InstantCommand(() -> shooter.setHeadingRotation(stratComInterface.getLeftSlider())));
-		stratComInterface.getDoubleToggleUp().whileHeld(new InstantCommand(() -> shooter.setDumbRPM(OscarMath.clipMap(stratComInterface.getRightSlider(), -1, 1, 0, 5000))));
+		stratComInterface.getSingleToggle().whileHeld(new InstantCommand(() -> shooter.setPower(OscarMath.clipMap(stratComInterface.getRightSlider(), -1, 1, 0, 0.65))));
+		stratComInterface.getSingleToggle().whileHeld(new InstantCommand(() -> shooter.feed(OscarMath.clipMap(stratComInterface.getLeftSlider(), -1, 1, 0, 0.7))));
+
+
+//		stratComInterface.getSingleToggle().whileHeld(new InstantCommand(() -> shooter.setHeadingRotation(stratComInterface.getLeftSlider())));
+//		stratComInterface.getDoubleToggleUp().whileHeld(new InstantCommand(() -> shooter.setDumbRPM(OscarMath.clipMap(stratComInterface.getRightSlider(), -1, 1, 0, 5000))));
+//		stratComInterface.getDoubleToggleDown().whileHeld(new InstantCommand(() -> shooter.setExitAngle(OscarMath.clipMap(stratComInterface.getRightSlider(), -1, 1, 20, 70))));
 	}
 }

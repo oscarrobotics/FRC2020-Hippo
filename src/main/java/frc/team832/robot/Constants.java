@@ -69,10 +69,10 @@ public class Constants {
         public static final int TURRET_CAN_ID = 4;
         public static final int FEED_MOTOR_CAN_ID = 6;
 
-        public static final PDPPortNumber PRIMARY_PDP_SLOT = PDPPortNumber.Port3;
-        public static final PDPPortNumber SECONDARY_PDP_SLOT = PDPPortNumber.Port12;
+        public static final PDPPortNumber PRIMARY_PDP_SLOT = PDPPortNumber.Port2;
+        public static final PDPPortNumber SECONDARY_PDP_SLOT = PDPPortNumber.Port3;
         public static final PDPPortNumber TURRET_PDP_SLOT = PDPPortNumber.Port4;
-        public static final PDPPortNumber FEEDER_PDP_SLOT = PDPPortNumber.Port12;
+        public static final PDPPortNumber FEEDER_PDP_SLOT = PDPPortNumber.Port6;
 
         public static final int HOOD_CHANNEL = 0;
 
@@ -157,10 +157,12 @@ public class Constants {
     }
 
     public static class ClimberValues {
-        public static final int LEFT_WINCH_CAN_ID = 7;
-        public static final int RIGHT_WINCH_CAN_ID = 8;
+        public static final int WINCH_CAN_ID = 7;
+        public static final int DEPLOY_CAN_ID = 8;
 
         public static final PDPPortNumber WINCH_PDP_PORT = PDPPortNumber.Port13;
+        public static final PDPPortNumber DEPLOY_PDP_PORT = PDPPortNumber.Port14;
+
     }
 
     public static class WOFValues {

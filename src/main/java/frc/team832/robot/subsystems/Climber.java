@@ -6,84 +6,76 @@ import frc.team832.lib.driverstation.dashboard.DashboardUpdatable;
 import frc.team832.lib.motorcontrol.NeutralMode;
 import frc.team832.lib.motorcontrol2.vendor.CANSparkMax;
 import frc.team832.lib.motors.Motor;
+import frc.team832.lib.power.GrouchPDP;
+import frc.team832.lib.power.impl.SmartMCAttachedPDPSlot;
 import frc.team832.robot.Constants;
 
 import static frc.team832.robot.Robot.pneumatics;
 
 public class Climber extends SubsystemBase implements DashboardUpdatable {
     private boolean initSuccessful;
-    private final CANSparkMax leftWinch, rightWinch;
+    private final CANSparkMax winch, deploy;
 
-    public Climber() {
+    private SmartMCAttachedPDPSlot winchSlot, deploySlot;
+
+    public Climber(GrouchPDP pdp) {
         DashboardManager.addTab(this, this);
 
-        leftWinch = new CANSparkMax(Constants.ClimberValues.LEFT_WINCH_CAN_ID, Motor.kNEO);
-        rightWinch = new CANSparkMax(Constants.ClimberValues.RIGHT_WINCH_CAN_ID, Motor.kNEO);
+        winch = new CANSparkMax(Constants.ClimberValues.WINCH_CAN_ID, Motor.kNEO);
+        deploy = new CANSparkMax(Constants.ClimberValues.DEPLOY_CAN_ID, Motor.kNEO550);
 
-        leftWinch.wipeSettings();
-        rightWinch.wipeSettings();
+        winchSlot = pdp.addDevice(Constants.ClimberValues.WINCH_PDP_PORT, winch);
+        deploySlot = pdp.addDevice(Constants.ClimberValues.DEPLOY_PDP_PORT, deploy);
 
-        leftWinch.setNeutralMode(NeutralMode.kBrake);
-        rightWinch.setNeutralMode(NeutralMode.kBrake);
+        winch.wipeSettings();
+        deploy.wipeSettings();
 
-        leftWinch.setInverted(false);
-        leftWinch.setSensorPhase(true);
+        winch.setNeutralMode(NeutralMode.kBrake);
+        deploy.setNeutralMode(NeutralMode.kBrake);
 
-        rightWinch.setInverted(false);
-        rightWinch.setSensorPhase(true);
+        winch.setInverted(false);
+        winch.setSensorPhase(true);
+
+        deploy.setInverted(false);
+        deploy.setSensorPhase(true);
 
         setCurrentLimit(40);
+        deploy.limitInputCurrent(30);
 
         initSuccessful = true;
     }
 
     private void setCurrentLimit (int limit) {
-        leftWinch.limitInputCurrent(limit);
-        rightWinch.limitInputCurrent(limit);
+        winch.limitInputCurrent(limit);
     }
 
     public boolean isInitSuccessful() { return initSuccessful; }
 
-    public void unwindLeftWinch() {
-        leftWinch.set(-0.25);
-    }
-
-    public void unwindRightWinch() {
-        rightWinch.set(-0.25);
-    }
-
     public void unwindWinch() {
+        winch.set(-0.25);
+    }
+
+    public void windWinch() {
+        winch.set(0.25);
+    }
+
+    public void climbDown() {
         pneumatics.unlockClimb();
-        unwindLeftWinch();
-        unwindRightWinch();
+        unwindWinch();
     }
 
-    public void windLeftWinch() {
-        leftWinch.set(0.75);
-    }
-
-    public void windRightWinch() {
-        rightWinch.set(0.75);
-    }
-
-    public void winchUp() {
+    public void climbUp() {
         pneumatics.unlockClimb();
-        windLeftWinch();
-        windRightWinch();
-    }
-
-    public void stopLeftWinch() {
-        leftWinch.set(0);
-    }
-
-    public void stopRightWinch() {
-        rightWinch.set(0);
+        windWinch();
     }
 
     public void stopWinch() {
+        winch.set(0);
+    }
+
+    public void stopClimb() {
         pneumatics.lockClimb();
-        stopLeftWinch();
-        stopRightWinch();
+        stopWinch();
     }
 
     @Override

@@ -2,10 +2,13 @@ package frc.team832.robot.subsystems;
 
 import com.revrobotics.CANDigitalInput;
 import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.wpilibj.AnalogInput;
+import edu.wpi.first.wpilibj.PWMSpeedController;
 import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.controller.ProfiledPIDController;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.team832.lib.control.REVSmartServo_Continuous;
 import frc.team832.lib.driverstation.dashboard.DashboardManager;
 import frc.team832.lib.driverstation.dashboard.DashboardUpdatable;
 import frc.team832.lib.motorcontrol.NeutralMode;
@@ -28,10 +31,12 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
 
     private CANSparkMax primaryMotor, secondaryMotor, turretMotor, feedMotor; //if needed add hood motor
     private NetworkTableEntry dashboard_wheelRPM, dashboard_PID, dashboard_hoodPos, dashboard_turretPos;
-    private Servo hoodServo;
+    private REVSmartServo_Continuous hoodServo;
     private CANDigitalInput turretLimitInput;
 
     private ShootMode mode = ShootMode.Idle, lastMode = ShootMode.Idle;
+
+    private AnalogInput potentiometer = new AnalogInput(1);
 
     private PIDController flywheelPID = new PIDController(Constants.ShooterValues.IDLE_kP,0, Constants.ShooterValues.IDLE_kD);
     private ProfiledPIDController turretPID = new ProfiledPIDController(Constants.ShooterValues.TURRET_kP, 0, Constants.ShooterValues.TURRET_kD, Constants.ShooterValues.TURRET_CONSTRAINTS);
@@ -55,33 +60,23 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
         turretSlot = pdp.addDevice(Constants.ShooterValues.TURRET_PDP_SLOT, turretMotor);
         feederSlot = pdp.addDevice(Constants.ShooterValues.FEEDER_PDP_SLOT, feedMotor);
 
-        hoodServo = new Servo(Constants.ShooterValues.HOOD_CHANNEL);
+        hoodServo = new REVSmartServo_Continuous(Constants.ShooterValues.HOOD_CHANNEL);
 
         primaryMotor.wipeSettings();
         secondaryMotor.wipeSettings();
         turretMotor.wipeSettings();
         feedMotor.wipeSettings();
 
-        secondaryMotor.follow(primaryMotor);
-
         NeutralMode flywheelMode = NeutralMode.kCoast;
         primaryMotor.setNeutralMode(flywheelMode);
         secondaryMotor.setNeutralMode(flywheelMode);
 
         turretMotor.setNeutralMode(NeutralMode.kBrake);
-
-        feedMotor.setNeutralMode(NeutralMode.kCoast);
+        feedMotor.setNeutralMode(NeutralMode.kBrake);
 
         primaryMotor.setInverted(false);
-        secondaryMotor.setInverted(false);
-        primaryMotor.setSensorPhase(true);
-        secondaryMotor.setSensorPhase(true);
 
-        turretMotor.setInverted(false);
-        turretMotor.setSensorPhase(true);
-
-        feedMotor.setInverted(false);
-        feedMotor.setSensorPhase(true);
+        secondaryMotor.follow(primaryMotor, true);
 
         turretLimitInput = new CANDigitalInput(turretMotor.getBaseController(), CANDigitalInput.LimitSwitch.kForward, CANDigitalInput.LimitSwitchPolarity.kNormallyOpen);
 
@@ -156,8 +151,8 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
         primaryMotor.set(power);
     }
 
-    public void setDumbRPM(double rpm) {
-        setRPM(rpm);
+    public void setPower(double pow) {
+        primaryMotor.set(pow);
     }
 
     public void flywheelTrackTarget() {
@@ -199,8 +194,12 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
     }
 
     public void setExitAngle(double degrees) {
-        double position = OscarMath.clipMap(degrees, 10.0, 80.0, 5, 495);//tune outmin and outmax for servo
-        hoodServo.set(hoodPID.calculate(hoodServo.getPosition(), position));
+        double angle = OscarMath.clipMap(degrees, 15, 85, 10, 80);//in min and in max need to be tuned to hood actual min and max angle
+        hoodServo.setSpeed(hoodPID.calculate(getHoodPositionDegrees(), angle));
+    }
+
+    private double getHoodPositionDegrees() {
+        return OscarMath.map(potentiometer.getVoltage(), 0, 5, 10, 80);
     }
 
     public void spin() {

@@ -59,8 +59,8 @@ public class SuperStructure extends SubsystemBase implements DashboardUpdatable 
 
     public void setMode(SuperStructureMode mode) {
 		if (currentMode != mode) {
-			currentMode = mode;
 			lastMode = currentMode;
+			currentMode = mode;
 			updateSuperStructure();
 		}
 	}

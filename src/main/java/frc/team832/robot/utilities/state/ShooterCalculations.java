@@ -6,11 +6,9 @@ public class ShooterCalculations {
     public double flywheelRPM, exitAngle, turretRotation;
 
     public void update() {
-        double distance = 0, pitch = 0, yaw = 0;
+        double distance = 0, pitch = 0, yaw = 0;//get values from vision
 
-        double angle = Math.atan(2.6 / distance);//AAHHHH figure out with kinematics
-
-        exitAngle = OscarMath.clipMap(pitch, 10, 80, ,80);//needs testing
+        exitAngle = pitch + 5;//needs testing
         flywheelRPM = (distance * 300) + 5000;//needs testing
         turretRotation = yaw / 180.0;//assuming yaw input is -179 to 180
     }
