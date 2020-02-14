@@ -36,7 +36,7 @@ public class SpindexerStatus {
         spinStall.setStallCurrent(30);
     }
 
-    public void update(List<Boolean> sensorData, boolean hallEffect, double currentVelocity) {
+    public void update(List<Boolean> sensorData, boolean hallEffect) {
 //        this.ballPositions = sensorData;
 //        if (isFull())
 //            state = SpindexerState.FULL;
@@ -44,16 +44,16 @@ public class SpindexerStatus {
 //            state = SpindexerState.FILLING;
 //        else
 //            state = SpindexerState.EMPTY;
-
+//
 //        spinStall.updateStallStatus();
-
+//
 //        if (hallEffect) {
 //            spindexer.zeroSpindexer();
 //            if (spindexer.getSpinnerDirection() == Spindexer.SpinnerDirection.Clockwise) absoluteRotations++;
 //            else absoluteRotations--;
 //        }
 //
-//        spinDirection = Math.signum(currentVelocity) == 1 ? Spindexer.SpinnerDirection.Clockwise : Spindexer.SpinnerDirection.CounterClockwise;
+//        spinDirection = Math.signum(spinMotor.getSensorVelocity()) == 1 ? Spindexer.SpinnerDirection.Clockwise : Spindexer.SpinnerDirection.CounterClockwise;
     }
 
     public boolean getPosition(int pos) {
@@ -83,7 +83,7 @@ public class SpindexerStatus {
     }
 
     public double getAbsoluteRotations() {
-        return absoluteRotations;
+        return absoluteRotations + spinMotor.getSensorPosition();
     }
 
     public int getFirstEmpty(){

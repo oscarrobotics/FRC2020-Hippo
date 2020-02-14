@@ -30,6 +30,6 @@ public class ShootCommandGroup extends SequentialCommandGroup {
                         superStructure::isSpindexerUnloaded,
                         superStructure)
         );
-        addRequirements(superStructure);
+        addRequirements(superStructure, pneumatics, shooter, spindexer);
     }
 }

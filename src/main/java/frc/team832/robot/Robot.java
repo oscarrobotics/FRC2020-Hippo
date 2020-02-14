@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.AddressableLED;
 import edu.wpi.first.wpilibj2.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.team832.lib.motorcontrol.NeutralMode;
 import frc.team832.lib.power.GrouchPDP;
 import frc.team832.robot.subsystems.*;
 
@@ -87,6 +88,20 @@ public class Robot extends TimedRobot {
 
     @Override
     public void autonomousInit() {
+    }
+
+    @Override
+    public void disabledInit() {
+        NeutralMode mode = NeutralMode.kCoast;
+        drivetrain.setNeutralMode(mode);
+        shooter.setFlyheelNeutralMode(mode);
+        shooter.setTurretMode(mode);
+        pneumatics.lockClimb();
+    }
+
+    @Override
+    public void disabledPeriodic() {
+
     }
 
     @Override

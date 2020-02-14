@@ -55,7 +55,7 @@ public class Spindexer extends SubsystemBase {
 
 	@Override
 	public void periodic() {
-		spindexerStatus.update(ballStatus, getHallEffect(), spinMotor.getSensorVelocity());
+		spindexerStatus.update(ballStatus, getHallEffect());
 	}
 
 	public void setCurrentLimit(int currentLimit) {
@@ -93,12 +93,18 @@ public class Spindexer extends SubsystemBase {
 	}
 
 	public void setSpinRPM(double rpm, SpinnerDirection spinDirection) {
-		lastSpinSpeed = rpm;
-		if (spinDirection == SpinnerDirection.Clockwise) {
-			spinMotor.set(spinPID.calculate(spinMotor.getSensorVelocity(), rpm));
-		}
-		else {
-			spinMotor.set(spinPID.calculate(spinMotor.getSensorVelocity(), -rpm));
+		setSpinRPM(rpm, spinDirection, false, 0, 0);
+	}
+
+	public void setSpinRPM(double rpm, SpinnerDirection spinDirection, boolean waitForShooter, double shooterCurrentRPM, double shooterTargetRPM) {
+		if (!waitForShooter || Math.abs(shooterCurrentRPM - shooterTargetRPM) < 100) {
+			lastSpinSpeed = rpm;
+			if (spinDirection == SpinnerDirection.Clockwise) {
+				spinMotor.set(spinPID.calculate(spinMotor.getSensorVelocity(), rpm));
+			}
+			else {
+				spinMotor.set(spinPID.calculate(spinMotor.getSensorVelocity(), -rpm));
+			}
 		}
 	}
 
@@ -133,7 +139,7 @@ public class Spindexer extends SubsystemBase {
 	}
 
 	public double getAbsoluteRotations() {
-		return spindexerStatus.getAbsoluteRotations() + getRelativeRotations(); }
+		return spindexerStatus.getAbsoluteRotations(); }
 
 	public void switchSpin() {
 		setSpinRPM(lastSpinSpeed, spindexerStatus.getSpinDirection() == SpinnerDirection.Clockwise ? SpinnerDirection.CounterClockwise : SpinnerDirection.Clockwise);

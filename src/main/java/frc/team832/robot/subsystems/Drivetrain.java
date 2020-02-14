@@ -82,11 +82,7 @@ public class Drivetrain extends SubsystemBase implements DashboardUpdatable {
         rightMasterSlot = pdp.addDevice(Constants.DrivetrainValues.RIGHT_MASTER_PDP_PORT, rightMaster);
         rightSlaveSlot = pdp.addDevice(Constants.DrivetrainValues.RIGHT_SLAVE_PDP_PORT, rightSlave);
 
-        NeutralMode idleMode = NeutralMode.kBrake;
-        leftMaster.setNeutralMode(idleMode);
-        leftSlave.setNeutralMode(idleMode);
-        rightMaster.setNeutralMode(idleMode);
-        rightSlave.setNeutralMode(idleMode);
+        setNeutralMode(NeutralMode.kBrake);
 
         setCurrentLimit(40);
 
@@ -209,5 +205,12 @@ public class Drivetrain extends SubsystemBase implements DashboardUpdatable {
     public void resetEncoders() {
         leftMaster.rezeroSensor();
         rightMaster.rezeroSensor();
+    }
+
+    public void setNeutralMode(NeutralMode mode) {
+        leftMaster.setNeutralMode(mode);
+        leftSlave.setNeutralMode(mode);
+        rightMaster.setNeutralMode(mode);
+        rightSlave.setNeutralMode(mode);
     }
 }

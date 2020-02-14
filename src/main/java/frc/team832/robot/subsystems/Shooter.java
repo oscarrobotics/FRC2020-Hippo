@@ -24,6 +24,7 @@ import frc.team832.robot.utilities.state.ShooterCalculations;
 import static frc.team832.robot.Constants.ShooterValues.TurretPowerTrain;
 import static frc.team832.robot.Constants.ShooterValues.TurretReduction;
 import static frc.team832.robot.Robot.oi;
+import static frc.team832.robot.Robot.spindexer;
 
 public class Shooter extends SubsystemBase implements DashboardUpdatable {
 
@@ -67,12 +68,8 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
         turretMotor.wipeSettings();
         feedMotor.wipeSettings();
 
-        NeutralMode flywheelMode = NeutralMode.kCoast;
-        primaryMotor.setNeutralMode(flywheelMode);
-        secondaryMotor.setNeutralMode(flywheelMode);
-
-        turretMotor.setNeutralMode(NeutralMode.kBrake);
-        feedMotor.setNeutralMode(NeutralMode.kBrake);
+        setFlyheelNeutralMode(NeutralMode.kCoast);
+        setTurretMode(NeutralMode.kBrake);
 
         primaryMotor.setInverted(false);
 
@@ -90,6 +87,16 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
         initSuccessful = true;
     }
 
+    public void setFlyheelNeutralMode(NeutralMode mode) {
+        primaryMotor.setNeutralMode(mode);
+        secondaryMotor.setNeutralMode(mode);
+    }
+
+    public void setTurretMode(NeutralMode mode) {
+        feedMotor.setNeutralMode(mode);
+        turretMotor.setNeutralMode(mode);
+    }
+
     @Override
     public String getDashboardTabName () {
         return "Shooter";
@@ -99,7 +106,6 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
     public void periodic() {
         shooterCalcs.update();
 //        trackTarget();
-
     }
 
     @Override
@@ -137,6 +143,7 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
 
     public void idle() {
         setMode(ShootMode.Idle);
+        setRPM(3000);
     }
 
     public void trackTarget() {
@@ -146,7 +153,7 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
     }
 
     private void setRPM(double rpm) {
-        double power = flywheelPID.calculate(primaryMotor.getSensorVelocity(), rpm);
+        double power = primaryMotor.getSensorVelocity() - 100 > rpm ? flywheelPID.calculate(primaryMotor.getSensorVelocity(), rpm) : flywheelPID.calculate(primaryMotor.getSensorVelocity(), rpm) * 0.1;//do this right
         dashboard_PID.setDouble(power);
         primaryMotor.set(power);
     }

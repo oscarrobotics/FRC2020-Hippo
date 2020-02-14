@@ -110,7 +110,6 @@ public class SuperStructure extends SubsystemBase implements DashboardUpdatable 
 	private void idleShooter(){
 		shooter.idle();
 		pneumatics.retractProp();
-		idleSpindexer();
 	}
 
 	public double getFeederRotationRelativeToSpindexer() {

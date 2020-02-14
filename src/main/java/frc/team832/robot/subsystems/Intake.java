@@ -24,7 +24,7 @@ public class Intake extends SubsystemBase {
 
 		intakeMotor.wipeSettings();
 
-		//Might will needed to be changed
+		//Might need to be changed
 		intakeMotor.setInverted(false);
 
 		setCurrentLimit(40);

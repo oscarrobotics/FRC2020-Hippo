@@ -35,8 +35,8 @@ public class OI {
 
 	private void configureButtonBindings() {
 		// do commands here
-		stratComInterface.getSCPlus().whileHeld(new StartEndCommand(climber::climbUp, climber::stopClimb, Robot.climber));
-		stratComInterface.getSCMinus().whileHeld(new StartEndCommand(climber::climbDown, climber::stopClimb, Robot.climber));
+		stratComInterface.getSCPlus().whenHeld(new StartEndCommand(climber::climbUp, climber::stopClimb, Robot.climber));
+		stratComInterface.getSCMinus().whenHeld(new StartEndCommand(climber::climbDown, climber::stopClimb, Robot.climber));
 
 //		stratComInterface.getSCSideMid().whileHeld(new StartEndCommand(() -> superStructure.setMode(SuperStructure.SuperStructureMode.INTAKING), () -> superStructure.setMode(SuperStructure.SuperStructureMode.IDLELAST), superStructure, intake, spindexer));
 //		stratComInterface.getSCSideBot().whileHeld(new StartEndCommand(() -> superStructure.setMode(SuperStructure.SuperStructureMode.OUTTAKING), () -> superStructure.setMode(SuperStructure.SuperStructureMode.IDLELAST), superStructure, intake, spindexer));
