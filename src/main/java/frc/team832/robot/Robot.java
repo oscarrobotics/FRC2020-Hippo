@@ -43,6 +43,7 @@ public class Robot extends TimedRobot {
     public void robotInit() {
         if (!drivetrain.isInitSuccessful()) {
             System.out.println("Drivetrain - init FAILED");
+            drivetrainTelemetryNotifier.startPeriodic(0.02);
         }
 
         if (intake.isInitSuccessful()) {
@@ -55,6 +56,7 @@ public class Robot extends TimedRobot {
 
         if (shooter.isInitSuccessful()) {
             System.out.println("Shooter - init FAILED");
+            shooterTelemetryNotifier.startPeriodic(0.02);
         }
 
         if (spindexer.isInitSuccessful()) {

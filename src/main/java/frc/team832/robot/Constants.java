@@ -75,42 +75,54 @@ public class Constants {
         public static final PDPPortNumber FEEDER_PDP_SLOT = PDPPortNumber.Port6;
 
         public static final int HOOD_SERVO_CHANNEL = 0;
+        //Shooter
+        public static final int HOOD_CHANNEL = 0;
 
-        public static final float FlywheelReduction = 2f / 1f;
+        public static final float FlywheelReduction = 50f / 26f;
         private static final Gearbox FlywheelGearbox = new Gearbox(FlywheelReduction);
         public static final WheeledPowerTrain FlywheelPowerTrain = new WheeledPowerTrain(FlywheelGearbox, Motor.kNEO, 2, Units.inchesToMeters(4));
 
+        public static final double HOOD_kP = 0;
+
+        public static final double SPIN_UP_kP = 0;
+        public static final double SPIN_UP_kF = 0;
+
+        public static final double SHOOTING_kP = 0.0007;
+        public static final double SHOOTING_kF = 0;
+
+        public static final double IDLE_kP = 0.0001;
+        public static final double IDLE_kF = 0;
+
+        private static final double FLYWHEEL_kS = 0;
+        private static final double FLYWHEEL_kV = Motor.kNEO.kv;
+        private static final double FLYWHEEL_kA = 0;
+
+        public static final SimpleMotorFeedforward FLYWHEEL_FF = new SimpleMotorFeedforward(FLYWHEEL_kS, FLYWHEEL_kV, FLYWHEEL_kA);
+
+        //Turret
         public static final float TurretReduction = 1f / (200f/1f);
         private static final Gearbox TurretGearbox = new Gearbox(TurretReduction);
         public static final WheeledPowerTrain TurretPowerTrain = new WheeledPowerTrain(TurretGearbox, Motor.kNEO550, 1, Units.inchesToMeters(10));
 
+        public static final Constraints TURRET_CONSTRAINTS = new Constraints(TurretPowerTrain.calculateMotorRpmFromWheelRpm(90),
+                TurretPowerTrain.calculateMotorRpmFromWheelRpm(450));
+
+        public static final double TURRET_kP = 0;
+        public static final double TURRET_kD = 0;
+
+
+        //Feeder
         public static final float FeedReduction = 1f;
         private static final Gearbox FeedGearbox = new Gearbox(FeedReduction);
         public static final WheeledPowerTrain FeedPowertrain = new WheeledPowerTrain(FeedGearbox, Motor.kNEO, 1, Units.inchesToMeters(4));
 
         public static final double FeedRpm = FeedPowertrain.calculateMotorRpmFromWheelRpm(3000);
 
-        public static final double TURRET_kP = 0;
-        public static final double TURRET_kD = 0;
+        private static final double FEEDER_kS = 0.25;
+        private static final double FEEDER_kV = 0.0005;
+        private static final double FEEDER_kA = 0.0001;
 
-        public static final Constraints TURRET_CONSTRAINTS = new Constraints(TurretPowerTrain.calculateMotorRpmFromWheelRpm(90),
-                                                                            TurretPowerTrain.calculateMotorRpmFromWheelRpm(450));
-
-        public static final double HOOD_kP = 0;
-        public static final double HOOD_kD = 0;
-        public static final double HOOD_kF = 0;
-
-        public static final double SPIN_UP_kP = 0;
-        public static final double SPIN_UP_kD = 0;
-        public static final double SPIN_UP_kF = 0;
-
-        public static final double SHOOTING_kP = 0;
-        public static final double SHOOTING_kD = 0;
-        public static final double SHOOTING_kF = 0;
-
-        public static final double IDLE_kP = 0;
-        public static final double IDLE_kD = 0;
-        public static final double IDLE_kF = 0;
+        public static final SimpleMotorFeedforward FEEDER_FF = new SimpleMotorFeedforward(FEEDER_kS, FEEDER_kV, FEEDER_kA);
     }
 
     public static class IntakeValues {
@@ -127,7 +139,6 @@ public class Constants {
         private static final double kA = 0.0001;
 
         public static final SimpleMotorFeedforward FF = new SimpleMotorFeedforward(kS, kV, kA);
-
     }
 
     public static class SpindexerValues {
@@ -143,17 +154,14 @@ public class Constants {
         public static final WheeledPowerTrain SpinPowertrain = new WheeledPowerTrain(SpinGearbox, Motor.kNEO, 1, Units.inchesToMeters(20));
 
         public static final double FEED_kP = 0;
-        public static final double FEED_kD = 0;
         public static final double FEED_kF = 0;
 
         public static final double SPIN_kP = 0;
-        public static final double SPIN_kD = 0;
         public static final double SPIN_kF = 0;
 
         public static Constraints Constraints = new Constraints(2, 8);
 
         public static final double POSITION_kP = 0;
-        public static final double POSITION_kD = 0;
         public static final double POSITION_kF = 0;
     }
 

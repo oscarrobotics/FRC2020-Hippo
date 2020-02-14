@@ -51,16 +51,15 @@ public class OI {
 
 
 		//Dumb testing commands
-		stratComInterface.getSC4().whenHeld(new StartEndCommand(() -> spindexer.spinClockwise(0.25), spindexer::stopSpin, spindexer));//All 3 of these could be being set to idle by superstructure every loop
+		stratComInterface.getSC4().whenHeld(new StartEndCommand(() -> spindexer.spinClockwise(0.1), spindexer::stopSpin, spindexer));//All 3 of these could be being set to idle by superstructure every loop
 		stratComInterface.getSC5().whenHeld(new StartEndCommand(shooter::spin, shooter::stopAll, shooter));
-		stratComInterface.getSCSideMid().whenHeld(new StartEndCommand(() -> intake.intake(0.9), intake::stop, intake));
+		stratComInterface.getSCSideTop().whenHeld(new StartEndCommand(() -> intake.intake(0.9), intake::stop, intake));
+		stratComInterface.getSCSideBot().whenHeld(new StartEndCommand(() -> intake.outtake(0.5), intake::stop, intake));
 
-		stratComInterface.getSingleToggle().whileHeld(new InstantCommand(() -> shooter.setPower(OscarMath.clipMap(stratComInterface.getRightSlider(), -1, 1, 0, 0.65))));
+		stratComInterface.getSingleToggle().whileHeld(new InstantCommand(() -> shooter.setDumbRPM(OscarMath.clipMap(stratComInterface.getRightSlider(), -1, 1, 0, 5000))));
 		stratComInterface.getSingleToggle().whileHeld(new InstantCommand(() -> shooter.feed(OscarMath.clipMap(stratComInterface.getLeftSlider(), -1, 1, 0, 0.7))));
 
 
-//		stratComInterface.getSingleToggle().whileHeld(new InstantCommand(() -> shooter.setHeadingRotation(stratComInterface.getLeftSlider())));
-//		stratComInterface.getDoubleToggleUp().whileHeld(new InstantCommand(() -> shooter.setDumbRPM(OscarMath.clipMap(stratComInterface.getRightSlider(), -1, 1, 0, 5000))));
 //		stratComInterface.getDoubleToggleDown().whileHeld(new InstantCommand(() -> shooter.setExitAngle(OscarMath.clipMap(stratComInterface.getRightSlider(), -1, 1, 20, 70))));
 	}
 }
