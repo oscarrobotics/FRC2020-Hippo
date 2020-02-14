@@ -23,8 +23,6 @@ public class SpindexerStatus {
     public SpindexerState state;
     private Spindexer.SpinnerDirection spinDirection;
 
-
-
     public SpindexerStatus(GrouchPDP pdp, Spindexer spindexer, CANSparkMax spinMotor) {
         this.spindexer = spindexer;
         this.spinMotor = spinMotor;
@@ -36,8 +34,12 @@ public class SpindexerStatus {
         spinStall.setStallCurrent(30);
     }
 
-    public void update(List<Boolean> sensorData, boolean hallEffect) {
-//        this.ballPositions = sensorData;
+    public void update() {
+
+//        if (spindexer.getBallSensor()) {
+//            spindexer.getNearestBallRotationRelativeToFeeder();//TODO: fix this
+//        }
+//
 //        if (isFull())
 //            state = SpindexerState.FULL;
 //        else if (!isEmpty())
@@ -47,7 +49,7 @@ public class SpindexerStatus {
 //
 //        spinStall.updateStallStatus();
 //
-//        if (hallEffect) {
+//        if (spindexer.getHallEffect()) {
 //            spindexer.zeroSpindexer();
 //            if (spindexer.getSpinnerDirection() == Spindexer.SpinnerDirection.Clockwise) absoluteRotations++;
 //            else absoluteRotations--;
@@ -88,7 +90,7 @@ public class SpindexerStatus {
 
     public int getFirstEmpty(){
         for(int i = 0; i < 5; i++) {
-            if(!getBooleanList().get(i)){
+            if(!ballPositions.get(i)) {
                 return i;
             }
         }

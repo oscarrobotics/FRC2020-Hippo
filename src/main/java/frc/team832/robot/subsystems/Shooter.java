@@ -3,8 +3,6 @@ package frc.team832.robot.subsystems;
 import com.revrobotics.CANDigitalInput;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.AnalogInput;
-import edu.wpi.first.wpilibj.PWMSpeedController;
-import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.controller.ProfiledPIDController;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -18,13 +16,10 @@ import frc.team832.lib.power.GrouchPDP;
 import frc.team832.lib.power.impl.SmartMCAttachedPDPSlot;
 import frc.team832.lib.util.OscarMath;
 import frc.team832.robot.Constants;
-import frc.team832.robot.OI;
 import frc.team832.robot.utilities.state.ShooterCalculations;
 
 import static frc.team832.robot.Constants.ShooterValues.TurretPowerTrain;
 import static frc.team832.robot.Constants.ShooterValues.TurretReduction;
-import static frc.team832.robot.Robot.oi;
-import static frc.team832.robot.Robot.spindexer;
 
 public class Shooter extends SubsystemBase implements DashboardUpdatable {
 
@@ -61,7 +56,7 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
         turretSlot = pdp.addDevice(Constants.ShooterValues.TURRET_PDP_SLOT, turretMotor);
         feederSlot = pdp.addDevice(Constants.ShooterValues.FEEDER_PDP_SLOT, feedMotor);
 
-        hoodServo = new REVSmartServo_Continuous(Constants.ShooterValues.HOOD_CHANNEL);
+        hoodServo = new REVSmartServo_Continuous(Constants.ShooterValues.HOOD_SERVO_CHANNEL);
 
         primaryMotor.wipeSettings();
         secondaryMotor.wipeSettings();

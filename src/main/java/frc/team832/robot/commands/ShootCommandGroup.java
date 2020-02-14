@@ -1,9 +1,7 @@
 package frc.team832.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import frc.team832.robot.Robot;
 import frc.team832.robot.subsystems.Pneumatics;
 import frc.team832.robot.subsystems.Shooter;
@@ -15,7 +13,7 @@ public class ShootCommandGroup extends SequentialCommandGroup {
     public ShootCommandGroup(SuperStructure superStructure, Pneumatics pneumatics, Shooter shooter, Spindexer spindexer) {
         addCommands(
                 new FunctionalCommand(
-                        () -> spindexer.setTargetPosition(spindexer.getNearestSafeSpotRelativeToFeeder()),
+                        () -> spindexer.setTargetPosition(spindexer.getNearestSafeRotationRelativeToFeeder()),
                         () -> {},
                         (ignored) -> spindexer.stopSpin(),
                         spindexer::isSafe,

@@ -74,7 +74,7 @@ public class Constants {
         public static final PDPPortNumber TURRET_PDP_SLOT = PDPPortNumber.Port4;
         public static final PDPPortNumber FEEDER_PDP_SLOT = PDPPortNumber.Port6;
 
-        public static final int HOOD_CHANNEL = 0;
+        public static final int HOOD_SERVO_CHANNEL = 0;
 
         public static final float FlywheelReduction = 2f / 1f;
         private static final Gearbox FlywheelGearbox = new Gearbox(FlywheelReduction);
@@ -135,7 +135,8 @@ public class Constants {
 
         public static final PDPPortNumber SPIN_MOTOR_PDP_SLOT = PDPPortNumber.Port5;
 
-        public static final int HALL_EFFECT_CHANNEL = 0;
+        public static final int HALL_EFFECT_DIO_CHANNEL = 0;
+        public static final int LASERSHARK_DIO_CHANNEL = 1;
 
         public static final float SpinReduction = 1f / (56f/1f);
         private static final Gearbox SpinGearbox = new Gearbox(SpinReduction);

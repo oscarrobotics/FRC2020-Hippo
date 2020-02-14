@@ -31,7 +31,7 @@ public class SuperStructure extends SubsystemBase implements DashboardUpdatable 
 	@Override
 	public void periodic() {
 		spindexerAntiStall();
-		if (spindexer.isFull()) spindexer.setTargetPosition(spindexer.getNearestSafeSpotRelativeToFeeder());
+		if (spindexer.isFull()) spindexer.setTargetPosition(spindexer.getNearestSafeRotationRelativeToFeeder());
 	}
 
 	private void updateSuperStructure(){
@@ -78,7 +78,7 @@ public class SuperStructure extends SubsystemBase implements DashboardUpdatable 
 	}
 
 	private void prepareShoot() {
-		spindexer.setTargetPosition(spindexer.getNearestSafeSpotRelativeToFeeder());
+		spindexer.setTargetPosition(spindexer.getNearestSafeRotationRelativeToFeeder());
 		shooter.spinUp();
 		pneumatics.propUp();
 	}
