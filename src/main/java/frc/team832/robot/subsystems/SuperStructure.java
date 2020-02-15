@@ -4,6 +4,7 @@ import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.team832.lib.driverstation.dashboard.DashboardManager;
 import frc.team832.lib.driverstation.dashboard.DashboardUpdatable;
+import frc.team832.lib.util.OscarMath;
 import frc.team832.robot.Constants;
 
 public class SuperStructure extends SubsystemBase implements DashboardUpdatable {
@@ -69,6 +70,16 @@ public class SuperStructure extends SubsystemBase implements DashboardUpdatable 
 		intake.intake(Constants.IntakeValues.IntakePowertrain.calculateMotorRpmFromSurfaceSpeed(10));
 		spindexer.setSpinRPM(Constants.SpindexerValues.SpinPowertrain.calculateMotorRpmFromWheelRpm(60), Spindexer.SpinnerDirection.Clockwise);
 		pneumatics.extendIntake();
+	}
+
+	public void dumbIntake(double power) {
+		intake.intake(OscarMath.map(power, -1, 1, 0, 1));
+		pneumatics.extendIntake();
+	}
+
+	public void dumbIntakeIdle() {
+		intake.stop();
+		pneumatics.retractIntake();
 	}
 
 	private void outtake() {

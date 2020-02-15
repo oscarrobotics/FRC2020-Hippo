@@ -13,12 +13,8 @@ import frc.team832.lib.motorcontrol2.vendor.CANSparkMax;
 import frc.team832.lib.motors.Motor;
 import frc.team832.lib.power.GrouchPDP;
 import frc.team832.lib.power.impl.SmartMCAttachedPDPSlot;
-import frc.team832.lib.sensors.REVThroughBorePWM;
 import frc.team832.lib.util.OscarMath;
 import frc.team832.robot.Constants;
-
-import static frc.team832.robot.Constants.ShooterValues.TurretPowerTrain;
-import static frc.team832.robot.Constants.ShooterValues.TurretReduction;
 
 public class Shooter extends SubsystemBase implements DashboardUpdatable {
 
@@ -35,10 +31,10 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
     private AnalogInput potentiometer = new AnalogInput(1);
 //    private REVThroughBorePWM turretEncoder = new REVThroughBorePWM(0, 1);
 
-    private PIDController flywheelPID = new PIDController(Constants.ShooterValues.SHOOTING_kP,0, 0);
-    private PIDController hoodPID = new PIDController(Constants.ShooterValues.HOOD_kP, 0, 0);
-    private PIDController feedPID = new PIDController(Constants.ShooterValues.FEED_kP, 0, 0);
-    private ProfiledPIDController turretPID = new ProfiledPIDController(Constants.ShooterValues.TURRET_kP, 0, 0, Constants.ShooterValues.TURRET_CONSTRAINTS);
+    private PIDController flywheelPID = new PIDController(Constants.ShooterValues.ShootingkP,0, 0);
+    private PIDController hoodPID = new PIDController(Constants.ShooterValues.HoodkP, 0, 0);
+    private PIDController feedPID = new PIDController(Constants.ShooterValues.FeedkP, 0, 0);
+    private ProfiledPIDController turretPID = new ProfiledPIDController(Constants.ShooterValues.TurretkP, 0, 0, Constants.ShooterValues.TURRET_CONSTRAINTS);
 
     private SmartMCAttachedPDPSlot primaryFlywheelSlot, secondaryFlywheelSlot, turretSlot, feederSlot;
 
@@ -115,13 +111,13 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
     private void updatePIDMode() {
         switch (mode) {
             case SpinUp:
-                flywheelPID.setPID(Constants.ShooterValues.SPIN_UP_kP, 0, 0);
+                flywheelPID.setPID(Constants.ShooterValues.SpinUpkP, 0, 0);
                 break;
             case Shooting:
-                flywheelPID.setPID(Constants.ShooterValues.SHOOTING_kP, 0, 0);
+                flywheelPID.setPID(Constants.ShooterValues.ShootingkP, 0, 0);
                 break;
             case Idle:
-                flywheelPID.setPID(Constants.ShooterValues.IDLE_kP, 0, 0);
+                flywheelPID.setPID(Constants.ShooterValues.IdlekP, 0, 0);
         }
     }
 

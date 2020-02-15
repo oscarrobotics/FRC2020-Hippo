@@ -14,9 +14,6 @@ import frc.team832.robot.Constants;
 import frc.team832.robot.utilities.positions.BallPosition;
 import frc.team832.robot.utilities.state.SpindexerStatus;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import static frc.team832.robot.Constants.SpindexerValues.SpinPowertrain;
 import static frc.team832.robot.Constants.SpindexerValues.SpinReduction;
 import static frc.team832.robot.Robot.*;
@@ -28,8 +25,8 @@ public class Spindexer extends SubsystemBase {
 	private final DigitalInput hallEffect;
 	private final LasersharkDistance ballSensor;
 	private final SpindexerStatus spindexerStatus;
-	private final PIDController spinPID = new PIDController(Constants.SpindexerValues.SPIN_kP, 0, 0);
-	private final ProfiledPIDController positionPID = new ProfiledPIDController(Constants.SpindexerValues.POSITION_kP, 0, 0, Constants.SpindexerValues.Constraints);
+	private final PIDController spinPID = new PIDController(Constants.SpindexerValues.SpinkP, 0, 0);
+	private final ProfiledPIDController positionPID = new ProfiledPIDController(Constants.SpindexerValues.PositionkP, 0, 0, Constants.SpindexerValues.Constraints);
 
 	private double tempSpindexerRotations = 0;
 	private double lastSpinSpeed = 0;
@@ -218,13 +215,13 @@ public class Spindexer extends SubsystemBase {
 
 
 	private BallPosition intToPosition(int i) {
-		if(i == 1) {
+		if(i == 0) {
 			return BallPosition.Position1;
-		} else if(i == 2) {
+		} else if(i == 1) {
 			return BallPosition.Position2;
-		} else if (i == 3) {
+		} else if (i == 2) {
 			return BallPosition.Position3;
-		} else if (i == 4) {
+		} else if (i == 3) {
 			return BallPosition.Position4;
 		} else {
 			return BallPosition.Position5;

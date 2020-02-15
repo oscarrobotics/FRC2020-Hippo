@@ -81,22 +81,22 @@ public class Constants {
         private static final Gearbox FlywheelGearbox = new Gearbox(FlywheelReduction);
         public static final WheeledPowerTrain FlywheelPowerTrain = new WheeledPowerTrain(FlywheelGearbox, Motor.kNEO, 2, Units.inchesToMeters(4));
 
-        public static final double HOOD_kP = 0;
+        public static final double HoodkP = 0;
 
-        public static final double SPIN_UP_kP = 0;
-        public static final double SPIN_UP_kF = 0;
+        public static final double SpinUpkP = 0;
+        public static final double SpinUpkF = 0;
 
-        public static final double SHOOTING_kP = 0.001;
-        public static final double SHOOTING_kF = 0;
+        public static final double ShootingkP = 0.001;
+        public static final double ShootingkF = 0;
 
-        public static final double IDLE_kP = 0.00001;
-        public static final double IDLE_kF = 0;
+        public static final double IdlekP = 0.00001;
+        public static final double IdlekF = 0;
 
-        private static final double FLYWHEEL_kS = 0;
-        private static final double FLYWHEEL_kV = Motor.kNEO.kv;
-        private static final double FLYWHEEL_kA = 0;
+        private static final double FlywheelkS = 0;
+        private static final double FlywheelkV = Motor.kNEO.kv;
+        private static final double FlywheelkA = 0;
 
-        public static final SimpleMotorFeedforward FLYWHEEL_FF = new SimpleMotorFeedforward(FLYWHEEL_kS, FLYWHEEL_kV, FLYWHEEL_kA);
+        public static final SimpleMotorFeedforward FLYWHEEL_FF = new SimpleMotorFeedforward(FlywheelkS, FlywheelkV, FlywheelkA);
 
         //Turret
         public static final float TurretReduction = 1f / (200f/1f);
@@ -106,11 +106,11 @@ public class Constants {
         public static final Constraints TURRET_CONSTRAINTS = new Constraints(TurretPowerTrain.calculateMotorRpmFromWheelRpm(90),
                 TurretPowerTrain.calculateMotorRpmFromWheelRpm(450));
 
-        public static final double TURRET_kP = 0;
-        public static final double TURRET_kF = 0;
+        public static final double TurretkP = 0;
+        public static final double TurretkF = 0;
 
-        public static final double FEED_kP = 0.0001;
-        public static final double FEED_kF = 0;
+        public static final double FeedkP = 0.0001;
+        public static final double feedkF = 0;
 
 
         //Feeder
@@ -120,11 +120,11 @@ public class Constants {
 
         public static final double FeedRpm = FeedPowertrain.calculateMotorRpmFromWheelRpm(3000);
 
-        private static final double FEEDER_kS = 0.0;
-        private static final double FEEDER_kV = 0.0;
-        private static final double FEEDER_kA = 0.0;
+        private static final double FeederkS = 0.0;
+        private static final double FeederkV = 0.0;
+        private static final double FeederkA = 0.0;
 
-        public static final SimpleMotorFeedforward FEEDER_FF = new SimpleMotorFeedforward(FEEDER_kS, FEEDER_kV, FEEDER_kA);
+        public static final SimpleMotorFeedforward FeederFF = new SimpleMotorFeedforward(FeederkS, FeederkV, FeederkA);
     }
 
     public static class IntakeValues {
@@ -155,13 +155,13 @@ public class Constants {
         private static final Gearbox SpinGearbox = new Gearbox(SpinReduction);
         public static final WheeledPowerTrain SpinPowertrain = new WheeledPowerTrain(SpinGearbox, Motor.kNEO, 1, Units.inchesToMeters(20));
 
-        public static final double SPIN_kP = 0;
-        public static final double SPIN_kF = 0;
+        public static final double SpinkP = 0;
+        public static final double SpinkF = 0;
 
         public static Constraints Constraints = new Constraints(2, 8);
 
-        public static final double POSITION_kP = 0;
-        public static final double POSITION_kF = 0;
+        public static final double PositionkP = 0;
+        public static final double PositionkF = 0;
     }
 
     public static class ClimberValues {
@@ -170,6 +170,12 @@ public class Constants {
 
         public static final PDPPortNumber WINCH_PDP_PORT = PDPPortNumber.Port13;
         public static final PDPPortNumber DEPLOY_PDP_PORT = PDPPortNumber.Port14;
+
+        public static final double MaxExtension = 1000;
+        public static final double MinExtention = 0;
+
+        public static final double ExtendkP = 0.001;
+        public static final double ExtendkF = 0.0;
 
     }
 
@@ -184,10 +190,10 @@ public class Constants {
     public class PneumaticsValues {
         public static final int PCM_MODULE_NUM = 0;
 
-        public static final int INTAKE_SOLENOID_ID = 1;
-        public static final int PROP_UP_SOLENOID_ID = 2;
-        public static final int WHEEL_O_FORTUNE_SOLENOID_ID = 3;
-        public static final int CLIMB_LOCK_SOLENOID_ID = 4;
+        public static final int INTAKE_SOLENOID_ID = 0;
+        public static final int PROP_UP_SOLENOID_ID = 1;
+        public static final int WHEEL_O_FORTUNE_SOLENOID_ID = 2;
+        public static final int CLIMB_LOCK_SOLENOID_ID = 3;
     }
 
     public static class FieldPositions {

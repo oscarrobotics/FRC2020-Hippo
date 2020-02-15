@@ -56,7 +56,7 @@ public class OI {
 		//Dumb testing commands
 		stratComInterface.getSC4().whenHeld(new StartEndCommand(() -> spindexer.spinClockwise(0.1), spindexer::stopSpin, spindexer));//All 3 of these could be being set to idle by superstructure every loop
 		stratComInterface.getSC5().whenHeld(new StartEndCommand(shooter::spin, shooter::stopAll, shooter));
-		stratComInterface.getSCSideTop().whenHeld(new StartEndCommand(() -> intake.intake(0.9), intake::stop, intake));
+		stratComInterface.getSCSideTop().whenHeld(new RunEndCommand(() -> superStructure.dumbIntake(stratComInterface.getLeftSlider()), superStructure::dumbIntakeIdle, superStructure, intake, pneumatics));
 		stratComInterface.getSCSideBot().whenHeld(new StartEndCommand(() -> intake.outtake(0.5), intake::stop, intake));
 
 		stratComInterface.getSingleToggle().whileHeld(new StartEndCommand(() -> shooter.setDumbRPM(OscarMath.clipMap(stratComInterface.getRightSlider(), -1, 1, 0, 5000)), shooter::idle));

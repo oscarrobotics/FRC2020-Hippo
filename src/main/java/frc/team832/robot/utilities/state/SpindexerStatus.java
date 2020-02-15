@@ -9,6 +9,7 @@ import frc.team832.robot.Constants;
 import frc.team832.robot.subsystems.Spindexer;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class SpindexerStatus {
@@ -18,12 +19,13 @@ public class SpindexerStatus {
     private final SmartMCAttachedPDPSlot spinSlot;
     private final StallDetector spinStall;
 
-    private List<Boolean> ballPositions = new ArrayList<>();
+    private boolean[] ballPositions = new boolean[5];
     private double absoluteRotations = 0;
     public SpindexerState state;
     private Spindexer.SpinnerDirection spinDirection;
 
     public SpindexerStatus(GrouchPDP pdp, Spindexer spindexer, CANSparkMax spinMotor) {
+
         this.spindexer = spindexer;
         this.spinMotor = spinMotor;
         this.pdp = pdp;
@@ -36,35 +38,32 @@ public class SpindexerStatus {
 
     public void update() {
 
-//        if (spindexer.getBallSensor() && spindexer.isOverBallSlot()) {
-//            ballPositions.set(spindexer.getNearestBallPosition().slotNumber, true);
-//        } else {
-//            ballPositions.set(spindexer.getNearestBallPosition().slotNumber, false);
-//        }
-//
-//        if (isFull())
-//            state = SpindexerState.FULL;
-//        else if (!isEmpty())
-//            state = SpindexerState.FILLING;
-//        else
-//            state = SpindexerState.EMPTY;
-//
-//        spinStall.updateStallStatus();
-//
-//        if (spindexer.getHallEffect()) {
-//            spindexer.zeroSpindexer();
-//            if (spindexer.getSpinnerDirection() == Spindexer.SpinnerDirection.Clockwise) absoluteRotations++;
-//            else absoluteRotations--;
-//        }
-//
-//        spinDirection = Math.signum(spinMotor.getSensorVelocity()) == 1 ? Spindexer.SpinnerDirection.Clockwise : Spindexer.SpinnerDirection.CounterClockwise;
+        boolean currentSlotHasBall = spindexer.getBallSensor() && spindexer.isOverBallSlot();
+        ballPositions[spindexer.getNearestBallPosition().slotNumber] = currentSlotHasBall;
+
+        if (isFull())
+            state = SpindexerState.FULL;
+        else if (!isEmpty())
+            state = SpindexerState.FILLING;
+        else
+            state = SpindexerState.EMPTY;
+
+        spinStall.updateStallStatus();
+
+        if (spindexer.getHallEffect()) {
+            spindexer.zeroSpindexer();
+            if (spindexer.getSpinnerDirection() == Spindexer.SpinnerDirection.Clockwise) absoluteRotations++;
+            else absoluteRotations--;
+        }
+
+        spinDirection = Math.signum(spinMotor.getSensorVelocity()) == 1 ? Spindexer.SpinnerDirection.Clockwise : Spindexer.SpinnerDirection.CounterClockwise;
     }
 
 
 
     public boolean getSlot(int pos) {
-        pos = OscarMath.clip(pos, 1, 5);
-        return ballPositions.get(pos);
+        pos = OscarMath.clip(pos, 1, 5) - 1;
+        return ballPositions[pos];
     }
 
     public boolean isFull() {
@@ -82,7 +81,7 @@ public class SpindexerStatus {
     public double getBallNumber() {
         double count = 0;
         for (int i = 0; i < 5; i++) {
-            if (ballPositions.get(i))
+            if (ballPositions[i])
                 count++;
         }
         return count;
@@ -94,7 +93,7 @@ public class SpindexerStatus {
 
     public int getFirstEmpty(){
         for(int i = 0; i < 5; i++) {
-            if(!ballPositions.get(i)) {
+            if(!ballPositions[i]) {
                 return i;
             }
         }
@@ -105,7 +104,7 @@ public class SpindexerStatus {
         return state;
     }
 
-    public List<Boolean> getBooleanList() { return ballPositions; }
+    public boolean[] getBooleanList() { return ballPositions; }
 
     public Spindexer.SpinnerDirection getSpinDirection() {
         return spinDirection;

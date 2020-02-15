@@ -1,5 +1,6 @@
 package frc.team832.robot.subsystems;
 
+import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.team832.lib.driverstation.dashboard.DashboardManager;
 import frc.team832.lib.driverstation.dashboard.DashboardUpdatable;
@@ -17,6 +18,8 @@ public class Climber extends SubsystemBase implements DashboardUpdatable {
     private final CANSparkMax winch, deploy;
 
     private SmartMCAttachedPDPSlot winchSlot, deploySlot;
+
+    private PIDController extendPID = new PIDController(Constants.ClimberValues.ExtendkP, 0, 0);
 
     public Climber(GrouchPDP pdp) {
         DashboardManager.addTab(this, this);
@@ -39,14 +42,10 @@ public class Climber extends SubsystemBase implements DashboardUpdatable {
         deploy.setInverted(false);
         deploy.setSensorPhase(true);
 
-        setCurrentLimit(40);
+        winch.limitInputCurrent(40);
         deploy.limitInputCurrent(30);
 
         initSuccessful = true;
-    }
-
-    private void setCurrentLimit (int limit) {
-        winch.limitInputCurrent(limit);
     }
 
     public boolean isInitSuccessful() { return initSuccessful; }
@@ -57,6 +56,11 @@ public class Climber extends SubsystemBase implements DashboardUpdatable {
 
     public void windWinch() {
         winch.set(0.25);
+    }
+
+    public void extendHook() {
+        double power = extendPID.calculate(deploy.getSensorPosition(), Constants.ClimberValues.MaxExtension);
+//        deploy.set();
     }
 
     public void climbDown() {
