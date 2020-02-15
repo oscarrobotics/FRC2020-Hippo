@@ -74,9 +74,8 @@ public class Constants {
         public static final PDPPortNumber TURRET_PDP_SLOT = PDPPortNumber.Port4;
         public static final PDPPortNumber FEEDER_PDP_SLOT = PDPPortNumber.Port6;
 
-        public static final int HOOD_SERVO_CHANNEL = 0;
         //Shooter
-        public static final int HOOD_CHANNEL = 0;
+        public static final int HOOD_SERVO_CHANNEL = 0;
 
         public static final float FlywheelReduction = 50f / 26f;
         private static final Gearbox FlywheelGearbox = new Gearbox(FlywheelReduction);
@@ -87,10 +86,10 @@ public class Constants {
         public static final double SPIN_UP_kP = 0;
         public static final double SPIN_UP_kF = 0;
 
-        public static final double SHOOTING_kP = 0.0007;
+        public static final double SHOOTING_kP = 0.001;
         public static final double SHOOTING_kF = 0;
 
-        public static final double IDLE_kP = 0.0001;
+        public static final double IDLE_kP = 0.00001;
         public static final double IDLE_kF = 0;
 
         private static final double FLYWHEEL_kS = 0;
@@ -108,7 +107,7 @@ public class Constants {
                 TurretPowerTrain.calculateMotorRpmFromWheelRpm(450));
 
         public static final double TURRET_kP = 0;
-        public static final double TURRET_kD = 0;
+        public static final double TURRET_kF = 0;
 
 
         //Feeder
@@ -118,9 +117,9 @@ public class Constants {
 
         public static final double FeedRpm = FeedPowertrain.calculateMotorRpmFromWheelRpm(3000);
 
-        private static final double FEEDER_kS = 0.25;
-        private static final double FEEDER_kV = 0.0005;
-        private static final double FEEDER_kA = 0.0001;
+        private static final double FEEDER_kS = 0.0;
+        private static final double FEEDER_kV = 0.0;
+        private static final double FEEDER_kA = 0.0;
 
         public static final SimpleMotorFeedforward FEEDER_FF = new SimpleMotorFeedforward(FEEDER_kS, FEEDER_kV, FEEDER_kA);
     }
@@ -134,9 +133,9 @@ public class Constants {
         private static final Gearbox IntakeGearbox = new Gearbox(IntakeReduction);
         public static final WheeledPowerTrain IntakePowertrain = new WheeledPowerTrain(IntakeGearbox, Motor.kNEO550, 1, Units.inchesToMeters(2));
 
-        private static final double kS = 0.25;
-        private static final double kV = 0.0005;
-        private static final double kA = 0.0001;
+        private static final double kS = 0.0;
+        private static final double kV = 0.0;
+        private static final double kA = 0.0;
 
         public static final SimpleMotorFeedforward FF = new SimpleMotorFeedforward(kS, kV, kA);
     }
@@ -153,7 +152,7 @@ public class Constants {
         private static final Gearbox SpinGearbox = new Gearbox(SpinReduction);
         public static final WheeledPowerTrain SpinPowertrain = new WheeledPowerTrain(SpinGearbox, Motor.kNEO, 1, Units.inchesToMeters(20));
 
-        public static final double FEED_kP = 0;
+        public static final double FEED_kP = 0.0001;
         public static final double FEED_kF = 0;
 
         public static final double SPIN_kP = 0;

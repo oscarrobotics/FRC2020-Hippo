@@ -37,7 +37,7 @@ public class SpindexerStatus {
     public void update() {
 
 //        if (spindexer.getBallSensor()) {
-//            spindexer.getNearestBallRotationRelativeToFeeder();//TODO: fix this
+//            ballPositions.set(spindexer.getNearestBallPosition().slotNumber, true);
 //        }
 //
 //        if (isFull())
@@ -58,17 +58,19 @@ public class SpindexerStatus {
 //        spinDirection = Math.signum(spinMotor.getSensorVelocity()) == 1 ? Spindexer.SpinnerDirection.Clockwise : Spindexer.SpinnerDirection.CounterClockwise;
     }
 
-    public boolean getPosition(int pos) {
-        pos = OscarMath.clip(pos, 1, 5) - 1;
+
+
+    public boolean getSlot(int pos) {
+        pos = OscarMath.clip(pos, 1, 5);
         return ballPositions.get(pos);
     }
 
     public boolean isFull() {
-        return getPosition(1) && getPosition(2) && getPosition(3) && getPosition(4) && getPosition(5);
+        return getSlot(1) && getSlot(2) && getSlot(3) && getSlot(4) && getSlot(5);
     }
 
     public boolean isEmpty() {
-        return !getPosition(1) && !getPosition(2) && !getPosition(3) && !getPosition(4) && !getPosition(5);
+        return !getSlot(1) && !getSlot(2) && !getSlot(3) && !getSlot(4) && !getSlot(5);
     }
 
     public boolean isStalling() {

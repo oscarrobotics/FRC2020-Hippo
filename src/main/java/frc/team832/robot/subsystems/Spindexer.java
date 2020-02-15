@@ -12,7 +12,6 @@ import frc.team832.lib.sensors.digital.LasersharkDistance;
 import frc.team832.lib.util.OscarMath;
 import frc.team832.robot.Constants;
 import frc.team832.robot.utilities.positions.BallPosition;
-import frc.team832.robot.utilities.positions.SafePosition;
 import frc.team832.robot.utilities.state.SpindexerStatus;
 
 import java.util.ArrayList;
@@ -29,9 +28,8 @@ public class Spindexer extends SubsystemBase {
 	private final DigitalInput hallEffect;
 	private final LasersharkDistance ballSensor;
 	private final SpindexerStatus spindexerStatus;
-	private final List<Boolean> ballStatus = new ArrayList<>();
-	private final PIDController spinPID = new PIDController(Constants.SpindexerValues.SPIN_kP, 0, Constants.SpindexerValues.SPIN_kD);
-	private final ProfiledPIDController positionPID = new ProfiledPIDController(Constants.SpindexerValues.POSITION_kP, 0, Constants.SpindexerValues.POSITION_kD, Constants.SpindexerValues.Constraints);
+	private final PIDController spinPID = new PIDController(Constants.SpindexerValues.SPIN_kP, 0, 0);
+	private final ProfiledPIDController positionPID = new ProfiledPIDController(Constants.SpindexerValues.POSITION_kP, 0, 0, Constants.SpindexerValues.Constraints);
 
 	private double tempSpindexerRotations = 0;
 	private double lastSpinSpeed = 0;
@@ -49,7 +47,7 @@ public class Spindexer extends SubsystemBase {
 
 		spindexerStatus = new SpindexerStatus(pdp, this, spinMotor);
 
-		initSuccessful = spinMotor.getCANConnected();
+		initSuccessful = true;
 	}
 
 	@Override
@@ -189,7 +187,7 @@ public class Spindexer extends SubsystemBase {
 		return superStructure.calculateSpindexerPosRelativeToFeeder(getNearestBallPosition().rotations);
 	}
 
-	private BallPosition getNearestBallPosition() {
+	public BallPosition getNearestBallPosition() {
 		double pos = spinMotor.getSensorPosition();
 		double nearestDistance = SpinPowertrain.calculateTicksFromPosition(0.1);
 		BallPosition ballPosition = BallPosition.Position1;
@@ -209,14 +207,16 @@ public class Spindexer extends SubsystemBase {
 		return ballPosition;
 	}
 
+
+
 	private BallPosition intToPosition(int i) {
-		if(i == 0) {
+		if(i == 1) {
 			return BallPosition.Position1;
-		} else if(i == 1) {
+		} else if(i == 2) {
 			return BallPosition.Position2;
-		} else if (i == 2) {
-			return BallPosition.Position3;
 		} else if (i == 3) {
+			return BallPosition.Position3;
+		} else if (i == 4) {
 			return BallPosition.Position4;
 		} else {
 			return BallPosition.Position5;

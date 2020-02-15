@@ -37,7 +37,7 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
     private PIDController flywheelPID = new PIDController(Constants.ShooterValues.SHOOTING_kP,0, 0);
     private PIDController hoodPID = new PIDController(Constants.ShooterValues.HOOD_kP, 0, 0);
     private PIDController feedPID = new PIDController(Constants.SpindexerValues.FEED_kP, 0, 0);
-    private ProfiledPIDController turretPID = new ProfiledPIDController(Constants.ShooterValues.TURRET_kP, 0, Constants.ShooterValues.TURRET_kD, Constants.ShooterValues.TURRET_CONSTRAINTS);
+    private ProfiledPIDController turretPID = new ProfiledPIDController(Constants.ShooterValues.TURRET_kP, 0, 0, Constants.ShooterValues.TURRET_CONSTRAINTS);
 
     private ShooterCalculations shooterCalcs = new ShooterCalculations();
 
@@ -119,6 +119,8 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
             case Shooting:
                 flywheelPID.setPID(Constants.ShooterValues.SHOOTING_kP, 0, 0);
                 break;
+            case Idle:
+                flywheelPID.setPID(Constants.ShooterValues.IDLE_kP, 0, 0);
         }
     }
 
@@ -136,7 +138,7 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
 
     public void idle() {
         setMode(ShootMode.Idle);
-        setRPM(3000);
+        setRPM(2000);
     }
 
     public void trackTarget() {
@@ -151,7 +153,7 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
 
         double ff = (rpm / (Constants.ShooterValues.FlywheelReduction * (Motor.kNEO.freeSpeed / (Motor.kNEO.kv / 12))) / 12) / 1.8;
         double pid = flywheelPID.calculate(primaryMotor.getSensorVelocity(), rpm);
-        double power = OscarMath.clip(ff + pid, -0.63, 0.63);
+        double power = OscarMath.clip(ff + pid, -0.6, 0.6);
         dashboard_PID.setDouble(pid);
         dashboard_ff.setDouble(ff);
         primaryMotor.set(power);
@@ -191,7 +193,7 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
     }//this is not right and needs to be looked over
 
     public void setHeadingRotation(double rotations) {
-        double targetRotation = OscarMath.clip(rotations, -0.5, 0.5);
+        double targetRotation = OscarMath.clip(rotations, 0.25, 0.75);
 //        turretMotor.set(turretPID.calculate(turretEncoder.getRotations(), TurretPowerTrain.calculateTicksFromPosition(targetRotation)));
     }
 
@@ -237,7 +239,11 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
         feedMotor.set(pow);
     }
 
-    public void setFeedRPM(double rpm) {
+    public void setDumbFeedRPM(double rpm) {
+        setFeedRPM(rpm);
+    }
+
+    private void setFeedRPM(double rpm) {
         feedMotor.set(feedPID.calculate(feedMotor.getSensorVelocity(), rpm) + Constants.ShooterValues.FEEDER_FF.calculate(rpm));
     }
 
@@ -251,6 +257,7 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
     }
 
     public void setDumbRPM(double rpm) {
+        setMode(ShootMode.Shooting);
         dashboard_wheelTargetRPM.setDouble(rpm);
         setRPM(rpm);
     }

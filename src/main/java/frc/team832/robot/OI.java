@@ -56,8 +56,8 @@ public class OI {
 		stratComInterface.getSCSideTop().whenHeld(new StartEndCommand(() -> intake.intake(0.9), intake::stop, intake));
 		stratComInterface.getSCSideBot().whenHeld(new StartEndCommand(() -> intake.outtake(0.5), intake::stop, intake));
 
-		stratComInterface.getSingleToggle().whileHeld(new InstantCommand(() -> shooter.setDumbRPM(OscarMath.clipMap(stratComInterface.getRightSlider(), -1, 1, 0, 5000))));
-		stratComInterface.getSingleToggle().whileHeld(new InstantCommand(() -> shooter.feed(OscarMath.clipMap(stratComInterface.getLeftSlider(), -1, 1, 0, 0.7))));
+		stratComInterface.getSingleToggle().whileHeld(new StartEndCommand(() -> shooter.setDumbRPM(OscarMath.clipMap(stratComInterface.getRightSlider(), -1, 1, 0, 5000)), shooter::idle));
+		stratComInterface.getSingleToggle().whileHeld(new InstantCommand(() -> shooter.setDumbFeedRPM(OscarMath.clipMap(stratComInterface.getLeftSlider(), -1, 1, 0, 3000))));
 
 
 //		stratComInterface.getDoubleToggleDown().whileHeld(new InstantCommand(() -> shooter.setExitAngle(OscarMath.clipMap(stratComInterface.getRightSlider(), -1, 1, 20, 70))));

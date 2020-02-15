@@ -8,7 +8,7 @@ public enum BallPosition {
 	Position5(0.8, 5);
 
 	public final double rotations;
-	public final double slotNumber;
+	public final int slotNumber;
 
 	BallPosition(double rotations, int slotNum) {
 		this.rotations = rotations;
