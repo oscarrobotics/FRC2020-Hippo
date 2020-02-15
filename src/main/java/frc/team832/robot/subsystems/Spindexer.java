@@ -68,7 +68,7 @@ public class Spindexer extends SubsystemBase {
 	}
 
 	public boolean isSafe() {
-		return Math.abs(shooter.getTurretRotations() - spindexer.getRelativeRotations()) <= .05;
+		return Math.abs(getNearestSafeRotationRelativeToFeeder() - getRelativeRotations()) < .05;
 	}
 
 	public void stopSpin() {
@@ -158,6 +158,14 @@ public class Spindexer extends SubsystemBase {
 			return true;
 		}
 		return false;
+	}
+
+	public boolean isOverBallSlot() {
+		return Math.abs(getRelativeRotations() - getNearestBallRotationRelativeToFeeder()) < 0.05;
+	}
+
+	public boolean isOverBallPosition(BallPosition position) {
+		return Math.abs(getRelativeRotations() - position.rotations) < 0.05;
 	}
 
 	public void setToPocket(BallPosition position) {

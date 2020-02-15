@@ -3,12 +3,15 @@ package frc.team832.robot;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.RunEndCommand;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import frc.team832.lib.driverinput.controllers.*;
 import frc.team832.lib.driverinput.oi.DriverOI;
 import frc.team832.lib.driverinput.oi.SticksDriverOI;
 import frc.team832.lib.driverinput.oi.XboxDriverOI;
 import frc.team832.lib.util.OscarMath;
+import frc.team832.robot.commands.PrepareShooter;
+import frc.team832.robot.commands.ShootCommandGroup;
 
 import static frc.team832.robot.Robot.*;
 
@@ -35,19 +38,19 @@ public class OI {
 
 	private void configureButtonBindings() {
 		// do commands here
-		stratComInterface.getSCPlus().whenHeld(new StartEndCommand(climber::climbUp, climber::stopClimb, Robot.climber));
-		stratComInterface.getSCMinus().whenHeld(new StartEndCommand(climber::climbDown, climber::stopClimb, Robot.climber));
+//		stratComInterface.getSCPlus().whenHeld(new StartEndCommand(climber::climbUp, climber::stopClimb, Robot.climber));
+//		stratComInterface.getSCMinus().whenHeld(new StartEndCommand(climber::climbDown, climber::stopClimb, Robot.climber));
 
 //		stratComInterface.getSCSideMid().whileHeld(new StartEndCommand(() -> superStructure.setMode(SuperStructure.SuperStructureMode.INTAKING), () -> superStructure.setMode(SuperStructure.SuperStructureMode.IDLELAST), superStructure, intake, spindexer));
 //		stratComInterface.getSCSideBot().whileHeld(new StartEndCommand(() -> superStructure.setMode(SuperStructure.SuperStructureMode.OUTTAKING), () -> superStructure.setMode(SuperStructure.SuperStructureMode.IDLELAST), superStructure, intake, spindexer));
 
-//		stratComInterface.getArcadeBlackRight().whenPressed(new PrepareShooter(superStructure, pneumatics, shooter, spindexer));
+//		stratComInterface.getArcadeWhiteLeft().whenPressed(new PrepareShooter(superStructure, pneumatics, shooter, spindexer));
 //		stratComInterface.getArcadeBlackLeft().whileHeld(new ShootCommandGroup(superStructure, pneumatics, shooter, spindexer));
 
-//		stratComInterface.getSC2().whileHeld(new StartEndCommand(pneumatics::extendWOFManipulator, pneumatics::retractWOFManipulator, Robot.pneumatics));
-//		stratComInterface.getSC1().whileHeld(new StartEndCommand(wheelOfFortune::spinCounterclockwise, wheelOfFortune::stopSpin, Robot.wheelOfFortune));
-//		stratComInterface.getSC3().whileHeld(new StartEndCommand(wheelOfFortune::spinClockwise, wheelOfFortune::stopSpin, Robot.wheelOfFortune));
-//		stratComInterface.getSC6().whenPressed(new InstantCommand(wheelOfFortune::spinThreeTimes, Robot.wheelOfFortune));
+//		stratComInterface.getArcadeWhiteRight().whenHeld(new StartEndCommand(pneumatics::extendWOFManipulator, pneumatics::retractWOFManipulator, Robot.pneumatics));
+//		stratComInterface.getSC1().whenHeld(new StartEndCommand(wheelOfFortune::spinCounterclockwise, wheelOfFortune::stopSpin, Robot.wheelOfFortune));
+//		stratComInterface.getSC3().whenHeld(new StartEndCommand(wheelOfFortune::spinClockwise, wheelOfFortune::stopSpin, Robot.wheelOfFortune));
+//		stratComInterface.getSC6().whenHeld(new RunEndCommand(wheelOfFortune::spinThreeTimes, wheelOfFortune::stopSpin, Robot.wheelOfFortune));
 
 
 		//Dumb testing commands

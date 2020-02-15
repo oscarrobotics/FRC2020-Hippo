@@ -109,6 +109,9 @@ public class Constants {
         public static final double TURRET_kP = 0;
         public static final double TURRET_kF = 0;
 
+        public static final double FEED_kP = 0.0001;
+        public static final double FEED_kF = 0;
+
 
         //Feeder
         public static final float FeedReduction = 1f;
@@ -151,9 +154,6 @@ public class Constants {
         public static final float SpinReduction = 1f / (56f/1f);
         private static final Gearbox SpinGearbox = new Gearbox(SpinReduction);
         public static final WheeledPowerTrain SpinPowertrain = new WheeledPowerTrain(SpinGearbox, Motor.kNEO, 1, Units.inchesToMeters(20));
-
-        public static final double FEED_kP = 0.0001;
-        public static final double FEED_kF = 0;
 
         public static final double SPIN_kP = 0;
         public static final double SPIN_kF = 0;

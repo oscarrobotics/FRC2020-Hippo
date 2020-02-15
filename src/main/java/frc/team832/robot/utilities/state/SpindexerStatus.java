@@ -36,8 +36,10 @@ public class SpindexerStatus {
 
     public void update() {
 
-//        if (spindexer.getBallSensor()) {
+//        if (spindexer.getBallSensor() && spindexer.isOverBallSlot()) {
 //            ballPositions.set(spindexer.getNearestBallPosition().slotNumber, true);
+//        } else {
+//            ballPositions.set(spindexer.getNearestBallPosition().slotNumber, false);
 //        }
 //
 //        if (isFull())
