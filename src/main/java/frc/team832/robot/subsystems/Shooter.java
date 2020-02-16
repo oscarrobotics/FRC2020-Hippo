@@ -34,7 +34,7 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
     private PIDController flywheelPID = new PIDController(Constants.ShooterValues.ShootingkP,0, 0);
     private PIDController hoodPID = new PIDController(Constants.ShooterValues.HoodkP, 0, 0);
     private PIDController feedPID = new PIDController(Constants.ShooterValues.FeedkP, 0, 0);
-    private ProfiledPIDController turretPID = new ProfiledPIDController(Constants.ShooterValues.TurretkP, 0, 0, Constants.ShooterValues.TURRET_CONSTRAINTS);
+    private ProfiledPIDController turretPID = new ProfiledPIDController(Constants.ShooterValues.TurretkP, 0, 0, Constants.ShooterValues.TurretConstraints);
 
     private SmartMCAttachedPDPSlot primaryFlywheelSlot, secondaryFlywheelSlot, turretSlot, feederSlot;
 
@@ -152,6 +152,9 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
         double ff = (rpm / (Constants.ShooterValues.FlywheelReduction * (Motor.kNEO.freeSpeed / (Motor.kNEO.kv / 12))) / 12) / 1.8;
         double pid = flywheelPID.calculate(primaryMotor.getSensorVelocity(), rpm);
         double power = OscarMath.clip(ff + pid, -0.6, 0.6);
+
+        if (rpm < primaryMotor.getSensorVelocity() + 50 && mode == ShootMode.Idle) power = 0;
+
         dashboard_PID.setDouble(pid);
         dashboard_ff.setDouble(ff);
         primaryMotor.set(power);

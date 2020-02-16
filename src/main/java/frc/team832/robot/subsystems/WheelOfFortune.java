@@ -1,6 +1,7 @@
 package frc.team832.robot.subsystems;
 
 import edu.wpi.first.wpilibj.I2C;
+import edu.wpi.first.wpilibj.controller.ProfiledPIDController;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.team832.lib.driverstation.dashboard.DashboardUpdatable;
 import frc.team832.lib.motorcontrol.NeutralMode;
@@ -10,10 +11,14 @@ import frc.team832.robot.Constants;
 import frc.team832.robot.OI;
 import frc.team832.robot.utilities.positions.ColorWheelPath;
 
+import java.awt.dnd.DropTarget;
+
 public class WheelOfFortune extends SubsystemBase implements DashboardUpdatable {
     private boolean initSuccessful = false;
 
     public CANSparkMax spinner;
+
+    private ProfiledPIDController pid = new ProfiledPIDController(Constants.WOFValues.kP, 0, 0, Constants.WOFValues.Constraints);
 
     private final I2C.Port i2cPort = I2C.Port.kOnboard;
 //    public final ColorSensorV3 colorSensor = new ColorSensorV3(i2cPort);
@@ -46,20 +51,21 @@ public class WheelOfFortune extends SubsystemBase implements DashboardUpdatable 
     }
 
     public void spinClockwise() {
-        if (OI.stratComInterface.getSC2().get()) spinner.set(0.5);
+        zspinner.set(0.5);
     }
 
     public void spinCounterclockwise() {
-        if (OI.stratComInterface.getSC2().get()) spinner.set(-0.5);
+        spinner.set(-0.5);
     }
 
     public void spinThreeTimes() {
         spinWheel(3);
     }
 
-    public void spinWheel(double revolutions) {
-        double additionalTicks = Constants.WOFValues.SpinPowertrain.calculateTicksFromPosition(revolutions);
-        spinner.set(spinner.getSensorPosition() + additionalTicks);
+    public void spinWheel(double rotations) {
+        double currentRotations = (spinner.getSensorPosition() / Constants.WOFValues.SpinReduction) % 1;
+        double targetRotations = currentRotations + rotations;
+        spinner.set(pid.calculate(currentRotations, targetRotations));
     }
 
     public void setColor(ColorWheelPath.ColorWheelColor targetColor) {
@@ -67,7 +73,7 @@ public class WheelOfFortune extends SubsystemBase implements DashboardUpdatable 
 //        path = new ColorWheelPath(currentColor, targetColor);
 
         double rotations = path.rotations * (path.direction == ColorWheelPath.Direction.CLOCKWISE ? 1 : -1);//assuming that clockwise is positive
-        spinner.set(Constants.WOFValues.SpinPowertrain.calculateTicksFromPosition(rotations));
+        spinWheel(rotations);
     }
 
     public void stopSpin() {

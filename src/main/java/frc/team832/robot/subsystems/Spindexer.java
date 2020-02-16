@@ -195,9 +195,11 @@ public class Spindexer extends SubsystemBase {
 	public BallPosition getNearestBallPosition() {
 		double pos = spinMotor.getSensorPosition();
 		double nearestDistance = SpinPowertrain.calculateTicksFromPosition(0.1);
-		BallPosition ballPosition = BallPosition.Position1;
+		BallPosition ballPosition = BallPosition.Position0;
 
-		if (Math.abs(pos - SpinPowertrain.calculateTicksFromPosition(BallPosition.Position1.rotations)) < nearestDistance) {
+		if (Math.abs(pos - SpinPowertrain.calculateTicksFromPosition(BallPosition.Position0.rotations)) < nearestDistance) {
+			ballPosition = BallPosition.Position0;
+		} else if (Math.abs(pos - SpinPowertrain.calculateTicksFromPosition(BallPosition.Position1.rotations)) < nearestDistance) {
 			ballPosition = BallPosition.Position1;
 		} else if (Math.abs(pos - SpinPowertrain.calculateTicksFromPosition(BallPosition.Position2.rotations)) < nearestDistance) {
 			ballPosition = BallPosition.Position2;
@@ -205,8 +207,6 @@ public class Spindexer extends SubsystemBase {
 			ballPosition = BallPosition.Position3;
 		} else if (Math.abs(pos - SpinPowertrain.calculateTicksFromPosition(BallPosition.Position4.rotations)) < nearestDistance) {
 			ballPosition = BallPosition.Position4;
-		} else if (Math.abs(pos - SpinPowertrain.calculateTicksFromPosition(BallPosition.Position5.rotations)) < nearestDistance) {
-			ballPosition = BallPosition.Position5;
 		}
 
 		return ballPosition;
@@ -216,15 +216,15 @@ public class Spindexer extends SubsystemBase {
 
 	private BallPosition intToPosition(int i) {
 		if(i == 0) {
-			return BallPosition.Position1;
+			return BallPosition.Position0;
 		} else if(i == 1) {
-			return BallPosition.Position2;
+			return BallPosition.Position1;
 		} else if (i == 2) {
-			return BallPosition.Position3;
+			return BallPosition.Position2;
 		} else if (i == 3) {
-			return BallPosition.Position4;
+			return BallPosition.Position3;
 		} else {
-			return BallPosition.Position5;
+			return BallPosition.Position4;
 		}
 	}
 }

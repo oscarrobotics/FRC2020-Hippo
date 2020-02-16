@@ -96,21 +96,21 @@ public class Constants {
         private static final double FlywheelkV = Motor.kNEO.kv;
         private static final double FlywheelkA = 0;
 
-        public static final SimpleMotorFeedforward FLYWHEEL_FF = new SimpleMotorFeedforward(FlywheelkS, FlywheelkV, FlywheelkA);
+        public static final SimpleMotorFeedforward FlywheelFF = new SimpleMotorFeedforward(FlywheelkS, FlywheelkV, FlywheelkA);
 
         //Turret
         public static final float TurretReduction = 1f / (200f/1f);
         private static final Gearbox TurretGearbox = new Gearbox(TurretReduction);
         public static final WheeledPowerTrain TurretPowerTrain = new WheeledPowerTrain(TurretGearbox, Motor.kNEO550, 1, Units.inchesToMeters(10));
 
-        public static final Constraints TURRET_CONSTRAINTS = new Constraints(TurretPowerTrain.calculateMotorRpmFromWheelRpm(90),
+        public static final Constraints TurretConstraints = new Constraints(TurretPowerTrain.calculateMotorRpmFromWheelRpm(90),
                 TurretPowerTrain.calculateMotorRpmFromWheelRpm(450));
 
         public static final double TurretkP = 0;
         public static final double TurretkF = 0;
 
         public static final double FeedkP = 0.0001;
-        public static final double feedkF = 0;
+        public static final double FeedkF = 0;
 
 
         //Feeder
@@ -185,6 +185,11 @@ public class Constants {
         public static final float SpinReduction = 1f / (25f/1f);
         private static final Gearbox SpinGearbox = new Gearbox(SpinReduction);
         public static final WheeledPowerTrain SpinPowertrain = new WheeledPowerTrain(SpinGearbox, Motor.kNEO550, 1, Units.inchesToMeters(4));
+
+        public static Constraints Constraints = new Constraints(4, 12);
+
+        public static final double kP = 0.0;
+        public static final double kF = 0.0;
     }
 
     public class PneumaticsValues {
