@@ -12,10 +12,6 @@ import frc.team832.lib.util.OscarMath;
 import frc.team832.robot.Constants;
 import frc.team832.robot.subsystems.Spindexer;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 public class SpindexerStatus implements DashboardUpdatable {
     private final Spindexer spindexer;
     private final CANSparkMax spinMotor;
@@ -132,20 +128,7 @@ public class SpindexerStatus implements DashboardUpdatable {
         ballSlot2.setBoolean(getSlot(2));
         ballSlot3.setBoolean(getSlot(3));
         ballSlot4.setBoolean(getSlot(4));
-        dashboard_state.setString(getDashboardState());
-    }
-
-    private String getDashboardState() {
-        switch (state) {
-            case FULL:
-                return "Full";
-            case FILLING:
-                return "Filling";
-            case EMPTY:
-                return "Empty";
-            default:
-                return "Error";
-        }
+        dashboard_state.setString(state.toString());
     }
 
     public enum SpindexerState {

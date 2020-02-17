@@ -51,7 +51,7 @@ public class WheelOfFortune extends SubsystemBase implements DashboardUpdatable 
     }
 
     public void spinClockwise() {
-        zspinner.set(0.5);
+        spinner.set(0.5);
     }
 
     public void spinCounterclockwise() {

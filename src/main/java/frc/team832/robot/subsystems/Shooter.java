@@ -15,6 +15,7 @@ import frc.team832.lib.power.GrouchPDP;
 import frc.team832.lib.power.impl.SmartMCAttachedPDPSlot;
 import frc.team832.lib.util.OscarMath;
 import frc.team832.robot.Constants;
+import frc.team832.robot.Constants.ShooterValues;
 
 public class Shooter extends SubsystemBase implements DashboardUpdatable {
 
@@ -31,27 +32,27 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
     private AnalogInput potentiometer = new AnalogInput(1);
 //    private REVThroughBorePWM turretEncoder = new REVThroughBorePWM(0, 1);
 
-    private PIDController flywheelPID = new PIDController(Constants.ShooterValues.ShootingkP,0, 0);
-    private PIDController hoodPID = new PIDController(Constants.ShooterValues.HoodkP, 0, 0);
-    private PIDController feedPID = new PIDController(Constants.ShooterValues.FeedkP, 0, 0);
-    private ProfiledPIDController turretPID = new ProfiledPIDController(Constants.ShooterValues.TurretkP, 0, 0, Constants.ShooterValues.TurretConstraints);
+    private PIDController flywheelPID = new PIDController(ShooterValues.ShootingkP,0, 0);
+    private PIDController hoodPID = new PIDController(ShooterValues.HoodkP, 0, 0);
+    private PIDController feedPID = new PIDController(ShooterValues.FeedkP, 0, 0);
+    private ProfiledPIDController turretPID = new ProfiledPIDController(ShooterValues.TurretkP, 0, 0, ShooterValues.TurretConstraints);
 
     private SmartMCAttachedPDPSlot primaryFlywheelSlot, secondaryFlywheelSlot, turretSlot, feederSlot;
 
     public Shooter(GrouchPDP pdp, Vision vision){
         DashboardManager.addTab(this, this);
 
-        primaryMotor = new CANSparkMax(Constants.ShooterValues.PRIMARY_CAN_ID, Motor.kNEO);
-        secondaryMotor = new CANSparkMax(Constants.ShooterValues.SECONDARY_CAN_ID, Motor.kNEO);
-        turretMotor = new CANSparkMax(Constants.ShooterValues.TURRET_CAN_ID, Motor.kNEO550);
-        feedMotor = new CANSparkMax(Constants.ShooterValues.FEED_MOTOR_CAN_ID, Motor.kNEO);
+        primaryMotor = new CANSparkMax(ShooterValues.PRIMARY_CAN_ID, Motor.kNEO);
+        secondaryMotor = new CANSparkMax(ShooterValues.SECONDARY_CAN_ID, Motor.kNEO);
+        turretMotor = new CANSparkMax(ShooterValues.TURRET_CAN_ID, Motor.kNEO550);
+        feedMotor = new CANSparkMax(ShooterValues.FEED_MOTOR_CAN_ID, Motor.kNEO);
 
-        primaryFlywheelSlot = pdp.addDevice(Constants.ShooterValues.PRIMARY_PDP_SLOT, primaryMotor);
-        secondaryFlywheelSlot = pdp.addDevice(Constants.ShooterValues.SECONDARY_PDP_SLOT, secondaryMotor);
-        turretSlot = pdp.addDevice(Constants.ShooterValues.TURRET_PDP_SLOT, turretMotor);
-        feederSlot = pdp.addDevice(Constants.ShooterValues.FEEDER_PDP_SLOT, feedMotor);
+        primaryFlywheelSlot = pdp.addDevice(ShooterValues.PRIMARY_PDP_SLOT, primaryMotor);
+        secondaryFlywheelSlot = pdp.addDevice(ShooterValues.SECONDARY_PDP_SLOT, secondaryMotor);
+        turretSlot = pdp.addDevice(ShooterValues.TURRET_PDP_SLOT, turretMotor);
+        feederSlot = pdp.addDevice(ShooterValues.FEEDER_PDP_SLOT, feedMotor);
 
-        hoodServo = new REVSmartServo_Continuous(Constants.ShooterValues.HOOD_SERVO_CHANNEL);
+        hoodServo = new REVSmartServo_Continuous(ShooterValues.HOOD_SERVO_CHANNEL);
 
         primaryMotor.wipeSettings();
         secondaryMotor.wipeSettings();
@@ -69,11 +70,11 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
 
         DashboardManager.getTab(this).add(flywheelPID);
 
-        dashboard_wheelRPM = DashboardManager.addTabItem(this, "RPM", 0.0);
+        dashboard_wheelRPM = DashboardManager.addTabItem(this, "Wheel RPM", 0.0);
         dashboard_PID = DashboardManager.addTabItem(this, "PID", 0.0);
         dashboard_hoodPos = DashboardManager.addTabItem(this, "Hood Position", 0.0);
         dashboard_turretPos = DashboardManager.addTabItem(this, "Turret Position", 0.0);
-        dashboard_wheelTargetRPM = DashboardManager.addTabItem(this, "Target RPM", 0.0);
+        dashboard_wheelTargetRPM = DashboardManager.addTabItem(this, "Target Wheel RPM", 0.0);
         dashboard_ff = DashboardManager.addTabItem(this, "FeedForward", 0.0);
 
         this.vision = vision;
@@ -103,7 +104,7 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
 
     @Override
     public void updateDashboardData () {
-        dashboard_wheelRPM.setDouble(primaryMotor.getSensorVelocity());
+        dashboard_wheelRPM.setDouble(primaryMotor.getSensorVelocity() * ShooterValues.FlywheelReduction);
     }
 
     public boolean isInitSuccessful() { return initSuccessful; }
@@ -111,13 +112,13 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
     private void updatePIDMode() {
         switch (mode) {
             case SpinUp:
-                flywheelPID.setPID(Constants.ShooterValues.SpinUpkP, 0, 0);
+                flywheelPID.setPID(ShooterValues.SpinUpkP, 0, 0);
                 break;
             case Shooting:
-                flywheelPID.setPID(Constants.ShooterValues.ShootingkP, 0, 0);
+                flywheelPID.setPID(ShooterValues.ShootingkP, 0, 0);
                 break;
             case Idle:
-                flywheelPID.setPID(Constants.ShooterValues.IdlekP, 0, 0);
+                flywheelPID.setPID(ShooterValues.IdlekP, 0, 0);
         }
     }
 
@@ -135,7 +136,7 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
 
     public void idle() {
         setMode(ShootMode.Idle);
-        setRPM(2000);
+//        setRPM(2000);
         feedMotor.set(0);
     }
 
@@ -145,15 +146,16 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
         turretTrackTarget();
     }
 
-    private void setRPM(double rpm) {
+    private void setWheelRPM(double wheelRPM) {
 //        double power = primaryMotor.getSensorVelocity() - rpm > 200 ? 0 : OscarMath.clip(flywheelPID.calculate(primaryMotor.getSensorVelocity(), rpm) + Constants.ShooterValues.FLYWHEEL_FF.calculate(rpm), -0.5, 0.5);
-//        double ff = Constants.ShooterValues.FLYWHEEL_FF.calculate(rpm);
+        double motorRpm = wheelRPM / ShooterValues.FlywheelReduction;
+        double batteryVoltage = primaryMotor.getInputVoltage();
+        double ff = ((ShooterValues.FlywheelFF.calculate(motorRpm)) / batteryVoltage) + (mode == ShootMode.Shooting ? ShooterValues.ShootingkF : ShooterValues.IdlekF);
 
-        double ff = (rpm / (Constants.ShooterValues.FlywheelReduction * (Motor.kNEO.freeSpeed / (Motor.kNEO.kv / 12))) / 12) / 1.8;
-        double pid = flywheelPID.calculate(primaryMotor.getSensorVelocity(), rpm);
-        double power = OscarMath.clip(ff + pid, -0.6, 0.6);
+        double pid = flywheelPID.calculate(primaryMotor.getSensorVelocity(), wheelRPM);
+        double power = OscarMath.clip(ff + pid, -0.5, 0.5);
 
-        if (rpm < primaryMotor.getSensorVelocity() + 50 && mode == ShootMode.Idle) power = 0;
+        if (wheelRPM < primaryMotor.getSensorVelocity() - 50 && mode == ShootMode.Idle) power = 0;
 
         dashboard_PID.setDouble(pid);
         dashboard_ff.setDouble(ff);
@@ -245,13 +247,13 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
     }
 
     private void setFeedRPM(double rpm) {
-        double ff = (rpm / (Constants.ShooterValues.FeedReduction * (Motor.kNEO.freeSpeed / (Motor.kNEO.kv / 12))) / 12) / 1.8;//Constants.ShooterValues.FEEDER_FF.calculate(rpm)
+        double ff = (rpm / (ShooterValues.FeedReduction * (Motor.kNEO.freeSpeed / (Motor.kNEO.kv / 12))) / 12) / 1.8;//Constants.ShooterValues.FEEDER_FF.calculate(rpm)
         double pid = feedPID.calculate(feedMotor.getSensorVelocity(), rpm);
         feedMotor.set(pid + ff);
     }
 
     public boolean atFeedRpm() {
-        return Math.abs(feedMotor.getSensorVelocity() - Constants.ShooterValues.FeedRpm) < 100;
+        return Math.abs(feedMotor.getSensorVelocity() - ShooterValues.FeedRpm) < 100;
     }
 
     public double getTurretRotations() {
@@ -260,9 +262,21 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
     }
 
     public void setDumbRPM(double rpm) {
-        setMode(ShootMode.Shooting);
-        dashboard_wheelTargetRPM.setDouble(rpm);
-        setRPM(rpm);
+        if (rpm < primaryMotor.getSensorVelocity() - 50)
+            setMode(ShootMode.Idle);
+        else
+            setMode(ShootMode.Shooting);
+
+        dashboard_wheelTargetRPM.setDouble(rpm * ShooterValues.FlywheelReduction);
+        setWheelRPM(rpm);
+    }
+
+    public void setHood(double pow) {
+        hoodServo.setSpeed(pow);
+    }
+
+    public void idleHood() {
+        hoodServo.setSpeed(0);
     }
 
     public enum ShootMode {

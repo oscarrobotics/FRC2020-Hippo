@@ -86,15 +86,17 @@ public class Constants {
         public static final double SpinUpkP = 0;
         public static final double SpinUpkF = 0;
 
-        public static final double ShootingkP = 0.001;
-        public static final double ShootingkF = 0;
+        public static final double ShootingkP = 0.0005;
+        public static final double ShootingkF = 0.03;
 
         public static final double IdlekP = 0.00001;
         public static final double IdlekF = 0;
 
-        private static final double FlywheelkS = 0;
-        private static final double FlywheelkV = Motor.kNEO.kv;
-        private static final double FlywheelkA = 0;
+
+        // TODO: Recharacterize with 1 for encoder ratio and with correct units
+        private static final double FlywheelkS = 0.0437;
+        private static final double FlywheelkV = 0.00217;
+        private static final double FlywheelkA = 0.00103;
 
         public static final SimpleMotorFeedforward FlywheelFF = new SimpleMotorFeedforward(FlywheelkS, FlywheelkV, FlywheelkA);
 
@@ -111,7 +113,6 @@ public class Constants {
 
         public static final double FeedkP = 0.0001;
         public static final double FeedkF = 0;
-
 
         //Feeder
         public static final float FeedReduction = 1f;

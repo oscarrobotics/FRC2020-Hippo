@@ -154,8 +154,8 @@ public class SuperStructure extends SubsystemBase implements DashboardUpdatable 
 
     @Override
     public void updateDashboardData() {
-		dashboard_mode.setString(getModeString());
-		dashboard_lastMode.setString(getLastModeString());
+		dashboard_mode.setString(currentMode.toString());
+		dashboard_lastMode.setString(lastMode.toString());
     }
 
     public enum SuperStructureMode {
@@ -185,36 +185,6 @@ public class SuperStructure extends SubsystemBase implements DashboardUpdatable 
 				break;
 			default:
 				break;
-		}
-	}
-
-	private String getModeString() {
-		switch (currentMode) {
-			case INTAKING:
-				return "Intaking";
-			case OUTTAKING:
-				return "Outtaking";
-			case IDLEALL:
-				return "Idle All";
-			case IDLELAST:
-				return "Idle Last";
-			default:
-				return "AHHHHHH";
-		}
-	}
-
-	private String getLastModeString() {
-		switch (lastMode) {
-			case INTAKING:
-				return "Intaking";
-			case OUTTAKING:
-				return "Outtaking";
-			case IDLEALL:
-				return "Idle All";
-			case IDLELAST:
-				return "Idle Last";
-			default:
-				return "AHHHHHH";
 		}
 	}
 }

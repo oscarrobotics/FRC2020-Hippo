@@ -55,14 +55,16 @@ public class OI {
 
 
 		//Dumb testing commands
-		stratComInterface.getSC4().whenHeld(new StartEndCommand(() -> spindexer.spinClockwise(0.1), spindexer::stopSpin, spindexer));//All 3 of these could be being set to idle by superstructure every loop
+		stratComInterface.getSC4().whenHeld(new StartEndCommand(() -> spindexer.spinClockwise(0.5), spindexer::stopSpin, spindexer));//All 3 of these could be being set to idle by superstructure every loop
 		stratComInterface.getSC5().whenHeld(new StartEndCommand(shooter::spin, shooter::stopAll, shooter));
-		stratComInterface.getSCSideTop().whenHeld(new RunEndCommand(() -> superStructure.dumbIntake(stratComInterface.getLeftSlider()), superStructure::dumbIntakeIdle, superStructure, intake, pneumatics));
+		stratComInterface.getDoubleToggleUp().whenHeld(new RunEndCommand(() -> superStructure.dumbIntake(stratComInterface.getLeftSlider()), superStructure::dumbIntakeIdle, superStructure, intake, pneumatics));
 		stratComInterface.getSCSideBot().whenHeld(new StartEndCommand(() -> intake.outtake(0.5), intake::stop, intake));
 
-		stratComInterface.getSingleToggle().whileHeld(new StartEndCommand(() -> shooter.setDumbRPM(OscarMath.clipMap(stratComInterface.getRightSlider(), -1, 1, 0, 5000)), shooter::idle));
-		stratComInterface.getSingleToggle().whileHeld(new InstantCommand(() -> shooter.setDumbFeedRPM(OscarMath.clipMap(stratComInterface.getLeftSlider(), -1, 1, 0, 3000))));
+		stratComInterface.getSingleToggle().whenHeld(new RunEndCommand(() -> shooter.setDumbRPM(OscarMath.clipMap(stratComInterface.getRightSlider(), -1, 1, 0, 5000)), shooter::idle));
+		stratComInterface.getSingleToggle().whenHeld(new RunEndCommand(() -> shooter.setDumbFeedRPM(OscarMath.clipMap(stratComInterface.getLeftSlider(), -1, 1, 0, 4000)), shooter::idle));
 
+		stratComInterface.getArcadeBlackRight().whileHeld(new StartEndCommand(() -> shooter.setHood(0.5), shooter::idleHood));
+		stratComInterface.getArcadeWhiteRight().whileHeld(new StartEndCommand(() -> shooter.setHood(-0.5), shooter::idleHood));
 
 //		stratComInterface.getDoubleToggleDown().whileHeld(new InstantCommand(() -> shooter.setExitAngle(OscarMath.clipMap(stratComInterface.getRightSlider(), -1, 1, 20, 70))));
 	}
