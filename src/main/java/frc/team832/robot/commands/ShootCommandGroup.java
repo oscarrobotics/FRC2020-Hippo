@@ -22,9 +22,9 @@ public class ShootCommandGroup extends SequentialCommandGroup {
                 new PrepareShooter(superStructure, pneumatics, shooter, spindexer),
 
                 new FunctionalCommand(
-                        () -> superStructure.setMode(SuperStructure.SuperStructureMode.SHOOTING),
+                        superStructure::shoot,
                         () -> {},
-                        (ignored) -> superStructure.idle(false),
+                        (ignored) -> superStructure.idleShooter(),
                         superStructure::isSpindexerUnloaded,
                         superStructure)
         );

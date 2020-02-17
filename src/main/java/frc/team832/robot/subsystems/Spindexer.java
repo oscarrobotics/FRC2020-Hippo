@@ -185,11 +185,11 @@ public class Spindexer extends SubsystemBase {
 	}
 
 	public double getNearestSafeRotationRelativeToFeeder() {
-		return getNearestBallRotationRelativeToFeeder() + superStructure.calculateSpindexerPosRelativeToFeeder(0.1);
+		return getNearestBallRotationRelativeToFeeder() + superStructure.calculateSpindexerRotRelativeToFeeder(0.1);
 	}
 
 	public double getNearestBallRotationRelativeToFeeder() {
-		return superStructure.calculateSpindexerPosRelativeToFeeder(getNearestBallPosition().rotations);
+		return superStructure.calculateSpindexerRotRelativeToFeeder(getNearestBallPosition().rotations);
 	}
 
 	public BallPosition getNearestBallPosition() {

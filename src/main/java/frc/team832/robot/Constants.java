@@ -172,8 +172,16 @@ public class Constants {
         public static final PDPPortNumber WINCH_PDP_PORT = PDPPortNumber.Port13;
         public static final PDPPortNumber DEPLOY_PDP_PORT = PDPPortNumber.Port14;
 
-        public static final double MaxExtension = 1000;
-        public static final double MinExtention = 0;
+        public static final float ExtendReduction = 1f / (5f/1f);
+        private static final Gearbox ExtendGearbox = new Gearbox(ExtendReduction);
+        public static final WheeledPowerTrain ExtendPowertrain = new WheeledPowerTrain(ExtendGearbox, Motor.kNEO, 1, Units.inchesToMeters(2));
+
+        public static final double MaxExtend = ExtendPowertrain.calculateTicksFromWheelDistance(Units.inchesToMeters(80));
+        public static final double MinExtend = ExtendPowertrain.calculateTicksFromWheelDistance(Units.inchesToMeters(54));
+        public static final double Retract = ExtendPowertrain.calculateTicksFromWheelDistance(Units.inchesToMeters(0));
+
+        public static final Constraints ExtendConstraints = new Constraints(ExtendPowertrain.calculateMotorRpmFromSurfaceSpeed(0.5),
+                ExtendPowertrain.calculateMotorRpmFromSurfaceSpeed(1));
 
         public static final double ExtendkP = 0.001;
         public static final double ExtendkF = 0.0;
