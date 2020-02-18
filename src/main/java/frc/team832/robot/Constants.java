@@ -12,6 +12,7 @@ import frc.team832.lib.motors.WheeledPowerTrain;
 import frc.team832.lib.motors.Gearbox;
 import frc.team832.lib.motors.Motor;
 import frc.team832.lib.power.PDPPortNumber;
+import frc.team832.lib.util.ClosedLoopConfig;
 
 public class Constants {
     public static class DrivetrainValues {
@@ -83,20 +84,14 @@ public class Constants {
 
         public static final double HoodkP = 0;
 
-        public static final double SpinUpkP = 0;
-        public static final double SpinUpkF = 0;
-
-        public static final double ShootingkP = 0.0005;
-        public static final double ShootingkF = 0.03;
-
-        public static final double IdlekP = 0.00001;
-        public static final double IdlekF = 0;
-
-
         // TODO: Recharacterize with 1 for encoder ratio and with correct units
         private static final double FlywheelkS = 0.0437;
         private static final double FlywheelkV = 0.00217;
         private static final double FlywheelkA = 0.00103;
+
+        public static final ClosedLoopConfig ShootingConfig = new ClosedLoopConfig(0.0005, 0, 0, 0.0);
+        public static final ClosedLoopConfig IdleConfig = new ClosedLoopConfig(0.000001, 0, 0, 0.0);
+        public static final ClosedLoopConfig SpinupConfig = new ClosedLoopConfig(0.0007, 0, 0, 0.0);
 
         public static final SimpleMotorFeedforward FlywheelFF = new SimpleMotorFeedforward(FlywheelkS, FlywheelkV, FlywheelkA);
 

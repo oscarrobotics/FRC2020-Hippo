@@ -14,7 +14,7 @@ public class ShooterCalculations {
         //-targetPose.getRotation().getDegrees() / 360.0;
         // (yaw / 360.0);//assuming yaw input is -179 to 180
 
-        flywheelRPM = distance < 1.5 ? 3000 : 7000;
+        flywheelRPM = distance < 2 ? 4000 : 8000;
         exitAngle = pitch + 5;//needs testing
         turretRotation = rotation;
     }
