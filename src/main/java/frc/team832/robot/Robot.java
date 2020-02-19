@@ -12,75 +12,70 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.AddressableLED;
 import edu.wpi.first.wpilibj2.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.team832.lib.CANDevice;
+import frc.team832.lib.OscarTimedRobot;
 import frc.team832.lib.motorcontrol.NeutralMode;
 import frc.team832.lib.power.GrouchPDP;
 import frc.team832.robot.subsystems.*;
 
-public class Robot extends TimedRobot {
+public class Robot extends OscarTimedRobot {
 
     public static final GrouchPDP pdp = new GrouchPDP(0);
-
-    public static final OI oi = new OI();
 
     // Subsystems
     public static final Drivetrain drivetrain = new Drivetrain(pdp);
     public static final Vision vision = new Vision(drivetrain);
     public static final Intake intake = new Intake(pdp);
     public static final Shooter shooter = new Shooter(pdp, vision);
-    public static final Spindexer spindexer = new Spindexer(pdp);
+    public static final Spindexer spindexer = new Spindexer(pdp)    ;
     public static final Climber climber = new Climber(pdp);
     public static final Pneumatics pneumatics = new Pneumatics();
     public static final WheelOfFortune wheelOfFortune = new WheelOfFortune();
     public static final SuperStructure superStructure = new SuperStructure(intake, shooter, spindexer, pneumatics);
 
+    public static final OI oi = new OI();
+
     private static final Notifier drivetrainTelemetryNotifier = new Notifier(drivetrain::updateDashboardData);
     private static final Notifier shooterTelemetryNotifier = new Notifier(shooter::updateDashboardData);
 
-    AddressableLED led = new AddressableLED(Constants.LEDValues.LED_PWM_PORT);
-    AddressableLEDBuffer ledBuffer = new AddressableLEDBuffer(16);
-
     @Override
     public void robotInit() {
+
+        CANDevice.printMissingDevices();
+
         if (!drivetrain.isInitSuccessful()) {
             System.out.println("Drivetrain - init FAILED");
             drivetrainTelemetryNotifier.startPeriodic(0.02);
         }
 
-        if (intake.isInitSuccessful()) {
+        if (!intake.isInitSuccessful()) {
             System.out.println("Intake - init FAILED");
         }
 
-        if (vision.isInitSuccessful()) {
+        if (!vision.isInitSuccessful()) {
             System.out.println("Vision - init FAILED");
         }
 
-        if (shooter.isInitSuccessful()) {
+        if (!shooter.isInitSuccessful()) {
             System.out.println("Shooter - init FAILED");
             shooterTelemetryNotifier.startPeriodic(0.02);
         }
 
-        if (spindexer.isInitSuccessful()) {
+        if (!spindexer.isInitSuccessful()) {
             System.out.println("Spindexer - init FAILED");
         }
 
-        if (climber.isInitSuccessful()) {
+        if (!climber.isInitSuccessful()) {
             System.out.println("Climber - init FAILED");
         }
 
-        if (pneumatics.isInitSuccessful()) {
+        if (!pneumatics.isInitSuccessful()) {
             System.out.println("Pneumatics - init FAILED");
         }
 
-        if (wheelOfFortune.isInitSuccessful()) {
+        if (!wheelOfFortune.isInitSuccessful()) {
             System.out.println("WheelOfFortune - init FAILED");
         }
-
-        led.setLength(ledBuffer.getLength());
-        for (int i = 0; i < ledBuffer.getLength(); i++)
-            ledBuffer.setRGB(i, 0, 255, 0);
-
-        led.setData(ledBuffer);
-        led.start();
     }
 
     @Override
@@ -97,7 +92,8 @@ public class Robot extends TimedRobot {
         NeutralMode mode = NeutralMode.kCoast;
         drivetrain.setNeutralMode(mode);
         shooter.setFlyheelNeutralMode(mode);
-        shooter.setTurretMode(mode);
+        shooter.setTurretNeutralMode(mode);
+        spindexer.setNeutralMode(mode);
         pneumatics.lockClimb();
     }
 
@@ -112,6 +108,11 @@ public class Robot extends TimedRobot {
 
     @Override
     public void teleopInit() {
+        NeutralMode mode = NeutralMode.kBrake;
+        drivetrain.setNeutralMode(mode);
+        shooter.setFlyheelNeutralMode(mode);
+        shooter.setTurretNeutralMode(mode);
+        spindexer.setNeutralMode(mode);
     }
 
     @Override

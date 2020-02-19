@@ -22,7 +22,7 @@ public class Climber extends SubsystemBase implements DashboardUpdatable {
 
     private SmartMCAttachedPDPSlot winchSlot, deploySlot;
 
-    private ProfiledPIDController extendPID = new PIDController(Constants.ClimberValues.ExtendkP, 0, 0);
+    private ProfiledPIDController extendPID = new ProfiledPIDController(Constants.ClimberValues.ExtendkP, 0, 0, Constants.ClimberValues.ExtendConstraints);
 
     public Climber(GrouchPDP pdp) {
         DashboardManager.addTab(this, this);

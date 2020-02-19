@@ -60,7 +60,7 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
         feedMotor.wipeSettings();
 
         setFlyheelNeutralMode(NeutralMode.kCoast);
-        setTurretMode(NeutralMode.kBrake);
+        setTurretNeutralMode(NeutralMode.kBrake);
 
         primaryMotor.setInverted(false);
 
@@ -88,7 +88,7 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
         secondaryMotor.setNeutralMode(mode);
     }
 
-    public void setTurretMode(NeutralMode mode) {
+    public void setTurretNeutralMode(NeutralMode mode) {
         feedMotor.setNeutralMode(mode);
         turretMotor.setNeutralMode(mode);
     }
@@ -214,7 +214,11 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
     }
 
     public void spin() {
-        turretMotor.set(0.6);
+        turretMotor.set(0.5);
+    }
+
+    public void otherSpin() {
+        turretMotor.set(-0.5);
     }
 
     public void stopShooter() {

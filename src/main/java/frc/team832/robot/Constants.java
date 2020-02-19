@@ -8,11 +8,14 @@ import edu.wpi.first.wpilibj.trajectory.TrajectoryConfig;
 import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.wpilibj.trajectory.constraint.DifferentialDriveVoltageConstraint;
 import edu.wpi.first.wpilibj.util.Units;
+import frc.team832.lib.drive.ClosedLoopDT;
 import frc.team832.lib.motors.WheeledPowerTrain;
 import frc.team832.lib.motors.Gearbox;
 import frc.team832.lib.motors.Motor;
 import frc.team832.lib.power.PDPPortNumber;
 import frc.team832.lib.util.ClosedLoopConfig;
+
+import java.nio.channels.ClosedSelectorException;
 
 public class Constants {
     public static class DrivetrainValues {
@@ -39,14 +42,19 @@ public class Constants {
         public static final WheeledPowerTrain DrivePowerTrain = new WheeledPowerTrain(DriveGearbox, Motor.kFalcon500, 2, DriveWheelDiameter);
         public static DifferentialDriveKinematics DriveKinematics = new DifferentialDriveKinematics(Units.inchesToMeters(29.0));
 
+        public static final SimpleMotorFeedforward LeftFF = new SimpleMotorFeedforward(0, 0, 0);
+        public static final SimpleMotorFeedforward RightFF = new SimpleMotorFeedforward(0, 0, 0);
+
+        public static final ClosedLoopConfig LeftConfig = new ClosedLoopConfig(0.01, 0, 0.001, 0);
+        public static final ClosedLoopConfig RightConfig = new ClosedLoopConfig(0.01, 0, 0.001, 0);
+
+        public static final ClosedLoopDT ClosedLoopDT = new ClosedLoopDT(LeftFF, RightFF, LeftConfig, RightConfig, DrivePowerTrain);
+
         public static final double LeftkP = 0.1;
         public static final double LeftkD = 0.01;
 
         public static final double RightkP = 0.1;
         public static final double RightkD = 0.01;
-
-        public static final SimpleMotorFeedforward LeftFF = new SimpleMotorFeedforward(0, 0, 0);
-        public static final SimpleMotorFeedforward RightFF = new SimpleMotorFeedforward(0, 0, 0);
 
         public static final DifferentialDriveVoltageConstraint LeftAutoVoltageConstraint =
                 new DifferentialDriveVoltageConstraint(LeftFF, DriveKinematics, 10);

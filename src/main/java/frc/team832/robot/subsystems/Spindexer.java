@@ -84,7 +84,11 @@ public class Spindexer extends SubsystemBase {
 		return spindexerStatus.isFull();
 	}
 
-	public enum SpinnerDirection {
+    public void setNeutralMode(NeutralMode mode) {
+		spinMotor.setNeutralMode(mode);
+    }
+
+    public enum SpinnerDirection {
 		Clockwise,
 		CounterClockwise;
 	}

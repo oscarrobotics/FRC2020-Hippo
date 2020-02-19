@@ -39,6 +39,7 @@ public class OI {
 		// do commands here
 //		stratComInterface.getSingleToggle().whenPressed(new InstantCommand(climber::extendHook));
 //		stratComInterface.getSingleToggle().whenHeld(new RunEndCommand(() -> climber.adjustHook(stratComInterface.getLeftSlider()), climber::stopExtend));
+//		stratComInterface.getSingleToggle().whenReleased(new InstantCommand(climber::retractHook));
 
 //		stratComInterface.getSCPlus().whenHeld(new StartEndCommand(climber::climbUp, climber::stopClimb, climber));
 //		stratComInterface.getSCMinus().whenHeld(new StartEndCommand(climber::climbDown, climber::stopClimb, climber));
@@ -59,10 +60,13 @@ public class OI {
 //		stratComInterface.getSC3().whenHeld(new StartEndCommand(wheelOfFortune::spinClockwise, wheelOfFortune::stopSpin, wheelOfFortune));
 //		stratComInterface.getSC2().whenHeld(new RunEndCommand(wheelOfFortune::spinThreeTimes, wheelOfFortune::stopSpin, wheelOfFortune));
 
-
 		//Dumb testing commands
-		stratComInterface.getSC4().whenHeld(new StartEndCommand(() -> spindexer.spinClockwise(0.5), spindexer::stopSpin, spindexer));//All 3 of these could be being set to idle by superstructure every loop
+		stratComInterface.getSC4().whenHeld(new StartEndCommand(() -> spindexer.spinClockwise(0.5), spindexer::stopSpin, spindexer));
+		stratComInterface.getSC1().whenHeld(new StartEndCommand(() -> spindexer.spinCounterclockwise(0.5), spindexer::stopSpin, spindexer));
+
 		stratComInterface.getSC5().whenHeld(new StartEndCommand(shooter::spin, shooter::stopAll, shooter));
+        stratComInterface.getSC2().whenHeld(new StartEndCommand(shooter::otherSpin, shooter::stopAll, shooter));
+
 		stratComInterface.getDoubleToggleUp().whenHeld(new RunEndCommand(() -> superStructure.dumbIntake(stratComInterface.getLeftSlider()), superStructure::dumbIntakeIdle, superStructure, intake, pneumatics));
 		stratComInterface.getSCSideBot().whenHeld(new StartEndCommand(() -> intake.outtake(0.5), intake::stop, intake));
 

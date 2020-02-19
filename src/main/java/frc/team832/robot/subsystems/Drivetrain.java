@@ -45,8 +45,6 @@ public class Drivetrain extends SubsystemBase implements DashboardUpdatable {
     private PIDController rightPID = new PIDController(Constants.DrivetrainValues.RightkP, 0, Constants.DrivetrainValues.RightkD);
     private PIDController leftPID = new PIDController(Constants.DrivetrainValues.LeftkP, 0, Constants.DrivetrainValues.LeftkD);
 
-    private ClosedLoopDT driveConfig = new ClosedLoopDT(Constants.DrivetrainValues.LeftFF, Constants.DrivetrainValues.RightFF, leftPID, rightPID, Constants.DrivetrainValues.DrivePowerTrain);
-
     private NetworkTable falconTable = NetworkTableInstance.getDefault().getTable("Live_Dashboard");
     private NetworkTableEntry falconPoseXEntry = falconTable.getEntry("robotX");
     private NetworkTableEntry falconPoseYEntry = falconTable.getEntry("robotY");
@@ -90,11 +88,11 @@ public class Drivetrain extends SubsystemBase implements DashboardUpdatable {
             navX = new NavXMicro(NavXMicro.NavXPort.I2C_onboard);
         }
 
-        driveConfig.setFFAccel(0.1);
-
         DashboardManager.addTab(this, this);
 
-        diffDrive = new SmartDiffDrive(leftMaster, rightMaster, driveConfig, Constants.DrivetrainValues.MaxRpm);
+        Constants.DrivetrainValues.ClosedLoopDT.setFFAccel(0.1);
+
+        diffDrive = new SmartDiffDrive(leftMaster, rightMaster, Constants.DrivetrainValues.ClosedLoopDT, Constants.DrivetrainValues.MaxRpm);
         driveOdometry = new DifferentialDriveOdometry(getDriveHeading(), startingPose);
         resetPose();
 
