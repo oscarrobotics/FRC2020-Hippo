@@ -14,7 +14,10 @@ public class FollowPath extends RamseteCommand {
     private static final PIDController rightDrivePIDController = new PIDController(Constants.DrivetrainValues.RightkP, 0, 0);
 
     public FollowPath (Trajectory trajectory, Drivetrain drivetrain) {
-        super(trajectory, Robot.drivetrain::getLatestPose, ramseteController, Constants.DrivetrainValues.LeftFF, Constants.DrivetrainValues.RightFF, Constants.DrivetrainValues.DriveKinematics, Robot.drivetrain::getWheelSpeeds, leftDrivePIDController, rightDrivePIDController, Robot.drivetrain::setWheelVolts, Robot.drivetrain);
+        super(trajectory, drivetrain::getLatestPose, ramseteController, Constants.DrivetrainValues.LeftFF,
+                Constants.DrivetrainValues.RightFF, Constants.DrivetrainValues.DriveKinematics,
+                drivetrain::getWheelSpeeds, leftDrivePIDController, rightDrivePIDController,
+                drivetrain::setWheelVolts, drivetrain);
         addRequirements(drivetrain);
     }
 }

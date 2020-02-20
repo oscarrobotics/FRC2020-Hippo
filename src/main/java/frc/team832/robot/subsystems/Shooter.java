@@ -14,32 +14,33 @@ import frc.team832.lib.motorcontrol2.vendor.CANSparkMax;
 import frc.team832.lib.motors.Motor;
 import frc.team832.lib.power.GrouchPDP;
 import frc.team832.lib.power.impl.SmartMCAttachedPDPSlot;
+import frc.team832.lib.sensors.REVThroughBorePWM;
 import frc.team832.lib.util.OscarMath;
 import frc.team832.robot.Constants.ShooterValues;
 
 public class Shooter extends SubsystemBase implements DashboardUpdatable {
 
-    private boolean initSuccessful = false;
+    public final boolean initSuccessful;
 
-    private Vision vision;
 
-    private CANSparkMax primaryMotor, secondaryMotor, turretMotor, feedMotor; //if needed add hood motor
-    private NetworkTableEntry dashboard_wheelRPM, dashboard_PID, dashboard_flywheelFF, dashboard_hoodPos, dashboard_turretPos, dashboard_wheelTargetRPM ,
+    private final Vision vision;
+    private final CANSparkMax primaryMotor, secondaryMotor, turretMotor, feedMotor; //if needed add hood motor
+    private final NetworkTableEntry dashboard_wheelRPM, dashboard_PID, dashboard_flywheelFF, dashboard_hoodPos, dashboard_turretPos, dashboard_wheelTargetRPM,
             dashboard_feedWheelRPM, dashboard_feedWheelTargetRPM, dashboard_feedFF;
-    private REVSmartServo_Continuous hoodServo;
+    private final REVSmartServo_Continuous hoodServo;
 
     private ShootMode mode = ShootMode.Shooting, lastMode = ShootMode.Shooting;
 
-    private AnalogInput potentiometer = new AnalogInput(1);
-//    private REVThroughBorePWM turretEncoder = new REVThroughBorePWM(0, 1);
+    private final AnalogInput potentiometer = new AnalogInput(ShooterValues.HOOD_POTENTIOMETER_ANALOG_CHANNEL);
+    private final REVThroughBorePWM turretEncoder = new REVThroughBorePWM(ShooterValues.TURRET_ENCODER_DIO_CHANNEL);
 
-    private PIDController hoodPID = new PIDController(ShooterValues.HoodkP, 0, 0);
-    private PIDController feedPID = new PIDController(ShooterValues.FeedkP, 0, 0);
-    private ProfiledPIDController turretPID = new ProfiledPIDController(ShooterValues.TurretkP, 0, 0, ShooterValues.TurretConstraints);
+    private final PIDController hoodPID = new PIDController(ShooterValues.HoodkP, 0, 0);
+    private final PIDController feedPID = new PIDController(ShooterValues.FeedkP, 0, 0);
+    private final ProfiledPIDController turretPID = new ProfiledPIDController(ShooterValues.TurretkP, 0, 0, ShooterValues.TurretConstraints);
 
-    private SmartMCAttachedPDPSlot primaryFlywheelSlot, secondaryFlywheelSlot, turretSlot, feederSlot;
+    private final SmartMCAttachedPDPSlot primaryFlywheelSlot, secondaryFlywheelSlot, turretSlot, feederSlot;
 
-    public Shooter(GrouchPDP pdp, Vision vision){
+    public Shooter(GrouchPDP pdp, Vision vision) {
         DashboardManager.addTab(this, this);
 
         primaryMotor = new CANSparkMax(ShooterValues.PRIMARY_CAN_ID, Motor.kNEO);
@@ -52,7 +53,7 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
         turretSlot = pdp.addDevice(ShooterValues.TURRET_PDP_SLOT, turretMotor);
         feederSlot = pdp.addDevice(ShooterValues.FEEDER_PDP_SLOT, feedMotor);
 
-        hoodServo = new REVSmartServo_Continuous(ShooterValues.HOOD_SERVO_CHANNEL);
+        hoodServo = new REVSmartServo_Continuous(ShooterValues.HOOD_SERVO_PWM_CHANNEL);
 
         primaryMotor.wipeSettings();
         secondaryMotor.wipeSettings();
@@ -80,7 +81,7 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
 
         this.vision = vision;
 
-        initSuccessful = true;
+        initSuccessful = primaryMotor.getCANConnection() && secondaryMotor.getCANConnection() && turretMotor.getCANConnection() && feedMotor.getCANConnection();
     }
 
     public void setFlyheelNeutralMode(NeutralMode mode) {
@@ -94,7 +95,7 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
     }
 
     @Override
-    public String getDashboardTabName () {
+    public String getDashboardTabName() {
         return "Shooter";
     }
 
@@ -104,12 +105,10 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
     }
 
     @Override
-    public void updateDashboardData () {
+    public void updateDashboardData() {
         dashboard_wheelRPM.setDouble(primaryMotor.getSensorVelocity() * ShooterValues.FlywheelReduction);
         dashboard_feedWheelRPM.setDouble(feedMotor.getSensorVelocity());
     }
-
-    public boolean isInitSuccessful() { return initSuccessful; }
 
     private void updatePIDMode() {
         switch (mode) {
@@ -167,15 +166,15 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
     }
 
     public void flywheelTrackTarget() {
-        setWheelRPM(vision.getCalculations().flywheelRPM);
+        setWheelRPM(vision.calculations.flywheelRPM);
     }
 
     private void hoodTrackTarget() {
-        setExitAngle(vision.getCalculations().exitAngle);
+        setExitAngle(vision.calculations.exitAngle);
     }
 
     private void turretTrackTarget() {
-        setHeadingRotation(vision.getCalculations().turretRotation);
+        setHeadingRotation(vision.calculations.turretRotation);
     }
 
     public boolean readyToShoot() {
@@ -183,7 +182,7 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
     }
 
     private boolean atShootingRpm() {
-        return Math.abs(primaryMotor.getSensorVelocity() - vision.getCalculations().flywheelRPM) < 100;
+        return Math.abs(primaryMotor.getSensorVelocity() - vision.calculations.flywheelRPM) < 100;
     }
 
     private boolean atTurretTarget() {
@@ -192,7 +191,7 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
     }
 
     private boolean atHoodTarget() {
-        return Math.abs(getHoodAngle() - vision.getCalculations().exitAngle) < 1;
+        return Math.abs(getHoodAngle() - vision.calculations.exitAngle) < 1;
     }
 
     public void setHeadingRotation(double rotations) {

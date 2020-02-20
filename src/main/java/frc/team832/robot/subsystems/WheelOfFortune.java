@@ -14,16 +14,15 @@ import frc.team832.robot.utilities.positions.ColorWheelPath;
 import java.awt.dnd.DropTarget;
 
 public class WheelOfFortune extends SubsystemBase implements DashboardUpdatable {
-    private boolean initSuccessful = false;
+    public final boolean initSuccessful;
+    private final CANSparkMax spinner;
 
-    public CANSparkMax spinner;
-
-    private ProfiledPIDController pid = new ProfiledPIDController(Constants.WOFValues.kP, 0, 0, Constants.WOFValues.Constraints);
+    private final ProfiledPIDController pid = new ProfiledPIDController(Constants.WOFValues.kP, 0, 0, Constants.WOFValues.Constraints);
 
     private final I2C.Port i2cPort = I2C.Port.kOnboard;
 //    public final ColorSensorV3 colorSensor = new ColorSensorV3(i2cPort);
 
-    public ColorWheelPath path;
+    private ColorWheelPath path;
 
     public WheelOfFortune() {
         spinner = new CANSparkMax(Constants.WOFValues.SPINNER_CAN_ID, Motor.kNEO550);
@@ -36,10 +35,10 @@ public class WheelOfFortune extends SubsystemBase implements DashboardUpdatable 
 
         setCurrentLimit(40);
 
-        initSuccessful = true;
+        initSuccessful = spinner.getCANConnection();
     }
 
-    public void senseColor() {
+//    public void senseColor() {
 //        Color detectedColor = colorSensor.getColor();
 //        double IR = colorSensor.getIR();
 //
@@ -48,7 +47,7 @@ public class WheelOfFortune extends SubsystemBase implements DashboardUpdatable 
 //        SmartDashboard.putNumber("Blue", detectedColor.blue);
 //        SmartDashboard.putNumber("IR", IR);
 //        int proximity = m_colorSensor.getProximity();
-    }
+//    }
 
     public void spinClockwise() {
         spinner.set(0.5);
@@ -82,10 +81,6 @@ public class WheelOfFortune extends SubsystemBase implements DashboardUpdatable 
 
     public void setCurrentLimit(int limit) {
         spinner.limitInputCurrent(limit);
-    }
-
-    public boolean isInitSuccessful() {
-        return initSuccessful;
     }
 
     @Override

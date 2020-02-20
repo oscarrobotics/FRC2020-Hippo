@@ -1,16 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
-
 package frc.team832.robot;
 
 import edu.wpi.first.wpilibj.Notifier;
-import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj2.AddressableLED;
-import edu.wpi.first.wpilibj2.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.team832.lib.CANDevice;
 import frc.team832.lib.OscarTimedRobot;
@@ -18,20 +8,21 @@ import frc.team832.lib.motorcontrol.NeutralMode;
 import frc.team832.lib.power.GrouchPDP;
 import frc.team832.robot.subsystems.*;
 
+@SuppressWarnings("WeakerAccess")
 public class Robot extends OscarTimedRobot {
 
     public static final GrouchPDP pdp = new GrouchPDP(0);
 
     // Subsystems
-    public static final Drivetrain drivetrain = new Drivetrain(pdp);
-    public static final Vision vision = new Vision(drivetrain);
-    public static final Intake intake = new Intake(pdp);
-    public static final Shooter shooter = new Shooter(pdp, vision);
-    public static final Spindexer spindexer = new Spindexer(pdp)    ;
-    public static final Climber climber = new Climber(pdp);
-    public static final Pneumatics pneumatics = new Pneumatics();
-    public static final WheelOfFortune wheelOfFortune = new WheelOfFortune();
-    public static final SuperStructure superStructure = new SuperStructure(intake, shooter, spindexer, pneumatics);
+    static final Drivetrain drivetrain = new Drivetrain(pdp);
+    static final Vision vision = new Vision(drivetrain);
+    static final Intake intake = new Intake(pdp);
+    static final Shooter shooter = new Shooter(pdp, vision);
+    static final Spindexer spindexer = new Spindexer(pdp);
+    static final Climber climber = new Climber(pdp);
+    static final Pneumatics pneumatics = new Pneumatics();
+    static final WheelOfFortune wheelOfFortune = new WheelOfFortune();
+    static final SuperStructure superStructure = new SuperStructure(intake, shooter, spindexer, pneumatics);
 
     public static final OI oi = new OI();
 
@@ -40,42 +31,57 @@ public class Robot extends OscarTimedRobot {
 
     @Override
     public void robotInit() {
-
-        CANDevice.printMissingDevices();
-
-        if (!drivetrain.isInitSuccessful()) {
-            System.out.println("Drivetrain - init FAILED");
+        if (drivetrain.initSuccessful) {
+            System.out.println("Drivetrain - init OK");
             drivetrainTelemetryNotifier.startPeriodic(0.02);
+        } else {
+            System.out.println("Drivetrain - init FAILED");
         }
 
-        if (!intake.isInitSuccessful()) {
+        if (intake.initSuccessful) {
+            System.out.println("Intake - init OK");
+        } else {
             System.out.println("Intake - init FAILED");
         }
 
-        if (!vision.isInitSuccessful()) {
+        if (vision.initSuccessful) {
+            System.out.println("Vision - init OK");
+        } else {
             System.out.println("Vision - init FAILED");
         }
 
-        if (!shooter.isInitSuccessful()) {
-            System.out.println("Shooter - init FAILED");
+        if (shooter.initSuccessful) {
             shooterTelemetryNotifier.startPeriodic(0.02);
+        } else {
+            System.out.println("Shooter - init OK");
         }
 
-        if (!spindexer.isInitSuccessful()) {
+        if (spindexer.initSuccessful) {
+            System.out.println("Spindexer - init OK");
+        } else {
             System.out.println("Spindexer - init FAILED");
         }
 
-        if (!climber.isInitSuccessful()) {
+        if (climber.initSuccessful) {
+            System.out.println("Climber - init OK");
+        } else {
             System.out.println("Climber - init FAILED");
         }
 
-        if (!pneumatics.isInitSuccessful()) {
+        // TODO: Move all pneumatics to their respective subsystems!
+        if (pneumatics.initSuccessful) {
+            System.out.println("Pneumatics - init OK");
+        } else {
             System.out.println("Pneumatics - init FAILED");
         }
 
-        if (!wheelOfFortune.isInitSuccessful()) {
+        if (wheelOfFortune.initSuccessful) {
+            System.out.println("WheelOfFortune - init OK");
+        } else {
             System.out.println("WheelOfFortune - init FAILED");
         }
+
+        CANDevice.printMissingDevices();
     }
 
     @Override

@@ -84,7 +84,9 @@ public class Constants {
         public static final PDPPortNumber FEEDER_PDP_SLOT = PDPPortNumber.Port6;
 
         //Shooter
-        public static final int HOOD_SERVO_CHANNEL = 0;
+        public static final int HOOD_SERVO_PWM_CHANNEL = 0;
+        public static final int HOOD_POTENTIOMETER_ANALOG_CHANNEL = 0;
+        public static final int TURRET_ENCODER_DIO_CHANNEL = 0;
 
         public static final float FlywheelReduction = 50f / 26f;
         private static final Gearbox FlywheelGearbox = new Gearbox(FlywheelReduction);

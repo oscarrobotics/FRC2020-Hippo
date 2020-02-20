@@ -8,13 +8,11 @@ import frc.team832.lib.power.impl.SmartMCAttachedPDPSlot;
 import frc.team832.lib.util.OscarMath;
 import frc.team832.robot.Constants;
 
-import static frc.team832.robot.Robot.pneumatics;
-
 public class Intake extends SubsystemBase {
-	private boolean initSuccessful = false;
 	private final CANSparkMax intakeMotor;
+	private final SmartMCAttachedPDPSlot intakeSlot;
 
-	private SmartMCAttachedPDPSlot intakeSlot;
+	public final boolean initSuccessful;
 
 	public Intake(GrouchPDP pdp) {
 		//Change Can ID
@@ -29,11 +27,7 @@ public class Intake extends SubsystemBase {
 
 		setCurrentLimit(40);
 
-		initSuccessful = true;
-	}
-
-	public boolean isInitSuccessful() {
-		return initSuccessful;
+		initSuccessful = intakeMotor.getCANConnection();
 	}
 
 	public void setCurrentLimit(int amps) {
@@ -56,7 +50,7 @@ public class Intake extends SubsystemBase {
 	}
 
 	public void setOuttakeRPM(double rpm) {
-		OscarMath.clip(rpm, 0, Motor.kNEO550.freeSpeed);
+		OscarMath.clip(rpm, -Motor.kNEO550.freeSpeed, 0);
 		intakeMotor.set(Constants.IntakeValues.FF.calculate(-rpm));
 	}
 

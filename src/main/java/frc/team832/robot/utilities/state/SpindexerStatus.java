@@ -58,16 +58,18 @@ public class SpindexerStatus implements DashboardUpdatable {
 
         spinStall.updateStallStatus();
 
-        if (spindexer.getHallEffect()) {
-            spindexer.zeroSpindexer();
-            if (spindexer.getSpinnerDirection() == Spindexer.SpinnerDirection.Clockwise) absoluteRotations++;
-            else absoluteRotations--;
-        }
+//        if (spindexer.getHallEffect()) {
+//           onHallEffect();
+//        }
 
         spinDirection = Math.signum(spinMotor.getSensorVelocity()) == 1 ? Spindexer.SpinnerDirection.Clockwise : Spindexer.SpinnerDirection.CounterClockwise;
     }
 
-
+    public void onHallEffect() {
+        spindexer.zeroSpindexer();
+        if (spindexer.getSpinnerDirection() == Spindexer.SpinnerDirection.Clockwise) absoluteRotations++;
+        else absoluteRotations--;
+    }
 
     public boolean getSlot(int pos) {
         pos = OscarMath.clip(pos, 0, 4);

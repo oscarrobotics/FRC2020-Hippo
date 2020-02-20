@@ -1,8 +1,5 @@
 package frc.team832.robot.subsystems;
 
-import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableEntry;
-import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
@@ -11,7 +8,6 @@ import edu.wpi.first.wpilibj.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveWheelSpeeds;
 import edu.wpi.first.wpilibj2.command.RunEndCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.team832.lib.drive.ClosedLoopDT;
 import frc.team832.lib.drive.SmartDiffDrive;
 import frc.team832.lib.driverstation.dashboard.DashboardManager;
 import frc.team832.lib.driverstation.dashboard.DashboardUpdatable;
@@ -27,14 +23,15 @@ import frc.team832.robot.utilities.ArcadeDriveProfile;
 import frc.team832.robot.utilities.TankDriveProfile;
 
 public class Drivetrain extends SubsystemBase implements DashboardUpdatable {
-    private boolean initSuccessful = false;
-    private CANTalonFX rightMaster, rightSlave, leftMaster, leftSlave;
+    public final boolean initSuccessful;
+    private final CANTalonFX rightMaster, rightSlave, leftMaster, leftSlave;
 
-    private SmartDiffDrive diffDrive;
-    public DifferentialDriveOdometry driveOdometry;
+    private final SmartDiffDrive diffDrive;
+    private final DifferentialDriveOdometry driveOdometry;
 
-    public Pose2d pose = new Pose2d();
     public NavXMicro navX;
+
+    private Pose2d pose = new Pose2d();
     private Pose2d startingPose = new Pose2d();
 
     private double latestLeftWheelVolts, latestRightWheelVolts;
@@ -44,15 +41,6 @@ public class Drivetrain extends SubsystemBase implements DashboardUpdatable {
 
     private PIDController rightPID = new PIDController(Constants.DrivetrainValues.RightkP, 0, Constants.DrivetrainValues.RightkD);
     private PIDController leftPID = new PIDController(Constants.DrivetrainValues.LeftkP, 0, Constants.DrivetrainValues.LeftkD);
-
-    private NetworkTable falconTable = NetworkTableInstance.getDefault().getTable("Live_Dashboard");
-    private NetworkTableEntry falconPoseXEntry = falconTable.getEntry("robotX");
-    private NetworkTableEntry falconPoseYEntry = falconTable.getEntry("robotY");
-    private NetworkTableEntry falconPoseHeadingEntry = falconTable.getEntry("robotHeading");
-    private NetworkTableEntry falconIsPathingEntry = falconTable.getEntry("isFollowingPath");
-    private NetworkTableEntry falconPathXEntry = falconTable.getEntry("pathX");
-    private NetworkTableEntry falconPathYEntry = falconTable.getEntry("pathY");
-    private NetworkTableEntry falconPathHeadingEntry = falconTable.getEntry("pathHeading");
 
     private SmartMCAttachedPDPSlot leftMasterSlot, leftSlaveSlot, rightMasterSlot, rightSlaveSlot;
 
@@ -98,11 +86,8 @@ public class Drivetrain extends SubsystemBase implements DashboardUpdatable {
 
         setDefaultCommand(new RunEndCommand(this::tankDrive, this::stopDrive, this));
 
-        initSuccessful = true;
-    }
-
-    public boolean isInitSuccessful() {
-        return initSuccessful;
+        initSuccessful = leftMaster.getCANConnection() && leftSlave.getCANConnection() &&
+                rightMaster.getCANConnection() && rightSlave.getCANConnection();
     }
 
     public void setCurrentLimit(int amps) {
@@ -133,37 +118,36 @@ public class Drivetrain extends SubsystemBase implements DashboardUpdatable {
     }
 
     public Rotation2d getDriveHeading() {
-//        return Rotation2d.fromDegrees(-navX.getYaw());
-        return Rotation2d.fromDegrees(0);
+        return navX == null ? new Rotation2d() : Rotation2d.fromDegrees(-navX.getYaw());
     }
 
     @Override
-    public String getDashboardTabName () {
+    public String getDashboardTabName() {
         return "Drivetrain";
     }
 
     @Override
-    public void updateDashboardData () {
+    public void updateDashboardData() {
         FalconDashboard.updateRobotPose2d(pose);
     }
 
-    public double getRightDistanceMeters () {
+    public double getRightDistanceMeters() {
         return Constants.DrivetrainValues.DrivePowerTrain.calculateWheelDistanceMeters(-rightMaster.getSensorPosition());
     }
 
-    public double getLeftDistanceMeters () {
+    public double getLeftDistanceMeters() {
         return Constants.DrivetrainValues.DrivePowerTrain.calculateWheelDistanceMeters(leftMaster.getSensorPosition());
     }
 
-    public double getRightVelocityMetersPerSec () {
+    public double getRightVelocityMetersPerSec() {
         return Constants.DrivetrainValues.DrivePowerTrain.calculateMetersPerSec(rightMaster.getSensorVelocity());
     }
 
-    public double getLeftVelocityMetersPerSec () {
+    public double getLeftVelocityMetersPerSec() {
         return Constants.DrivetrainValues.DrivePowerTrain.calculateMetersPerSec(leftMaster.getSensorVelocity());
     }
 
-    public DifferentialDriveWheelSpeeds getWheelSpeeds () {
+    public DifferentialDriveWheelSpeeds getWheelSpeeds() {
         return new DifferentialDriveWheelSpeeds(getLeftVelocityMetersPerSec(), getRightVelocityMetersPerSec());
     }
 
@@ -191,7 +175,7 @@ public class Drivetrain extends SubsystemBase implements DashboardUpdatable {
         resetEncoders();
         this.pose = pose;
         if (navX != null) {
-//            navX.zero();
+            navX.zero();
         }
         driveOdometry.resetPosition(this.pose, getDriveHeading());
     }

@@ -7,11 +7,11 @@ import frc.team832.lib.driverstation.dashboard.DashboardUpdatable;
 import frc.team832.robot.Constants;
 
 public class Pneumatics extends SubsystemBase implements DashboardUpdatable {
-	boolean initSuccessful;
-	private Solenoid moveIntake;
-	private Solenoid propUpRobot;
-	private Solenoid wheelOfFortunePneumatics;
-	private Solenoid climbLock;
+	public final boolean initSuccessful;
+	private final Solenoid moveIntake;
+	private final Solenoid propUpRobot;
+	private final Solenoid wheelOfFortunePneumatics;
+	private final Solenoid climbLock;
 
 	public Pneumatics() {
 		DashboardManager.addTab(this, this);
@@ -62,11 +62,5 @@ public class Pneumatics extends SubsystemBase implements DashboardUpdatable {
 	}
 
 	@Override
-	public void updateDashboardData () {
-
-	}
-
-	public boolean isInitSuccessful () {
-		return initSuccessful;
-	}
+	public void updateDashboardData () {}
 }

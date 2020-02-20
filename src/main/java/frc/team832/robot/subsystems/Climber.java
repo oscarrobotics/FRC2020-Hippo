@@ -14,10 +14,8 @@ import frc.team832.lib.power.impl.SmartMCAttachedPDPSlot;
 import frc.team832.lib.util.OscarMath;
 import frc.team832.robot.Constants;
 
-import static frc.team832.robot.Robot.pneumatics;
-
 public class Climber extends SubsystemBase implements DashboardUpdatable {
-    private boolean initSuccessful;
+    public final boolean initSuccessful;
     private final CANSparkMax winchMotor, deployMotor;
 
     private SmartMCAttachedPDPSlot winchSlot, deploySlot;
@@ -48,10 +46,8 @@ public class Climber extends SubsystemBase implements DashboardUpdatable {
         winchMotor.limitInputCurrent(40);
         deployMotor.limitInputCurrent(30);
 
-        initSuccessful = true;
+        initSuccessful = winchMotor.getCANConnection() && deployMotor.getCANConnection();
     }
-
-    public boolean isInitSuccessful() { return initSuccessful; }
 
     public void unwindWinch() {
         winchMotor.set(-0.25);
@@ -79,19 +75,19 @@ public class Climber extends SubsystemBase implements DashboardUpdatable {
     }
 
     public void climbDown() {
-        pneumatics.unlockClimb();
+//        pneumatics.unlockClimb();
         unwindWinch();
     }
 
     public void climbUp() {
         retractHook();
-        pneumatics.unlockClimb();
+//        pneumatics.unlockClimb();
         windWinch();
     }
 
     public void stopClimb() {
         winchMotor.set(0);
-        pneumatics.lockClimb();
+//        pneumatics.lockClimb();
     }
 
     @Override

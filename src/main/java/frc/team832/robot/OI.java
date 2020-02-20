@@ -8,9 +8,11 @@ import frc.team832.lib.driverinput.controllers.*;
 import frc.team832.lib.driverinput.oi.DriverOI;
 import frc.team832.lib.driverinput.oi.SticksDriverOI;
 import frc.team832.lib.driverinput.oi.XboxDriverOI;
+import frc.team832.lib.sensors.digital.HallEffect;
 import frc.team832.lib.util.OscarMath;
 import frc.team832.robot.commands.PrepareShooter;
 import frc.team832.robot.commands.ShootCommandGroup;
+import frc.team832.robot.subsystems.*;
 
 import static frc.team832.robot.Robot.*;
 

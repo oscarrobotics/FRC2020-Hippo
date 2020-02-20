@@ -17,7 +17,7 @@ public class ShootCommandGroup extends SequentialCommandGroup {
                         () -> {},
                         (ignored) -> spindexer.stopSpin(),
                         spindexer::isSafe,
-                        Robot.spindexer),
+                        spindexer),
 
                 new PrepareShooter(superStructure, pneumatics, shooter, spindexer),
 

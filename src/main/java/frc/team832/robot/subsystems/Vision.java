@@ -11,12 +11,11 @@ import frc.team832.lib.vision.VisionTarget;
 import frc.team832.robot.utilities.state.ShooterCalculations;
 
 public class Vision extends ChameleonVisionSubsystem implements DashboardUpdatable {
-	private boolean initSuccessful = false;
-	private ShooterCalculations calculations = new ShooterCalculations();
+	public final boolean initSuccessful;
 
-	private Drivetrain drivetrain;
-
-	NetworkTableEntry dashboard_pitch, dashboard_yaw, dashboard_area, dashboard_isValid;
+	public final ShooterCalculations calculations = new ShooterCalculations();
+	private final Drivetrain drivetrain;
+	private final NetworkTableEntry dashboard_pitch, dashboard_yaw, dashboard_area, dashboard_isValid;
 
 	public Vision(Drivetrain drivetrain) {
 		super("ACTUALLY DO THIS LATER", 0);//TODO: fix this
@@ -31,14 +30,11 @@ public class Vision extends ChameleonVisionSubsystem implements DashboardUpdatab
 		initSuccessful = true;
 	}
 
+	@Override
 	public void consumeTarget (VisionTarget target) {
-		if (target.isValid)
+		if (target.isValid) {
 			calculations.update(target.pitch, target.yaw, target.area, target.poseMeters, drivetrain.getLatestPose());
-
-	}
-
-	public ShooterCalculations getCalculations() {
-		return calculations;
+		}
 	}
 
 	@Override
@@ -53,9 +49,5 @@ public class Vision extends ChameleonVisionSubsystem implements DashboardUpdatab
 		dashboard_yaw.setDouble(getYawEntry().getDouble(0.0));
 		dashboard_isValid.setBoolean(getIsValidEntry().getBoolean(false));
 	}
-
-    public boolean isInitSuccessful() {
-		return initSuccessful;
-    }
 }
 
