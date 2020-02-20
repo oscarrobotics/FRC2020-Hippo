@@ -27,7 +27,7 @@ public class Drivetrain extends SubsystemBase implements DashboardUpdatable {
     public final boolean initSuccessful;
     private final CANTalonFX rightMaster, rightSlave, leftMaster, leftSlave;
 
-    private Solenoid propUpRobot;
+    private static Solenoid propUpRobot;
 
     private SmartDiffDrive diffDrive;
     public DifferentialDriveOdometry driveOdometry;
@@ -202,11 +202,11 @@ public class Drivetrain extends SubsystemBase implements DashboardUpdatable {
         rightSlave.setNeutralMode(mode);
     }
 
-    public void propUp() {
+    public static void propUp() {
         propUpRobot.set(true);
     }
 
-    public void retractProp() {
+    public static void retractProp() {
         propUpRobot.set(false);
     }
 }

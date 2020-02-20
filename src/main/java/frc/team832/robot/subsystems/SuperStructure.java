@@ -6,6 +6,7 @@ import frc.team832.lib.driverstation.dashboard.DashboardManager;
 import frc.team832.lib.driverstation.dashboard.DashboardUpdatable;
 import frc.team832.lib.util.OscarMath;
 import frc.team832.robot.Constants;
+import frc.team832.robot.Robot;
 
 public class SuperStructure extends SubsystemBase implements DashboardUpdatable {
 
@@ -46,18 +47,18 @@ public class SuperStructure extends SubsystemBase implements DashboardUpdatable 
 
 	public void dumbIntake(double power) {
 		intake.intake(OscarMath.map(power, -1, 1, 0, 1));
-		pneumatics.extendIntake();
+		intake.extendIntake();
 	}
 
 	public void dumbIntakeIdle() {
 		intake.stop();
-		pneumatics.retractIntake();
+		intake.retractIntake();
 	}
 
 	public void prepareShoot() {
 		spindexer.setTargetPosition(spindexer.getNearestSafeRotationRelativeToFeeder());
 		shooter.spinUp();
-		pneumatics.propUp();
+		Drivetrain.propUp();
 	}
 
 	public void shoot() {
@@ -67,7 +68,7 @@ public class SuperStructure extends SubsystemBase implements DashboardUpdatable 
 
 	public void idleIntake() {
 		intake.stop();
-		pneumatics.retractIntake();
+		intake.retractIntake();
 	}
 
 	public void idleSpindexer() {
@@ -76,7 +77,7 @@ public class SuperStructure extends SubsystemBase implements DashboardUpdatable 
 
 	public void idleShooter(){
 		shooter.idle();
-		pneumatics.retractProp();
+		Drivetrain.retractProp();
 	}
 
 	public void idleAll() {

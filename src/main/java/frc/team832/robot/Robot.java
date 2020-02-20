@@ -68,13 +68,6 @@ public class Robot extends OscarTimedRobot {
             System.out.println("Climber - init FAILED");
         }
 
-        // TODO: Move all pneumatics to their respective subsystems!
-        if (pneumatics.initSuccessful) {
-            System.out.println("Pneumatics - init OK");
-        } else {
-            System.out.println("Pneumatics - init FAILED");
-        }
-
         if (wheelOfFortune.initSuccessful) {
             System.out.println("WheelOfFortune - init OK");
         } else {
@@ -100,7 +93,7 @@ public class Robot extends OscarTimedRobot {
         shooter.setFlyheelNeutralMode(mode);
         shooter.setTurretNeutralMode(mode);
         spindexer.setNeutralMode(mode);
-        pneumatics.lockClimb();
+        climber.lockClimb();
     }
 
     @Override

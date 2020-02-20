@@ -12,6 +12,7 @@ import frc.team832.robot.Constants;
 public class Intake extends SubsystemBase {
 	private final CANSparkMax intakeMotor;
 	private Solenoid moveIntake;
+	SmartMCAttachedPDPSlot intakeSlot;
 
 	public final boolean initSuccessful;
 

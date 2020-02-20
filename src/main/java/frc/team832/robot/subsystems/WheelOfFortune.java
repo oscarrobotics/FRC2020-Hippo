@@ -20,7 +20,7 @@ public class WheelOfFortune extends SubsystemBase implements DashboardUpdatable 
 
     private Solenoid wheelOfFortunePneumatics;
 
-    public CANSparkMax spinner;
+//    public CANSparkMax spinner;
 
     private ProfiledPIDController pid = new ProfiledPIDController(Constants.WOFValues.kP, 0, 0, Constants.WOFValues.Constraints);
 
