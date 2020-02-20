@@ -25,7 +25,7 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
 
     private final Vision vision;
     private final CANSparkMax primaryMotor, secondaryMotor, turretMotor, feedMotor; //if needed add hood motor
-    private final NetworkTableEntry dashboard_wheelRPM, dashboard_PID, dashboard_flywheelFF, dashboard_hoodPos, dashboard_turretPos, dashboard_wheelTargetRPM,
+    private final NetworkTableEntry dashboard_wheelRPM, dashboard_flywheelFF, dashboard_hoodPos, dashboard_turretPos, dashboard_turretPow, dashboard_wheelTargetRPM,
             dashboard_feedWheelRPM, dashboard_feedWheelTargetRPM, dashboard_feedFF;
     private final REVSmartServo_Continuous hoodServo;
 
@@ -39,6 +39,8 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
     private final ProfiledPIDController turretPID = new ProfiledPIDController(ShooterValues.TurretkP, 0, 0, ShooterValues.TurretConstraints);
 
     private final SmartMCAttachedPDPSlot primaryFlywheelSlot, secondaryFlywheelSlot, turretSlot, feederSlot;
+
+    private double turretTarget;
 
     public Shooter(GrouchPDP pdp, Vision vision) {
         DashboardManager.addTab(this, this);
@@ -69,15 +71,22 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
 
         setCurrentLimit(40);
 
+        turretPID.reset(getTurretRotations());
+        hoodPID.reset();
+        feedPID.reset();
+
+        turretTarget = turretEncoder.getDistance();
+
         dashboard_wheelRPM = DashboardManager.addTabItem(this, "Flywheel RPM", 0.0);
         dashboard_wheelTargetRPM = DashboardManager.addTabItem(this, "Target Flywheel RPM", 0.0);
-        dashboard_PID = DashboardManager.addTabItem(this, "PID", 0.0);
         dashboard_hoodPos = DashboardManager.addTabItem(this, "Hood Position", 0.0);
         dashboard_turretPos = DashboardManager.addTabItem(this, "Turret Position", 0.0);
+        dashboard_turretPow = DashboardManager.addTabItem(this, "Turret Power", 0.0);
         dashboard_flywheelFF = DashboardManager.addTabItem(this, "Flywheel FF", 0.0);
         dashboard_feedWheelRPM = DashboardManager.addTabItem(this, "Feed Wheel RPM", 0.0);
         dashboard_feedWheelTargetRPM = DashboardManager.addTabItem(this, "Target Feed Wheel RPM", 0.0);
         dashboard_feedFF = DashboardManager.addTabItem(this, "Feeder FF", 0.0);
+        //DashboardManager.getTab(this).add(turretPID);
 
         this.vision = vision;
 
@@ -102,12 +111,15 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
     @Override
     public void periodic() {
 //        trackTarget();
+        turretMotor.set(-turretPID.calculate(getTurretRotations(), turretTarget));
     }
 
     @Override
     public void updateDashboardData() {
         dashboard_wheelRPM.setDouble(primaryMotor.getSensorVelocity() * ShooterValues.FlywheelReduction);
         dashboard_feedWheelRPM.setDouble(feedMotor.getSensorVelocity());
+        dashboard_turretPos.setDouble(turretEncoder.getDistance());
+        dashboard_turretPow.setDouble(turretMotor.getOutputVoltage());
     }
 
     private void updatePIDMode() {
@@ -186,7 +198,7 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
     }
 
     private boolean atTurretTarget() {
-//        return Math.abs(turretEncoder.getRotations() - vision.getCalculations().turretRotation) < 0.05;
+//        return Math.abs(turretEncoder.getDistance() - vision.getCalculations().turretRotation) < 0.05;
         return false;
     }
 
@@ -218,6 +230,10 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
 
     public void otherSpin() {
         turretMotor.set(-0.5);
+    }
+
+    public void setTurretPosition (double pos){
+        turretTarget = pos;
     }
 
     public void stopShooter() {
@@ -264,8 +280,8 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
     }
 
     public double getTurretRotations() {
-//        return turretEncoder.getRotations();
-        return 0;
+        return turretEncoder.getDistance();
+//        return 0;
     }
 
     public void setDumbRPM(double rpm) {

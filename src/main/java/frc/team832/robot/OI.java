@@ -78,6 +78,11 @@ public class OI {
 		stratComInterface.getArcadeBlackRight().whileHeld(new StartEndCommand(() -> shooter.setHood(0.5), shooter::idleHood));
 		stratComInterface.getArcadeWhiteRight().whileHeld(new StartEndCommand(() -> shooter.setHood(-0.5), shooter::idleHood));
 
+		stratComInterface.getArcadeBlackRight().whenPressed(new InstantCommand(() -> shooter.setTurretPosition(Constants.ShooterValues.PracticeTurretForwardPosition), shooter));
+		stratComInterface.getArcadeWhiteRight().whenPressed(new InstantCommand(() -> shooter.setTurretPosition(.08), shooter));
+		stratComInterface.getArcadeWhiteLeft().whenPressed(new InstantCommand(() -> shooter.setTurretPosition(.58), shooter));
+
+
 //		stratComInterface.getDoubleToggleDown().whileHeld(new InstantCommand(() -> shooter.setExitAngle(OscarMath.clipMap(stratComInterface.getRightSlider(), -1, 1, 20, 70))));
 	}
 }

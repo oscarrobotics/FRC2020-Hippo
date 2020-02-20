@@ -32,7 +32,7 @@ public class Drivetrain extends SubsystemBase implements DashboardUpdatable {
     private SmartDiffDrive diffDrive;
     public DifferentialDriveOdometry driveOdometry;
 
-    public NavXMicro navX;
+//    public NavXMicro navX;
 
     private Pose2d pose = new Pose2d();
     private Pose2d startingPose = new Pose2d();
@@ -79,7 +79,7 @@ public class Drivetrain extends SubsystemBase implements DashboardUpdatable {
         setCurrentLimit(40);
 
         if (RobotBase.isReal()) {
-            navX = new NavXMicro(NavXMicro.NavXPort.I2C_onboard);
+//            navX = new NavXMicro(NavXMicro.NavXPort.I2C_onboard);
         }
 
         DashboardManager.addTab(this, this);
@@ -124,7 +124,8 @@ public class Drivetrain extends SubsystemBase implements DashboardUpdatable {
     }
 
     public Rotation2d getDriveHeading() {
-        return navX == null ? new Rotation2d() : Rotation2d.fromDegrees(-navX.getYaw());
+//        return navX == null ? new Rotation2d() : Rotation2d.fromDegrees(-navX.getYaw());
+        return new Rotation2d(0);
     }
 
     @Override
@@ -180,9 +181,9 @@ public class Drivetrain extends SubsystemBase implements DashboardUpdatable {
     public void resetPose(Pose2d pose) {
         resetEncoders();
         this.pose = pose;
-        if (navX != null) {
-            navX.zero();
-        }
+//        if (navX != null) {
+//            navX.zero();
+//        }
         driveOdometry.resetPosition(this.pose, getDriveHeading());
     }
 

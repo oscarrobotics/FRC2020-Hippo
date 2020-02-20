@@ -110,15 +110,17 @@ public class Constants {
         private static final Gearbox TurretGearbox = new Gearbox(TurretReduction);
         public static final WheeledPowerTrain TurretPowerTrain = new WheeledPowerTrain(TurretGearbox, Motor.kNEO550, 1, Units.inchesToMeters(10));
 
-        public static final Constraints TurretConstraints = new Constraints(TurretPowerTrain.calculateMotorRpmFromWheelRpm(90),
-                TurretPowerTrain.calculateMotorRpmFromWheelRpm(450));
+        public static final Constraints TurretConstraints = new Constraints(TurretPowerTrain.calculateMotorRpmFromWheelRpm(300),/*was 90*/
+                TurretPowerTrain.calculateMotorRpmFromWheelRpm(9000));//was 450
 
-        public static final double TurretkP = 0;
+        public static final double TurretkP = 4.0;
+        public static final double TurretkD = 1.0;
         public static final double TurretkF = 0;
 
         public static final double FeedkP = 0.0001;
         public static final double FeedkF = 0;
 
+        public static final double PracticeTurretForwardPosition = .33;
         //Feeder
         public static final float FeedReduction = 1f;
         private static final Gearbox FeedGearbox = new Gearbox(FeedReduction);
@@ -154,7 +156,7 @@ public class Constants {
 
         public static final PDPPortNumber SPIN_MOTOR_PDP_SLOT = PDPPortNumber.Port5;
 
-        public static final int HALL_EFFECT_DIO_CHANNEL = 0;
+        public static final int HALL_EFFECT_DIO_CHANNEL = 2;
         public static final int LASERSHARK_DIO_CHANNEL = 1;
 
         public static final float SpinReduction = 1f / (56f/1f);

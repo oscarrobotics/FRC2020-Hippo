@@ -58,7 +58,7 @@ public class SuperStructure extends SubsystemBase implements DashboardUpdatable 
 	public void prepareShoot() {
 		spindexer.setTargetPosition(spindexer.getNearestSafeRotationRelativeToFeeder());
 		shooter.spinUp();
-		Drivetrain.propUp();
+//		Drivetrain.propUp();
 	}
 
 	public void shoot() {
@@ -77,7 +77,7 @@ public class SuperStructure extends SubsystemBase implements DashboardUpdatable 
 
 	public void idleShooter(){
 		shooter.idle();
-		Drivetrain.retractProp();
+//		Drivetrain.retractProp();
 	}
 
 	public void idleAll() {

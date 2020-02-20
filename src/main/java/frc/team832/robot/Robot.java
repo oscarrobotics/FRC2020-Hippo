@@ -51,9 +51,12 @@ public class Robot extends OscarTimedRobot {
         }
 
         if (shooter.initSuccessful) {
+            System.out.println("Shooter - init OK");
             shooterTelemetryNotifier.startPeriodic(0.02);
         } else {
-            System.out.println("Shooter - init OK");
+            System.out.println("Shooter - init FAILED");
+            shooterTelemetryNotifier.startPeriodic(0.02);
+
         }
 
         if (spindexer.initSuccessful) {
