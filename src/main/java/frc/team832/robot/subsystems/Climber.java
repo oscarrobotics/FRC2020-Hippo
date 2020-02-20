@@ -1,5 +1,6 @@
 package frc.team832.robot.subsystems;
 
+import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.controller.ProfiledPIDController;
 import edu.wpi.first.wpilibj.util.Units;
@@ -18,12 +19,17 @@ public class Climber extends SubsystemBase implements DashboardUpdatable {
     public final boolean initSuccessful;
     private final CANSparkMax winchMotor, deployMotor;
 
+    private Solenoid climbLock;
+
     private SmartMCAttachedPDPSlot winchSlot, deploySlot;
 
     private ProfiledPIDController extendPID = new ProfiledPIDController(Constants.ClimberValues.ExtendkP, 0, 0, Constants.ClimberValues.ExtendConstraints);
 
     public Climber(GrouchPDP pdp) {
         DashboardManager.addTab(this, this);
+
+        climbLock = new Solenoid(Constants.PneumaticsValues.PCM_MODULE_NUM, Constants.PneumaticsValues.CLIMB_LOCK_SOLENOID_ID);
+
 
         winchMotor = new CANSparkMax(Constants.ClimberValues.WINCH_CAN_ID, Motor.kNEO);
         deployMotor = new CANSparkMax(Constants.ClimberValues.DEPLOY_CAN_ID, Motor.kNEO550);
@@ -75,19 +81,27 @@ public class Climber extends SubsystemBase implements DashboardUpdatable {
     }
 
     public void climbDown() {
-//        pneumatics.unlockClimb();
+        unlockClimb();
         unwindWinch();
     }
 
     public void climbUp() {
         retractHook();
-//        pneumatics.unlockClimb();
+        unlockClimb();
         windWinch();
     }
 
     public void stopClimb() {
         winchMotor.set(0);
-//        pneumatics.lockClimb();
+        lockClimb();
+    }
+
+    public void lockClimb() {
+        climbLock.set(true);
+    }
+
+    public void unlockClimb() {
+        climbLock.set(false);
     }
 
     @Override

@@ -1,5 +1,6 @@
 package frc.team832.robot.subsystems;
 
+import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.team832.lib.motorcontrol2.vendor.CANSparkMax;
 import frc.team832.lib.motors.Motor;
@@ -10,7 +11,7 @@ import frc.team832.robot.Constants;
 
 public class Intake extends SubsystemBase {
 	private final CANSparkMax intakeMotor;
-	private final SmartMCAttachedPDPSlot intakeSlot;
+	private Solenoid moveIntake;
 
 	public final boolean initSuccessful;
 
@@ -21,6 +22,9 @@ public class Intake extends SubsystemBase {
 		intakeSlot = pdp.addDevice(Constants.IntakeValues.INTAKE_MOTOR_PDP_SLOT, intakeMotor);
 
 		intakeMotor.wipeSettings();
+
+		moveIntake = new Solenoid(Constants.PneumaticsValues.PCM_MODULE_NUM, Constants.PneumaticsValues.INTAKE_SOLENOID_ID);
+
 
 		//Might need to be changed
 		intakeMotor.setInverted(false);
@@ -57,4 +61,13 @@ public class Intake extends SubsystemBase {
 	public void stop() {
 		intakeMotor.set(0);
 	}
+
+	public void extendIntake() {
+		moveIntake.set(true);
+	}
+
+	public void retractIntake() {
+		moveIntake.set(false);
+	}
+
 }

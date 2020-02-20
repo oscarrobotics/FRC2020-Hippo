@@ -1,6 +1,7 @@
 package frc.team832.robot.subsystems;
 
 import edu.wpi.first.wpilibj.I2C;
+import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.controller.ProfiledPIDController;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.team832.lib.driverstation.dashboard.DashboardUpdatable;
@@ -17,7 +18,11 @@ public class WheelOfFortune extends SubsystemBase implements DashboardUpdatable 
     public final boolean initSuccessful;
     private final CANSparkMax spinner;
 
-    private final ProfiledPIDController pid = new ProfiledPIDController(Constants.WOFValues.kP, 0, 0, Constants.WOFValues.Constraints);
+    private Solenoid wheelOfFortunePneumatics;
+
+    public CANSparkMax spinner;
+
+    private ProfiledPIDController pid = new ProfiledPIDController(Constants.WOFValues.kP, 0, 0, Constants.WOFValues.Constraints);
 
     private final I2C.Port i2cPort = I2C.Port.kOnboard;
 //    public final ColorSensorV3 colorSensor = new ColorSensorV3(i2cPort);
@@ -26,6 +31,7 @@ public class WheelOfFortune extends SubsystemBase implements DashboardUpdatable 
 
     public WheelOfFortune() {
         spinner = new CANSparkMax(Constants.WOFValues.SPINNER_CAN_ID, Motor.kNEO550);
+        wheelOfFortunePneumatics = new Solenoid(Constants.PneumaticsValues.PCM_MODULE_NUM, Constants.PneumaticsValues.WHEEL_O_FORTUNE_SOLENOID_ID);
 
         spinner.wipeSettings();
         spinner.setNeutralMode(NeutralMode.kBrake);
@@ -77,6 +83,14 @@ public class WheelOfFortune extends SubsystemBase implements DashboardUpdatable 
 
     public void stopSpin() {
         spinner.set(0);
+    }
+
+    public void extendWOFManipulator() {
+        wheelOfFortunePneumatics.set(true);
+    }
+
+    public void retractWOFManipulator() {
+        wheelOfFortunePneumatics.set(true);
     }
 
     public void setCurrentLimit(int limit) {

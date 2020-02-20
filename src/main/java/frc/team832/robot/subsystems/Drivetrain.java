@@ -1,6 +1,7 @@
 package frc.team832.robot.subsystems;
 
 import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
@@ -26,8 +27,10 @@ public class Drivetrain extends SubsystemBase implements DashboardUpdatable {
     public final boolean initSuccessful;
     private final CANTalonFX rightMaster, rightSlave, leftMaster, leftSlave;
 
-    private final SmartDiffDrive diffDrive;
-    private final DifferentialDriveOdometry driveOdometry;
+    private Solenoid propUpRobot;
+
+    private SmartDiffDrive diffDrive;
+    public DifferentialDriveOdometry driveOdometry;
 
     public NavXMicro navX;
 
@@ -49,6 +52,9 @@ public class Drivetrain extends SubsystemBase implements DashboardUpdatable {
         leftSlave = new CANTalonFX(Constants.DrivetrainValues.LEFT_SLAVE_CAN_ID);
         rightMaster = new CANTalonFX(Constants.DrivetrainValues.RIGHT_MASTER_CAN_ID);
         rightSlave = new CANTalonFX(Constants.DrivetrainValues.RIGHT_SLAVE_CAN_ID);
+
+        propUpRobot = new Solenoid(Constants.PneumaticsValues.PCM_MODULE_NUM, Constants.PneumaticsValues.PROP_UP_SOLENOID_ID);
+
 
         leftMaster.wipeSettings();
         leftSlave.wipeSettings();
@@ -194,5 +200,13 @@ public class Drivetrain extends SubsystemBase implements DashboardUpdatable {
         leftSlave.setNeutralMode(mode);
         rightMaster.setNeutralMode(mode);
         rightSlave.setNeutralMode(mode);
+    }
+
+    public void propUp() {
+        propUpRobot.set(true);
+    }
+
+    public void retractProp() {
+        propUpRobot.set(false);
     }
 }
