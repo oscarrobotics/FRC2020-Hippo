@@ -7,6 +7,7 @@ import frc.team832.lib.OscarTimedRobot;
 import frc.team832.lib.motorcontrol.NeutralMode;
 import frc.team832.lib.power.GrouchPDP;
 import frc.team832.robot.subsystems.*;
+import frc.team832.robot.utilities.state.SpindexerStatus;
 
 @SuppressWarnings("WeakerAccess")
 public class Robot extends OscarTimedRobot {
@@ -20,11 +21,12 @@ public class Robot extends OscarTimedRobot {
     static final Shooter shooter = new Shooter(pdp, vision);
     static final Spindexer spindexer = new Spindexer(pdp);
     static final Climber climber = new Climber(pdp);
-    static final Pneumatics pneumatics = new Pneumatics();
     static final WheelOfFortune wheelOfFortune = new WheelOfFortune();
-    static final SuperStructure superStructure = new SuperStructure(intake, shooter, spindexer, pneumatics);
+    static final SuperStructure superStructure = new SuperStructure(intake, shooter, spindexer);
+
 
     public static final OI oi = new OI();
+    public static SpindexerStatus spindexerStatus = new SpindexerStatus(pdp, superStructure, spindexer, spindexer.getSpinMotor());
 
     private static final Notifier drivetrainTelemetryNotifier = new Notifier(drivetrain::updateDashboardData);
     private static final Notifier shooterTelemetryNotifier = new Notifier(shooter::updateDashboardData);

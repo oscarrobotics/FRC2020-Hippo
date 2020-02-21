@@ -35,10 +35,6 @@ public class Intake extends SubsystemBase {
 		initSuccessful = intakeMotor.getCANConnection();
 	}
 
-	public void setCurrentLimit(int amps) {
-		intakeMotor.limitInputCurrent(amps);
-	}
-
 	public void intake(double power) {
 		OscarMath.clip(power, 0, 1);
 		intakeMotor.set(power);
@@ -69,6 +65,10 @@ public class Intake extends SubsystemBase {
 
 	public void retractIntake() {
 		moveIntake.set(false);
+	}
+
+	public void setCurrentLimit(int amps) {
+		intakeMotor.limitInputCurrent(amps);
 	}
 
 }

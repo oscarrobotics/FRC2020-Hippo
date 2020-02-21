@@ -96,13 +96,6 @@ public class Drivetrain extends SubsystemBase implements DashboardUpdatable {
                 rightMaster.getCANConnection() && rightSlave.getCANConnection();
     }
 
-    public void setCurrentLimit(int amps) {
-        leftMaster.limitInputCurrent(amps);
-        leftSlave.limitInputCurrent(amps);
-        rightMaster.limitInputCurrent(amps);
-        rightSlave.limitInputCurrent(amps);
-    }
-
     public void tankDrive() {
         tankProfile.calculateTankSpeeds();
         diffDrive.tankDrive(tankProfile.leftPower, tankProfile.rightPower, tankProfile.loopMode);
@@ -126,11 +119,6 @@ public class Drivetrain extends SubsystemBase implements DashboardUpdatable {
     public Rotation2d getDriveHeading() {
 //        return navX == null ? new Rotation2d() : Rotation2d.fromDegrees(-navX.getYaw());
         return new Rotation2d(0);
-    }
-
-    @Override
-    public String getDashboardTabName() {
-        return "Drivetrain";
     }
 
     @Override
@@ -201,6 +189,18 @@ public class Drivetrain extends SubsystemBase implements DashboardUpdatable {
         leftSlave.setNeutralMode(mode);
         rightMaster.setNeutralMode(mode);
         rightSlave.setNeutralMode(mode);
+    }
+
+    public void setCurrentLimit(int amps) {
+        leftMaster.limitInputCurrent(amps);
+        leftSlave.limitInputCurrent(amps);
+        rightMaster.limitInputCurrent(amps);
+        rightSlave.limitInputCurrent(amps);
+    }
+
+    @Override
+    public String getDashboardTabName() {
+        return "Drivetrain";
     }
 
     public static void propUp() {

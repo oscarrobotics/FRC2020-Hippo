@@ -24,10 +24,12 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
 
 
     private final Vision vision;
-    private final CANSparkMax primaryMotor, secondaryMotor, turretMotor, feedMotor; //if needed add hood motor
+    private final CANSparkMax primaryMotor, secondaryMotor, turretMotor, feedMotor;
+    private final REVSmartServo_Continuous hoodServo;
+
     private final NetworkTableEntry dashboard_wheelRPM, dashboard_flywheelFF, dashboard_hoodPos, dashboard_turretPos, dashboard_turretPow, dashboard_wheelTargetRPM,
             dashboard_feedWheelRPM, dashboard_feedWheelTargetRPM, dashboard_feedFF;
-    private final REVSmartServo_Continuous hoodServo;
+
 
     private ShootMode mode = ShootMode.Shooting, lastMode = ShootMode.Shooting;
 
@@ -86,26 +88,10 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
         dashboard_feedWheelRPM = DashboardManager.addTabItem(this, "Feed Wheel RPM", 0.0);
         dashboard_feedWheelTargetRPM = DashboardManager.addTabItem(this, "Target Feed Wheel RPM", 0.0);
         dashboard_feedFF = DashboardManager.addTabItem(this, "Feeder FF", 0.0);
-        //DashboardManager.getTab(this).add(turretPID);
 
         this.vision = vision;
 
         initSuccessful = primaryMotor.getCANConnection() && secondaryMotor.getCANConnection() && turretMotor.getCANConnection() && feedMotor.getCANConnection();
-    }
-
-    public void setFlyheelNeutralMode(NeutralMode mode) {
-        primaryMotor.setNeutralMode(mode);
-        secondaryMotor.setNeutralMode(mode);
-    }
-
-    public void setTurretNeutralMode(NeutralMode mode) {
-        feedMotor.setNeutralMode(mode);
-        turretMotor.setNeutralMode(mode);
-    }
-
-    @Override
-    public String getDashboardTabName() {
-        return "Shooter";
     }
 
     @Override
@@ -114,33 +100,13 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
         turretMotor.set(-turretPID.calculate(getTurretRotations(), turretTarget));
     }
 
+
     @Override
     public void updateDashboardData() {
         dashboard_wheelRPM.setDouble(primaryMotor.getSensorVelocity() * ShooterValues.FlywheelReduction);
         dashboard_feedWheelRPM.setDouble(feedMotor.getSensorVelocity());
         dashboard_turretPos.setDouble(turretEncoder.getDistance());
         dashboard_turretPow.setDouble(turretMotor.getOutputVoltage());
-    }
-
-    private void updatePIDMode() {
-        switch (mode) {
-            case SpinUp:
-                primaryMotor.setPIDF(ShooterValues.SpinupConfig);
-                break;
-            case Shooting:
-                primaryMotor.setPIDF(ShooterValues.ShootingConfig);
-                break;
-            case Idle:
-                primaryMotor.setPIDF(ShooterValues.IdleConfig);
-        }
-    }
-
-    public void setMode(ShootMode mode) {
-        if (this.mode != mode) {
-            this.lastMode = this.mode;
-            this.mode = mode;
-            updatePIDMode();
-        }
     }
 
     public void spinUp() {
@@ -247,12 +213,6 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
         feedMotor.set(0);
     }
 
-    public void setCurrentLimit(int limit) {
-        primaryMotor.limitInputCurrent(limit);
-        secondaryMotor.limitInputCurrent(limit);
-        feedMotor.limitInputCurrent(limit);
-    }
-
     public void stopFeed() {
         feedMotor.set(0);
     }
@@ -300,6 +260,51 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
     public void idleHood() {
         hoodServo.setSpeed(0);
     }
+
+    public void setCurrentLimit(int limit) {
+        primaryMotor.limitInputCurrent(limit);
+        secondaryMotor.limitInputCurrent(limit);
+        feedMotor.limitInputCurrent(limit);
+    }
+
+
+    public void setFlyheelNeutralMode(NeutralMode mode) {
+        primaryMotor.setNeutralMode(mode);
+        secondaryMotor.setNeutralMode(mode);
+    }
+
+    public void setTurretNeutralMode(NeutralMode mode) {
+        feedMotor.setNeutralMode(mode);
+        turretMotor.setNeutralMode(mode);
+    }
+
+    private void updatePIDMode() {
+        switch (mode) {
+            case SpinUp:
+                primaryMotor.setPIDF(ShooterValues.SpinupConfig);
+                break;
+            case Shooting:
+                primaryMotor.setPIDF(ShooterValues.ShootingConfig);
+                break;
+            case Idle:
+                primaryMotor.setPIDF(ShooterValues.IdleConfig);
+        }
+    }
+
+    public void setMode(ShootMode mode) {
+        if (this.mode != mode) {
+            this.lastMode = this.mode;
+            this.mode = mode;
+            updatePIDMode();
+        }
+    }
+
+
+    @Override
+    public String getDashboardTabName() {
+        return "Shooter";
+    }
+
 
     public enum ShootMode {
         SpinUp,

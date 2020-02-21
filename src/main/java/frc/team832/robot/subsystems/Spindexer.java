@@ -15,13 +15,14 @@ import frc.team832.robot.Constants.SpindexerValues;
 import frc.team832.robot.utilities.positions.BallPosition;
 import frc.team832.robot.utilities.state.SpindexerStatus;
 
+import static frc.team832.robot.Robot.spindexerStatus;
+
 public class Spindexer extends SubsystemBase {
 	public final boolean initSuccessful;
 
 	private final CANSparkMax spinMotor;
 	private final HallEffect hallEffect;
 	private final LasersharkDistance ballSensor;
-	private final SpindexerStatus spindexerStatus;
 	private final PIDController spinPID = new PIDController(SpindexerValues.SpinkP, 0, 0);
 	private final ProfiledPIDController positionPID = new ProfiledPIDController(SpindexerValues.PositionkP, 0, 0, SpindexerValues.Constraints);
 
@@ -39,8 +40,6 @@ public class Spindexer extends SubsystemBase {
 		hallEffect = new HallEffect(SpindexerValues.HALL_EFFECT_DIO_CHANNEL);
 		ballSensor = new LasersharkDistance(SpindexerValues.LASERSHARK_DIO_CHANNEL);
 
-		spindexerStatus = new SpindexerStatus(pdp, this, spinMotor);
-
 		hallEffect.setupInterrupts(spindexerStatus::onHallEffect);
 
 		initSuccessful = spinMotor.getCANConnection() && ballSensor.getDistanceMeters() != 0;
@@ -49,51 +48,6 @@ public class Spindexer extends SubsystemBase {
 	@Override
 	public void periodic() {
 		spindexerStatus.update();
-	}
-
-	public double getBallSensorRaw() {
-		return ballSensor.getPercentageDistance();
-	}
-
-	public boolean getBallSensor() {
-		return getBallSensorRaw() >= Units.inchesToMeters(3);
-	}
-
-	public void setCurrentLimit(int currentLimit) {
-		spinMotor.limitInputCurrent(currentLimit);
-	}
-
-	public boolean isSafe() {
-		return Math.abs(getNearestSafeRotationRelativeToFeeder() - getRelativeRotations()) < .05;
-	}
-
-	public void stopSpin() {
-		spinMotor.set(0);
-	}
-
-	public void spinCounterclockwise(double pow) {
-		spinMotor.set(-OscarMath.clip(pow, 0, 1));
-	}
-
-	public void spinClockwise(double pow) {
-		spinMotor.set(OscarMath.clip(pow, 0, 1));
-	}
-
-	public boolean isFull() {
-		return spindexerStatus.isFull();
-	}
-
-    public void setNeutralMode(NeutralMode mode) {
-		spinMotor.setNeutralMode(mode);
-    }
-
-    public enum SpinnerDirection {
-		Clockwise,
-		CounterClockwise;
-	}
-
-	public SpinnerDirection getSpinnerDirection() {
-		return spindexerStatus.getSpinDirection();
 	}
 
 	public void setSpinRPM(double rpm, SpinnerDirection spinDirection) {
@@ -112,52 +66,8 @@ public class Spindexer extends SubsystemBase {
 		}
 	}
 
-	public boolean isStalled() {
-		return spindexerStatus.isStalling();
-	}
-
-	public void setTargetPosition(double pos) {
-		spinMotor.set(positionPID.calculate(spinMotor.getSensorPosition(), SpindexerValues.SpinPowertrain.calculateTicksFromPosition(pos)));
-	}
-	
-	public double getPosition() {
-		return spinMotor.getSensorPosition();
-	}
-
-	public void zeroSpindexer() {
-		spinMotor.rezeroSensor();
-	}
-
-	public SpindexerStatus.SpindexerState getState() { return spindexerStatus.getState(); }
-
-	public double getRelativeRotations() {
-		return spinMotor.getSensorPosition() * SpindexerValues.SpinReduction;
-	}
-
-	public double getAbsoluteRotations() {
-		return spindexerStatus.getAbsoluteRotations(); }
-
 	public void switchSpin() {
 		setSpinRPM(lastSpinSpeed, spindexerStatus.getSpinDirection() == SpinnerDirection.Clockwise ? SpinnerDirection.CounterClockwise : SpinnerDirection.Clockwise);
-	}
-
-	public boolean isUnloaded() {
-		if (tempSpindexerRotations == 0) {
-			tempSpindexerRotations = getAbsoluteRotations();
-		}
-		if (Math.abs(tempSpindexerRotations - getAbsoluteRotations()) > 2) {
-			tempSpindexerRotations = 0;
-			return true;
-		}
-		return false;
-	}
-
-	public boolean isOverBallSlot() {
-		return Math.abs(getRelativeRotations() - getNearestBallRotationRelativeToFeeder()) < 0.05;
-	}
-
-	public boolean isOverBallPosition(BallPosition position) {
-		return Math.abs(getRelativeRotations() - position.rotations) < 0.05;
 	}
 
 	public void setToPocket(BallPosition position) {
@@ -166,7 +76,7 @@ public class Spindexer extends SubsystemBase {
 	}
 
 	public void setToSafeSpot() {
-		double target = SpindexerValues.SpinPowertrain.calculateTicksFromPosition(getNearestSafeRotationRelativeToFeeder());
+		double target = SpindexerValues.SpinPowertrain.calculateTicksFromPosition(spindexerStatus.getNearestSafeRotationRelativeToFeeder());
 		spinMotor.set(positionPID.calculate(spinMotor.getSensorPosition(), target));
 	}
 
@@ -179,16 +89,79 @@ public class Spindexer extends SubsystemBase {
 		}
 	}
 
-	// YOU CAN'T DO THIS! No cross-subsystem references except *inside* the SuperStructure!!!
-	public double getNearestSafeRotationRelativeToFeeder() {
-		return 0;
-//		return getNearestBallRotationRelativeToFeeder() + superStructure.calculateSpindexerRotRelativeToFeeder(0.1);
+	public void setTargetPosition(double pos) {
+		spinMotor.set(positionPID.calculate(spinMotor.getSensorPosition(), SpindexerValues.SpinPowertrain.calculateTicksFromPosition(pos)));
 	}
 
-	// YOU CAN'T DO THIS! No cross-subsystem references except *inside* the SuperStructure!!!
-	public double getNearestBallRotationRelativeToFeeder() {
-		return 0;
-//		return superStructure.calculateSpindexerRotRelativeToFeeder(getNearestBallPosition().rotations);
+	public double getPosition() {
+		return spinMotor.getSensorPosition();
+	}
+
+	public void zeroSpindexer() {
+		spinMotor.rezeroSensor();
+	}
+
+	public SpindexerStatus.SpindexerState getState() { return spindexerStatus.getState(); }
+
+	public SpinnerDirection getSpinnerDirection() {
+		return spindexerStatus.getSpinDirection();
+	}
+
+	public boolean isStalled() {
+		return spindexerStatus.isStalling();
+	}
+
+	public double getRelativeRotations() {
+		return spinMotor.getSensorPosition() * SpindexerValues.SpinReduction;
+	}
+
+	public double getAbsoluteRotations() { return spindexerStatus.getAbsoluteRotations(); }
+
+	public void stopSpin() {
+		spinMotor.set(0);
+	}
+
+	public void spinCounterclockwise(double pow) {
+		spinMotor.set(-OscarMath.clip(pow, 0, 1));
+	}
+
+	public void spinClockwise(double pow) {
+		spinMotor.set(OscarMath.clip(pow, 0, 1));
+	}
+
+	public double getBallSensorRaw() {
+		return ballSensor.getPercentageDistance();
+	}
+
+	public boolean getBallSensor() {
+		return getBallSensorRaw() >= Units.inchesToMeters(3);
+	}
+
+	public boolean isSafe() {
+		return Math.abs(spindexerStatus.getNearestSafeRotationRelativeToFeeder() - getRelativeRotations()) < .05;
+	}
+
+	public boolean isFull() {
+		return spindexerStatus.isFull();
+	}
+
+	public void setCurrentLimit(int currentLimit) {
+		spinMotor.limitInputCurrent(currentLimit);
+	}
+
+	public void setNeutralMode(NeutralMode mode) {
+		spinMotor.setNeutralMode(mode);
+	}
+
+	public boolean isUnloaded() {
+		if (tempSpindexerRotations == 0) {
+			tempSpindexerRotations = getAbsoluteRotations();
+		}
+		if (Math.abs(tempSpindexerRotations - getAbsoluteRotations()) > 2) {
+			tempSpindexerRotations = 0;
+			return true;
+		}
+		return false;
 	}
 
 	public BallPosition getNearestBallPosition() {
@@ -223,5 +196,14 @@ public class Spindexer extends SubsystemBase {
 		} else {
 			return BallPosition.Position4;
 		}
+	}
+
+	public enum SpinnerDirection {
+		Clockwise,
+		CounterClockwise;
+	}
+
+	public CANSparkMax getSpinMotor() {
+		return spinMotor;
 	}
 }

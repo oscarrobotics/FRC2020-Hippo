@@ -69,7 +69,7 @@ public class OI {
 		stratComInterface.getSC5().whenHeld(new StartEndCommand(shooter::spin, shooter::stopAll, shooter));
         stratComInterface.getSC2().whenHeld(new StartEndCommand(shooter::otherSpin, shooter::stopAll, shooter));
 
-		stratComInterface.getDoubleToggleUp().whenHeld(new RunEndCommand(() -> superStructure.dumbIntake(stratComInterface.getLeftSlider()), superStructure::dumbIntakeIdle, superStructure, intake, pneumatics));
+		stratComInterface.getDoubleToggleUp().whenHeld(new RunEndCommand(() -> superStructure.dumbIntake(stratComInterface.getLeftSlider()), superStructure::dumbIntakeIdle, superStructure, intake));
 		stratComInterface.getSCSideBot().whenHeld(new StartEndCommand(() -> intake.outtake(0.5), intake::stop, intake));
 
 		stratComInterface.getSingleToggle().whenHeld(new RunEndCommand(() -> shooter.setDumbRPM(OscarMath.clipMap(stratComInterface.getRightSlider(), -1, 1, 0, 5000)), shooter::idle));

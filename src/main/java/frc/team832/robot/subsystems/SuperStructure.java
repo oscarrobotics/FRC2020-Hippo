@@ -13,15 +13,13 @@ public class SuperStructure extends SubsystemBase implements DashboardUpdatable 
 	private Intake intake;
 	private Shooter shooter;
 	private Spindexer spindexer;
-	private Pneumatics pneumatics;
 
 	private NetworkTableEntry dashboard_mode, dashboard_lastMode;
 
-	public SuperStructure(Intake intake, Shooter shooter, Spindexer spindexer, Pneumatics pneumatics) {
+	public SuperStructure(Intake intake, Shooter shooter, Spindexer spindexer) {
 		this.intake = intake;
 		this.shooter = shooter;
 		this.spindexer = spindexer;
-		this.pneumatics = pneumatics;
 
         DashboardManager.addTab(this, this);
 
@@ -32,7 +30,7 @@ public class SuperStructure extends SubsystemBase implements DashboardUpdatable 
 	@Override
 	public void periodic() {
 		spindexerAntiStall();
-		if (spindexer.isFull()) spindexer.setTargetPosition(spindexer.getNearestSafeRotationRelativeToFeeder());
+		if (spindexer.isFull()) spindexer.setTargetPosition(getNearestSafeRotationRelativeToFeeder());
 	}
 
 	public void intake() {
@@ -56,7 +54,7 @@ public class SuperStructure extends SubsystemBase implements DashboardUpdatable 
 	}
 
 	public void prepareShoot() {
-		spindexer.setTargetPosition(spindexer.getNearestSafeRotationRelativeToFeeder());
+		spindexer.setTargetPosition(getNearestSafeRotationRelativeToFeeder());
 		shooter.spinUp();
 //		Drivetrain.propUp();
 	}
@@ -86,6 +84,10 @@ public class SuperStructure extends SubsystemBase implements DashboardUpdatable 
 		idleSpindexer();
 	}
 
+	private void spindexerAntiStall() {
+//		if (spindexer.isStalled()) spindexer.switchSpin();
+	}
+
 	public double getFeederRotationRelativeToSpindexer() {
 		return -getSpindexerRotationRelativeToFeeder();
 	}
@@ -98,8 +100,12 @@ public class SuperStructure extends SubsystemBase implements DashboardUpdatable 
 		return targetPos - shooter.getTurretRotations();
 	}
 
-	private void spindexerAntiStall() {
-//		if (spindexer.isStalled()) spindexer.switchSpin();
+	public double getNearestSafeRotationRelativeToFeeder() {
+		return getNearestBallRotationRelativeToFeeder() + calculateSpindexerRotRelativeToFeeder(0.1);
+	}
+
+	public double getNearestBallRotationRelativeToFeeder() {
+		return calculateSpindexerRotRelativeToFeeder(spindexer.getNearestBallPosition().rotations);
 	}
 
 	public boolean isSpindexerUnloaded() {

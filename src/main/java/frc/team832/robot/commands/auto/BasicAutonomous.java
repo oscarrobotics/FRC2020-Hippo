@@ -10,12 +10,12 @@ import frc.team832.robot.commands.ShootCommandGroup;
 import frc.team832.robot.subsystems.*;
 
 public class BasicAutonomous extends SequentialCommandGroup {
-    public BasicAutonomous(SuperStructure superStructure, Drivetrain drivetrain, Pneumatics pneumatics, Shooter shooter, Spindexer spindexer, Intake intake) {
+    public BasicAutonomous(SuperStructure superStructure, Drivetrain drivetrain, Shooter shooter, Spindexer spindexer, Intake intake) {
         var path = PathHelper.generatePath(drivetrain.getLatestPose(), new Pose2d(-1.0, 0, Rotation2d.fromDegrees(0))); //TODO: Change coordinates
         addCommands(
-                new ShootCommandGroup(superStructure, pneumatics, shooter, spindexer),
+                new ShootCommandGroup(superStructure, shooter, spindexer),
                 new FollowPath(path, drivetrain)
         );
-        addRequirements(superStructure, drivetrain, pneumatics, shooter, spindexer, intake);
+        addRequirements(superStructure, drivetrain, shooter, spindexer, intake);
     }
 }

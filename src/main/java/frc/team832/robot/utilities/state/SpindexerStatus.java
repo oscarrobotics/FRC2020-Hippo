@@ -11,9 +11,12 @@ import frc.team832.lib.power.monitoring.StallDetector;
 import frc.team832.lib.util.OscarMath;
 import frc.team832.robot.Constants;
 import frc.team832.robot.subsystems.Spindexer;
+import frc.team832.robot.subsystems.SuperStructure;
+import frc.team832.robot.utilities.positions.BallPosition;
 
 public class SpindexerStatus implements DashboardUpdatable {
     private final Spindexer spindexer;
+    private final SuperStructure superStructure;
     private final CANSparkMax spinMotor;
     private final GrouchPDP pdp;
     private final SmartMCAttachedPDPSlot spinSlot;
@@ -26,9 +29,10 @@ public class SpindexerStatus implements DashboardUpdatable {
 
     NetworkTableEntry ballSlot0, ballSlot1, ballSlot2, ballSlot3, ballSlot4, dashboard_state;
 
-    public SpindexerStatus(GrouchPDP pdp, Spindexer spindexer, CANSparkMax spinMotor) {
+    public SpindexerStatus(GrouchPDP pdp, SuperStructure superStructure, Spindexer spindexer, CANSparkMax spinMotor) {
 
         this.spindexer = spindexer;
+        this.superStructure = superStructure;
         this.spinMotor = spinMotor;
         this.pdp = pdp;
 
@@ -46,7 +50,7 @@ public class SpindexerStatus implements DashboardUpdatable {
     }
 
     public void update() {
-        boolean currentSlotHasBall = spindexer.getBallSensor() && spindexer.isOverBallSlot();
+        boolean currentSlotHasBall = spindexer.getBallSensor() && isOverBallSlot();
         ballPositions[spindexer.getNearestBallPosition().slotNumber] = currentSlotHasBall;
 
         if (isFull())
@@ -63,6 +67,14 @@ public class SpindexerStatus implements DashboardUpdatable {
 //        }
 
         spinDirection = Math.signum(spinMotor.getSensorVelocity()) == 1 ? Spindexer.SpinnerDirection.Clockwise : Spindexer.SpinnerDirection.CounterClockwise;
+    }
+
+    public boolean isOverBallSlot() {
+        return Math.abs(spindexer.getRelativeRotations() - superStructure.getNearestBallRotationRelativeToFeeder()) < 0.05;
+    }
+
+    public boolean isOverBallPosition(BallPosition position) {
+        return Math.abs(spindexer.getRelativeRotations() - position.rotations) < 0.05;
     }
 
     public void onHallEffect() {
@@ -132,6 +144,16 @@ public class SpindexerStatus implements DashboardUpdatable {
         ballSlot4.setBoolean(getSlot(4));
         dashboard_state.setString(state.toString());
     }
+
+    public double getFeederRotationRelativeToSpindexer() { return superStructure.getFeederRotationRelativeToSpindexer(); }
+
+    public double getSpindexerRotationRelativeToFeeder() { return superStructure.getSpindexerRotationRelativeToFeeder(); }
+
+    public double calculateSpindexerRotRelativeToFeeder(double targetPos) { return superStructure.calculateSpindexerRotRelativeToFeeder(targetPos); }
+
+    public double getNearestSafeRotationRelativeToFeeder() { return superStructure.getNearestSafeRotationRelativeToFeeder(); }
+
+    public double getNearestBallRotationRelativeToFeeder() { return superStructure.getNearestBallRotationRelativeToFeeder(); }
 
     public enum SpindexerState {
         FULL,
