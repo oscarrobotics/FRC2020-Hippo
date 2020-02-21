@@ -97,7 +97,7 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
     @Override
     public void periodic() {
 //        trackTarget();
-        turretMotor.set(-turretPID.calculate(getTurretRotations(), turretTarget));
+        runTurretPID();
     }
 
 
@@ -241,7 +241,6 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
 
     public double getTurretRotations() {
         return turretEncoder.getDistance();
-//        return 0;
     }
 
     public void setDumbRPM(double rpm) {
@@ -298,6 +297,8 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
             updatePIDMode();
         }
     }
+
+    private void runTurretPID() { turretMotor.set(-turretPID.calculate(getTurretRotations(), turretTarget)); }
 
 
     @Override

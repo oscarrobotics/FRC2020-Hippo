@@ -39,7 +39,7 @@ public class Drivetrain extends SubsystemBase implements DashboardUpdatable {
 
     private double latestLeftWheelVolts, latestRightWheelVolts;
 
-    private TankDriveProfile tankProfile = new TankDriveProfile(false, true);
+    private TankDriveProfile tankProfile = new TankDriveProfile(false, false);
     private ArcadeDriveProfile arcadeProfile = new ArcadeDriveProfile();
 
     private PIDController rightPID = new PIDController(Constants.DrivetrainValues.RightkP, 0, Constants.DrivetrainValues.RightkD);

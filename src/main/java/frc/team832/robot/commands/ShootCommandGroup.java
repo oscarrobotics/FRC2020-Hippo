@@ -6,15 +6,16 @@ import frc.team832.robot.subsystems.Shooter;
 import frc.team832.robot.subsystems.SuperStructure;
 import frc.team832.robot.subsystems.Spindexer;
 
+
 public class ShootCommandGroup extends SequentialCommandGroup {
 
     public ShootCommandGroup(SuperStructure superStructure, Shooter shooter, Spindexer spindexer) {
         addCommands(
                 new FunctionalCommand(
-                        () -> spindexer.setTargetPosition(spindexer.getNearestSafeRotationRelativeToFeeder()),
+                        superStructure::moveSpindexerToSafePos,
                         () -> {},
-                        (ignored) -> spindexer.stopSpin(),
-                        spindexer::isSafe,
+                        (ignored) -> superStructure.idleSpindexer(),
+                        () -> spindexer.isSafe(superStructure.getNearestSafeRotationRelativeToFeeder()),
                         spindexer),
 
                 new PrepareShooter(superStructure, shooter, spindexer),

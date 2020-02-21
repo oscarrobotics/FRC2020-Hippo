@@ -24,9 +24,7 @@ public class Robot extends OscarTimedRobot {
     static final WheelOfFortune wheelOfFortune = new WheelOfFortune();
     static final SuperStructure superStructure = new SuperStructure(intake, shooter, spindexer);
 
-
     public static final OI oi = new OI();
-    public static SpindexerStatus spindexerStatus = new SpindexerStatus(pdp, superStructure, spindexer, spindexer.getSpinMotor());
 
     private static final Notifier drivetrainTelemetryNotifier = new Notifier(drivetrain::updateDashboardData);
     private static final Notifier shooterTelemetryNotifier = new Notifier(shooter::updateDashboardData);

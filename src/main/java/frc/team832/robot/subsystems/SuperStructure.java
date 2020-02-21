@@ -7,6 +7,7 @@ import frc.team832.lib.driverstation.dashboard.DashboardUpdatable;
 import frc.team832.lib.util.OscarMath;
 import frc.team832.robot.Constants;
 import frc.team832.robot.Robot;
+import frc.team832.robot.utilities.positions.BallPosition;
 
 public class SuperStructure extends SubsystemBase implements DashboardUpdatable {
 
@@ -29,6 +30,7 @@ public class SuperStructure extends SubsystemBase implements DashboardUpdatable 
 
 	@Override
 	public void periodic() {
+		spindexer.updateStatus(isOverBallSlot());
 		spindexerAntiStall();
 		if (spindexer.isFull()) spindexer.setTargetPosition(getNearestSafeRotationRelativeToFeeder());
 	}
@@ -84,6 +86,10 @@ public class SuperStructure extends SubsystemBase implements DashboardUpdatable 
 		idleSpindexer();
 	}
 
+	public void moveSpindexerToSafePos() {
+		spindexer.setTargetPosition(getNearestSafeRotationRelativeToFeeder());
+	}
+
 	private void spindexerAntiStall() {
 //		if (spindexer.isStalled()) spindexer.switchSpin();
 	}
@@ -106,6 +112,14 @@ public class SuperStructure extends SubsystemBase implements DashboardUpdatable 
 
 	public double getNearestBallRotationRelativeToFeeder() {
 		return calculateSpindexerRotRelativeToFeeder(spindexer.getNearestBallPosition().rotations);
+	}
+
+	public boolean isOverBallSlot() {
+		return Math.abs(spindexer.getRelativeRotations() - getNearestBallRotationRelativeToFeeder()) < 0.05;
+	}
+
+	public boolean isOverBallPosition(BallPosition position) {
+		return Math.abs(spindexer.getRelativeRotations() - position.rotations) < 0.05;
 	}
 
 	public boolean isSpindexerUnloaded() {

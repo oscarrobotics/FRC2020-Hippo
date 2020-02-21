@@ -15,7 +15,6 @@ import frc.team832.robot.Constants.SpindexerValues;
 import frc.team832.robot.utilities.positions.BallPosition;
 import frc.team832.robot.utilities.state.SpindexerStatus;
 
-import static frc.team832.robot.Robot.spindexerStatus;
 
 public class Spindexer extends SubsystemBase {
 	public final boolean initSuccessful;
@@ -26,8 +25,11 @@ public class Spindexer extends SubsystemBase {
 	private final PIDController spinPID = new PIDController(SpindexerValues.SpinkP, 0, 0);
 	private final ProfiledPIDController positionPID = new ProfiledPIDController(SpindexerValues.PositionkP, 0, 0, SpindexerValues.Constraints);
 
+	private SpindexerStatus spindexerStatus;
+
 	private double tempSpindexerRotations = 0;
 	private double lastSpinSpeed = 0;
+	private double spindexerTarget;
 
 	public Spindexer(GrouchPDP pdp) {
 		spinMotor = new CANSparkMax(SpindexerValues.SPIN_MOTOR_CAN_ID, Motor.kNEO);
@@ -36,6 +38,8 @@ public class Spindexer extends SubsystemBase {
 		spinMotor.setInverted(false); //these might change
 		spinMotor.setSensorPhase(true);
 		spinMotor.setNeutralMode(NeutralMode.kBrake);
+
+		spindexerStatus = new SpindexerStatus(pdp, this, spinMotor);
 
 		hallEffect = new HallEffect(SpindexerValues.HALL_EFFECT_DIO_CHANNEL);
 		ballSensor = new LasersharkDistance(SpindexerValues.LASERSHARK_DIO_CHANNEL);
@@ -47,7 +51,7 @@ public class Spindexer extends SubsystemBase {
 
 	@Override
 	public void periodic() {
-		spindexerStatus.update();
+
 	}
 
 	public void setSpinRPM(double rpm, SpinnerDirection spinDirection) {
@@ -75,11 +79,6 @@ public class Spindexer extends SubsystemBase {
 		spinMotor.set(positionPID.calculate(spinMotor.getSensorPosition(), target));
 	}
 
-	public void setToSafeSpot() {
-		double target = SpindexerValues.SpinPowertrain.calculateTicksFromPosition(spindexerStatus.getNearestSafeRotationRelativeToFeeder());
-		spinMotor.set(positionPID.calculate(spinMotor.getSensorPosition(), target));
-	}
-
 	public void setToEmpty() {
 		int pos;
 		if(getState() != SpindexerStatus.SpindexerState.FULL){
@@ -87,6 +86,10 @@ public class Spindexer extends SubsystemBase {
 			var empty = intToPosition(pos);
 			setTargetPosition(empty.rotations);
 		}
+	}
+
+	public void updateStatus(boolean isOverSlot) {
+		spindexerStatus.update(isOverSlot);
 	}
 
 	public void setTargetPosition(double pos) {
@@ -137,8 +140,8 @@ public class Spindexer extends SubsystemBase {
 		return getBallSensorRaw() >= Units.inchesToMeters(3);
 	}
 
-	public boolean isSafe() {
-		return Math.abs(spindexerStatus.getNearestSafeRotationRelativeToFeeder() - getRelativeRotations()) < .05;
+	public boolean isSafe(double feederPos) {
+		return Math.abs(feederPos - getRelativeRotations()) < .05;
 	}
 
 	public boolean isFull() {
@@ -163,6 +166,8 @@ public class Spindexer extends SubsystemBase {
 		}
 		return false;
 	}
+
+
 
 	public BallPosition getNearestBallPosition() {
 		double pos = spinMotor.getSensorPosition();
