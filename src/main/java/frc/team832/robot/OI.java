@@ -66,9 +66,10 @@ public class OI {
 //		stratComInterface.getSingleToggle().whenHeld(new RunEndCommand(() -> shooter.setDumbRPM(OscarMath.clipMap(stratComInterface.getRightSlider(), -1, 1, 0, 5000)), shooter::idle));
 //		stratComInterface.getSingleToggle().whenHeld(new RunEndCommand(() -> shooter.setDumbFeedRPM(OscarMath.clipMap(stratComInterface.getLeftSlider(), -1, 1, 0, 4000)), shooter::idle));
 
-		stratComInterface.getSingleToggle().whenHeld(new RunEndCommand(() -> spindexer.setDumbPosition(OscarMath.clipMap(stratComInterface.getRightSlider(), -1, 1, 0, 1)), spindexer::stopSpin));
-		stratComInterface.getSingleToggle().whenHeld(new RunEndCommand(() -> shooter.setDumbTurretPosition(OscarMath.clipMap(
-						stratComInterface.getLeftSlider(), -1, 1,
+		stratComInterface.getSingleToggle().whenHeld(new RunEndCommand(() -> spindexer.setDumbPosition(OscarMath.clipMap(
+				stratComInterface.getRightSlider(), -1, 1, 0, 1)), spindexer::stopSpin));
+		stratComInterface.getSingleToggle().whenHeld(new RunEndCommand(
+						() -> shooter.setDumbTurretPosition(OscarMath.clipMap(stratComInterface.getLeftSlider(), -1, 1,
 						Constants.ShooterValues.PracticeTurretForwardPosition - 0.25,
 						Constants.ShooterValues.PracticeTurretForwardPosition + 0.25)), shooter::idleTurret));
 

@@ -42,9 +42,6 @@ public class Drivetrain extends SubsystemBase implements DashboardUpdatable {
     private TankDriveProfile tankProfile = new TankDriveProfile(false, false);
     private ArcadeDriveProfile arcadeProfile = new ArcadeDriveProfile();
 
-    private PIDController rightPID = new PIDController(Constants.DrivetrainValues.RightkP, 0, Constants.DrivetrainValues.RightkD);
-    private PIDController leftPID = new PIDController(Constants.DrivetrainValues.LeftkP, 0, Constants.DrivetrainValues.LeftkD);
-
     private SmartMCAttachedPDPSlot leftMasterSlot, leftSlaveSlot, rightMasterSlot, rightSlaveSlot;
 
     public Drivetrain(GrouchPDP pdp) {
@@ -199,15 +196,9 @@ public class Drivetrain extends SubsystemBase implements DashboardUpdatable {
     }
 
     @Override
-    public String getDashboardTabName() {
-        return "Drivetrain";
-    }
+    public String getDashboardTabName() { return "Drivetrain"; }
 
-    public static void propUp() {
-        propUpRobot.set(true);
-    }
+    public static void propUp() { propUpRobot.set(true); }
 
-    public static void retractProp() {
-        propUpRobot.set(false);
-    }
+    public static void retractProp() { propUpRobot.set(false); }
 }

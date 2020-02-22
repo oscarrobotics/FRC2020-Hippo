@@ -220,12 +220,11 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
     }
 
     private boolean atTurretTarget() {
-//        return Math.abs(turretEncoder.getDistance() - vision.getCalculations().turretRotation) < 0.05;
-        return false;
+        return Math.abs(turretEncoder.getDistance() - vision.calculations.turretRotation) < 0.05;
     }
 
     private boolean atHoodTarget() {
-        return Math.abs(getHoodAngle() - vision.calculations.exitAngle) < 1;
+        return Math.abs(getHoodAngle() - vision.calculations.exitAngle) < 2;
     }
 
     public void stopShooter() {
