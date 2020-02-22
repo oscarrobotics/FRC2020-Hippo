@@ -26,10 +26,11 @@ public class Spindexer extends SubsystemBase {
 	private final ProfiledPIDController positionPID = new ProfiledPIDController(SpindexerValues.PositionkP, 0, 0, SpindexerValues.Constraints);
 
 	private SpindexerStatus spindexerStatus;
+	private SpinMode spinMode;
 
 	private double tempSpindexerRotations = 0;
 	private double lastSpinSpeed = 0;
-	private double spindexerTarget;
+	private double spindexerTargetVelocity = 0, spindexerTargetPosition = 0;
 
 	public Spindexer(GrouchPDP pdp) {
 		spinMotor = new CANSparkMax(SpindexerValues.SPIN_MOTOR_CAN_ID, Motor.kNEO);
@@ -51,7 +52,15 @@ public class Spindexer extends SubsystemBase {
 
 	@Override
 	public void periodic() {
+		runSpindexerPID();
+	}
 
+	public void setDumbPosition(double rot) {
+		setTargetRotation(rot);
+	}
+
+	public void setDumbRPM(double rpm) {
+		setTargetVelocity(rpm);
 	}
 
 	public void setSpinRPM(double rpm, SpinnerDirection spinDirection) {
@@ -62,10 +71,10 @@ public class Spindexer extends SubsystemBase {
 		if (!waitForShooter || Math.abs(shooterCurrentRPM - shooterTargetRPM) < 100) {
 			lastSpinSpeed = rpm;
 			if (spinDirection == SpinnerDirection.Clockwise) {
-				spinMotor.set(spinPID.calculate(spinMotor.getSensorVelocity(), rpm));
+				setTargetVelocity(rpm);
 			}
 			else {
-				spinMotor.set(spinPID.calculate(spinMotor.getSensorVelocity(), -rpm));
+				setTargetVelocity(-rpm);
 			}
 		}
 	}
@@ -74,17 +83,14 @@ public class Spindexer extends SubsystemBase {
 		setSpinRPM(lastSpinSpeed, spindexerStatus.getSpinDirection() == SpinnerDirection.Clockwise ? SpinnerDirection.CounterClockwise : SpinnerDirection.Clockwise);
 	}
 
-	public void setToPocket(BallPosition position) {
-		double target = SpindexerValues.SpinPowertrain.calculateTicksFromPosition(position.rotations);
-		spinMotor.set(positionPID.calculate(spinMotor.getSensorPosition(), target));
-	}
+	public void setToPocket(BallPosition position) { setTargetRotation(position.rotations); }
 
 	public void setToEmpty() {
 		int pos;
 		if(getState() != SpindexerStatus.SpindexerState.FULL){
 			pos = spindexerStatus.getFirstEmpty();
 			var empty = intToPosition(pos);
-			setTargetPosition(empty.rotations);
+			setTargetRotation(empty.rotations);
 		}
 	}
 
@@ -92,12 +98,14 @@ public class Spindexer extends SubsystemBase {
 		spindexerStatus.update(isOverSlot);
 	}
 
-	public void setTargetPosition(double pos) {
-		spinMotor.set(positionPID.calculate(spinMotor.getSensorPosition(), SpindexerValues.SpinPowertrain.calculateTicksFromPosition(pos)));
+	public void setTargetRotation(double rot) {
+		spinMode = SpinMode.Position;
+		spindexerTargetPosition = rot;
 	}
 
-	public double getPosition() {
-		return spinMotor.getSensorPosition();
+	public void setTargetVelocity(double rpm) {
+		spinMode = SpinMode.Velocity;
+		spindexerTargetVelocity = rpm;
 	}
 
 	public void zeroSpindexer() {
@@ -114,15 +122,13 @@ public class Spindexer extends SubsystemBase {
 		return spindexerStatus.isStalling();
 	}
 
-	public double getRelativeRotations() {
-		return spinMotor.getSensorPosition() * SpindexerValues.SpinReduction;
-	}
+	public double getRelativeRotations() { return spinMotor.getSensorPosition() * SpindexerValues.SpinReduction; }
 
 	public double getAbsoluteRotations() { return spindexerStatus.getAbsoluteRotations(); }
 
-	public void stopSpin() {
-		spinMotor.set(0);
-	}
+	public double getVelocity() { return spinMotor.getSensorVelocity() * SpindexerValues.SpinReduction; }
+
+	public void stopSpin() { spinMotor.set(0); }
 
 	public void spinCounterclockwise(double pow) {
 		spinMotor.set(-OscarMath.clip(pow, 0, 1));
@@ -167,7 +173,15 @@ public class Spindexer extends SubsystemBase {
 		return false;
 	}
 
-
+	private void runSpindexerPID() {
+		double power;
+		if (spinMode == SpinMode.Position) {
+			power = positionPID.calculate(getRelativeRotations(), spindexerTargetPosition);
+		} else {
+			power = spinPID.calculate(getVelocity(), spindexerTargetVelocity);
+		}
+		spinMotor.set(power);
+	}
 
 	public BallPosition getNearestBallPosition() {
 		double pos = spinMotor.getSensorPosition();
@@ -205,10 +219,11 @@ public class Spindexer extends SubsystemBase {
 
 	public enum SpinnerDirection {
 		Clockwise,
-		CounterClockwise;
+		CounterClockwise
 	}
 
-	public CANSparkMax getSpinMotor() {
-		return spinMotor;
+	public enum SpinMode {
+		Position,
+		Velocity
 	}
 }

@@ -98,7 +98,7 @@ public class SpindexerStatus implements DashboardUpdatable {
     }
 
     public double getAbsoluteRotations() {
-        return absoluteRotations + spinMotor.getSensorPosition();
+        return absoluteRotations + spindexer.getRelativeRotations();
     }
 
     public int getFirstEmpty(){

@@ -6,7 +6,6 @@ import frc.team832.lib.driverstation.dashboard.DashboardManager;
 import frc.team832.lib.driverstation.dashboard.DashboardUpdatable;
 import frc.team832.lib.util.OscarMath;
 import frc.team832.robot.Constants;
-import frc.team832.robot.Robot;
 import frc.team832.robot.utilities.positions.BallPosition;
 
 public class SuperStructure extends SubsystemBase implements DashboardUpdatable {
@@ -32,17 +31,19 @@ public class SuperStructure extends SubsystemBase implements DashboardUpdatable 
 	public void periodic() {
 		spindexer.updateStatus(isOverBallSlot());
 		spindexerAntiStall();
-		if (spindexer.isFull()) spindexer.setTargetPosition(getNearestSafeRotationRelativeToFeeder());
+		if (spindexer.isFull()) spindexer.setTargetRotation(getNearestSafeRotationRelativeToFeeder());
 	}
 
 	public void intake() {
 		intake.setIntakeRPM(Constants.IntakeValues.IntakePowertrain.calculateMotorRpmFromSurfaceSpeed(10));
-		spindexer.setSpinRPM(Constants.SpindexerValues.SpinPowertrain.calculateMotorRpmFromWheelRpm(60), Spindexer.SpinnerDirection.Clockwise);
+		spindexer.setSpinRPM(Constants.SpindexerValues.SpinPowertrain.calculateMotorRpmFromWheelRpm(30), Spindexer.SpinnerDirection.Clockwise);
+		intake.extendIntake();
 	}
 
 	public void outtake() {
 		intake.setOuttakeRPM(Constants.IntakeValues.IntakePowertrain.calculateMotorRpmFromSurfaceSpeed(5));
-		spindexer.setSpinRPM(Constants.SpindexerValues.SpinPowertrain.calculateMotorRpmFromWheelRpm(60), Spindexer.SpinnerDirection.CounterClockwise);
+		spindexer.setSpinRPM(Constants.SpindexerValues.SpinPowertrain.calculateMotorRpmFromWheelRpm(30), Spindexer.SpinnerDirection.CounterClockwise);
+		intake.extendIntake();
 	}
 
 	public void dumbIntake(double power) {
@@ -56,7 +57,7 @@ public class SuperStructure extends SubsystemBase implements DashboardUpdatable 
 	}
 
 	public void prepareShoot() {
-		spindexer.setTargetPosition(getNearestSafeRotationRelativeToFeeder());
+		spindexer.setTargetRotation(getNearestSafeRotationRelativeToFeeder());
 		shooter.spinUp();
 //		Drivetrain.propUp();
 	}
@@ -87,7 +88,7 @@ public class SuperStructure extends SubsystemBase implements DashboardUpdatable 
 	}
 
 	public void moveSpindexerToSafePos() {
-		spindexer.setTargetPosition(getNearestSafeRotationRelativeToFeeder());
+		spindexer.setTargetRotation(getNearestSafeRotationRelativeToFeeder());
 	}
 
 	private void spindexerAntiStall() {
