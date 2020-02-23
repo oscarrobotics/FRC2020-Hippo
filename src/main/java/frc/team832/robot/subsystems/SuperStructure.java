@@ -4,6 +4,7 @@ import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.team832.lib.driverstation.dashboard.DashboardManager;
 import frc.team832.lib.driverstation.dashboard.DashboardUpdatable;
+import frc.team832.lib.motors.Motor;
 import frc.team832.lib.util.OscarMath;
 import frc.team832.robot.Constants;
 import frc.team832.robot.utilities.positions.BallPosition;
@@ -36,18 +37,18 @@ public class SuperStructure extends SubsystemBase implements DashboardUpdatable 
 
 	public void intake() {
 		intake.setIntakeRPM(Constants.IntakeValues.IntakePowertrain.calculateMotorRpmFromSurfaceSpeed(10));
-		spindexer.setSpinRPM(Constants.SpindexerValues.SpinPowertrain.calculateMotorRpmFromWheelRpm(30), Spindexer.SpinnerDirection.Clockwise);
+		spindexer.setSpinRPM(60, Spindexer.SpinnerDirection.Clockwise);
 		intake.extendIntake();
 	}
 
 	public void outtake() {
 		intake.setOuttakeRPM(Constants.IntakeValues.IntakePowertrain.calculateMotorRpmFromSurfaceSpeed(5));
-		spindexer.setSpinRPM(Constants.SpindexerValues.SpinPowertrain.calculateMotorRpmFromWheelRpm(30), Spindexer.SpinnerDirection.CounterClockwise);
+		spindexer.setSpinRPM(60, Spindexer.SpinnerDirection.CounterClockwise);
 		intake.extendIntake();
 	}
 
-	public void dumbIntake(double power) {
-		intake.intake(OscarMath.map(power, -1, 1, 0, 1));
+	public void dumbIntake(double slider) {
+		intake.setIntakeRPM(OscarMath.map(slider, -1, 1, 0, Motor.kNEO550.freeSpeed));
 		intake.extendIntake();
 	}
 

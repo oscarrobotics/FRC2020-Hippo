@@ -3,6 +3,7 @@ package frc.team832.robot.subsystems;
 import com.revrobotics.CANPIDController;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.AnalogInput;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.controller.ProfiledPIDController;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -16,6 +17,7 @@ import frc.team832.lib.power.GrouchPDP;
 import frc.team832.lib.power.impl.SmartMCAttachedPDPSlot;
 import frc.team832.lib.sensors.REVThroughBorePWM;
 import frc.team832.lib.util.OscarMath;
+import frc.team832.robot.Constants;
 import frc.team832.robot.Constants.ShooterValues;
 
 public class Shooter extends SubsystemBase implements DashboardUpdatable {
@@ -28,7 +30,7 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
     private final REVSmartServo_Continuous hoodServo;
 
     private final NetworkTableEntry dashboard_wheelRPM, dashboard_flywheelFF, dashboard_hoodPos, dashboard_turretPos, dashboard_turretPow, dashboard_wheelTargetRPM,
-            dashboard_feedWheelRPM, dashboard_feedWheelTargetRPM, dashboard_feedFF;
+            dashboard_feedWheelRPM, dashboard_feedWheelTargetRPM, dashboard_feedFF, dashboard_turretTarget;
 
 
     private ShootMode mode = ShootMode.Shooting, lastMode = ShootMode.Shooting;
@@ -77,17 +79,18 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
         hoodPID.reset();
         feedPID.reset();
 
-        turretTarget = turretEncoder.getDistance();
+        turretTarget = getTurretRotations();
 
         dashboard_wheelRPM = DashboardManager.addTabItem(this, "Flywheel RPM", 0.0);
         dashboard_wheelTargetRPM = DashboardManager.addTabItem(this, "Target Flywheel RPM", 0.0);
         dashboard_hoodPos = DashboardManager.addTabItem(this, "Hood Position", 0.0);
-        dashboard_turretPos = DashboardManager.addTabItem(this, "Turret Position", 0.0);
-        dashboard_turretPow = DashboardManager.addTabItem(this, "Turret Power", 0.0);
         dashboard_flywheelFF = DashboardManager.addTabItem(this, "Flywheel FF", 0.0);
         dashboard_feedWheelRPM = DashboardManager.addTabItem(this, "Feed Wheel RPM", 0.0);
         dashboard_feedWheelTargetRPM = DashboardManager.addTabItem(this, "Target Feed Wheel RPM", 0.0);
         dashboard_feedFF = DashboardManager.addTabItem(this, "Feeder FF", 0.0);
+        dashboard_turretPos = DashboardManager.addTabItem(this, "Turret Position", 0.0);
+        dashboard_turretPow = DashboardManager.addTabItem(this, "Turret Power", 0.0);
+        dashboard_turretTarget = DashboardManager.addTabItem(this, "Turret Target", 0.0);
 
         this.vision = vision;
 
@@ -96,20 +99,42 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
 
     @Override
     public void periodic() {
-//        trackTarget();
-        handlePID();
+//        handlePID();
     }
 
+
+//    final double startPos = getTurretRotations();
+//
+//
+//    private void find_kS() {
+//        double difference = Math.abs(startPos - getTurretRotations());
+//        System.out.println("Diff:" + difference);
+//        if (difference > 0.005) {
+//            System.out.println(turretMotor.get());
+//            return;
+//        }
+//
+//        double newPower = turretMotor.get() + 0.005;
+//        turretMotor.set(newPower);
+//
+//    }
 
     @Override
     public void updateDashboardData() {
         dashboard_wheelRPM.setDouble(primaryMotor.getSensorVelocity() * ShooterValues.FlywheelReduction);
         dashboard_feedWheelRPM.setDouble(feedMotor.getSensorVelocity());
-        dashboard_turretPos.setDouble(turretEncoder.getDistance());
+        dashboard_turretPos.setDouble(getTurretRotations());
         dashboard_turretPow.setDouble(turretMotor.getOutputVoltage());
+        dashboard_turretTarget.setDouble(turretTarget);
     }
 
     public void setDumbTurretPosition(double rot) {
+        setTurretTargetRotation(rot);
+    }
+
+    public void setDumbPower(double pow) {
+        turretMotor.set(pow);
+//        System.out.println(pow);
     }
 
     private void setWheelRPM(double wheelTargetRPM) {
@@ -151,7 +176,7 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
 
     public void setHeadingRotation(double rotations) {
         double targetRotation = OscarMath.clip(rotations, 0.25, 0.75);
-        setTurretTargetPosition(targetRotation);
+        setTurretTargetRotation(targetRotation);
     }
 
     public void setHeadingDegrees(double degrees) {
@@ -165,7 +190,7 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
 
     private void setFeedTargetRPM(double rpm) { feedTarget = rpm; }
 
-    public void setTurretTargetPosition(double pos){ turretTarget = pos; }
+    public void setTurretTargetRotation(double pos){ turretTarget = pos; }
 
     public void setHood(double pow) {
         hoodServo.setSpeed(pow);
@@ -187,13 +212,13 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
         hoodServo.setSpeed(0);
     }
 
-    public void idleTurret() { setTurretTargetPosition(getTurretRotations()); }
+    public void idleTurret() { setTurretTargetRotation(getTurretRotations()); }
 
     private double getHoodAngle() {
         return OscarMath.map(potentiometer.getVoltage(), 0, 5, 10, 80);
     }
 
-    public double getTurretRotations() { return turretEncoder.getDistance(); }
+    public double getTurretRotations() { return turretEncoder.get(); }
 
     public void flywheelTrackTarget() {
         setWheelRPM(vision.calculations.flywheelRPM);
@@ -220,7 +245,7 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
     }
 
     private boolean atTurretTarget() {
-        return Math.abs(turretEncoder.getDistance() - vision.calculations.turretRotation) < 0.05;
+        return Math.abs(getTurretRotations() - vision.calculations.turretRotation) < 0.05;
     }
 
     private boolean atHoodTarget() {
@@ -286,7 +311,25 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
         runTurretPID();
     }
 
-    private void runTurretPID() { turretMotor.set(-turretPID.calculate(getTurretRotations(), turretTarget)); }
+    private void runTurretPID() {
+        double targetRotations = turretTarget;
+        if (getTurretRotations() < ShooterValues.PracticeTurretRightPosition && targetRotations < ShooterValues.PracticeTurretRightPosition) {
+            targetRotations = ShooterValues.PracticeTurretRightPosition;
+        } else if (getTurretRotations() > ShooterValues.PracticeTurretLeftPosition && targetRotations > ShooterValues.PracticeTurretLeftPosition) {
+            targetRotations = ShooterValues.PracticeTurretLeftPosition;
+        }
+
+        double power = -turretPID.calculate(getTurretRotations(), targetRotations);
+
+        if (power > 0.01) {
+            power += ShooterValues.TurretClockwisekF;
+        } else if (power < 0.01) {
+            power += ShooterValues.TurretCounterClockwisekF;
+        }
+
+        turretMotor.set(power);
+    }
+
 
     private void runFeederPID() {
         double rpm = feedTarget;

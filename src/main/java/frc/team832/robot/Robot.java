@@ -28,6 +28,7 @@ public class Robot extends OscarTimedRobot {
 
     private static final Notifier drivetrainTelemetryNotifier = new Notifier(drivetrain::updateDashboardData);
     private static final Notifier shooterTelemetryNotifier = new Notifier(shooter::updateDashboardData);
+    private static final Notifier intakeTelemetryNotifier = new Notifier(intake::updateDashboardData);
 
     @Override
     public void robotInit() {
@@ -40,6 +41,7 @@ public class Robot extends OscarTimedRobot {
 
         if (intake.initSuccessful) {
             System.out.println("Intake - init OK");
+            intakeTelemetryNotifier.startPeriodic(0.02);
         } else {
             System.out.println("Intake - init FAILED");
         }
@@ -115,6 +117,7 @@ public class Robot extends OscarTimedRobot {
         shooter.setFlyheelNeutralMode(mode);
         shooter.setTurretNeutralMode(mode);
         spindexer.setNeutralMode(mode);
+        climber.zeroDeploy();
     }
 
     @Override

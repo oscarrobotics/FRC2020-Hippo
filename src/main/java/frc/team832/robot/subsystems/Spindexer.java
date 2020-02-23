@@ -40,6 +40,8 @@ public class Spindexer extends SubsystemBase {
 		spinMotor.setSensorPhase(true);
 		spinMotor.setNeutralMode(NeutralMode.kBrake);
 
+		zeroSpindexer();
+
 		spindexerStatus = new SpindexerStatus(pdp, this, spinMotor);
 
 		hallEffect = new HallEffect(SpindexerValues.HALL_EFFECT_DIO_CHANNEL);
@@ -52,7 +54,7 @@ public class Spindexer extends SubsystemBase {
 
 	@Override
 	public void periodic() {
-		runSpindexerPID();
+//	    runSpindexerPID();
 	}
 
 	public void setDumbPosition(double rot) {
@@ -122,13 +124,13 @@ public class Spindexer extends SubsystemBase {
 		return spindexerStatus.isStalling();
 	}
 
-	public double getRelativeRotations() { return spinMotor.getSensorPosition() * SpindexerValues.SpinReduction; }
+	public double getRelativeRotations() { return (spinMotor.getSensorPosition() * SpindexerValues.SpinReduction) % 1; }
 
 	public double getAbsoluteRotations() { return spindexerStatus.getAbsoluteRotations(); }
 
 	public double getVelocity() { return spinMotor.getSensorVelocity() * SpindexerValues.SpinReduction; }
 
-	public void stopSpin() { spinMotor.set(0); }
+	public void stopSpin() { setTargetVelocity(0); }
 
 	public void spinCounterclockwise(double pow) {
 		spinMotor.set(-OscarMath.clip(pow, 0, 1));

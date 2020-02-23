@@ -14,6 +14,7 @@ import frc.team832.lib.motors.Gearbox;
 import frc.team832.lib.motors.Motor;
 import frc.team832.lib.power.PDPPortNumber;
 import frc.team832.lib.util.ClosedLoopConfig;
+import frc.team832.lib.util.OscarMath;
 
 import java.nio.channels.ClosedSelectorException;
 
@@ -113,14 +114,17 @@ public class Constants {
         public static final Constraints TurretConstraints = new Constraints(TurretPowerTrain.calculateMotorRpmFromWheelRpm(300),/*was 90*/
                 TurretPowerTrain.calculateMotorRpmFromWheelRpm(9000));//was 450
 
-        public static final double TurretkP = 4.0;
-        public static final double TurretkD = 1.0;
-        public static final double TurretkF = 0;
+        public static final double TurretkP = 2.0;
+        public static final double TurretClockwisekF = 0.05;//.1542
+        public static final double TurretCounterClockwisekF = 0.055;//.1645
 
         public static final double FeedkP = 0.0001;
         public static final double FeedkF = 0;
 
-        public static final double PracticeTurretForwardPosition = .33;
+        public static final double PracticeTurretLeftPosition = 0.53;
+        public static final double PracticeTurretRightPosition = 0.12;
+        public static final double PracticeTurretForwardPosition = (1.0/3.0);
+
         //Feeder
         public static final float FeedReduction = 1f;
         private static final Gearbox FeedGearbox = new Gearbox(FeedReduction);
@@ -133,6 +137,7 @@ public class Constants {
         private static final double FeederkA = 0.0;
 
         public static final SimpleMotorFeedforward FeederFF = new SimpleMotorFeedforward(FeederkS, FeederkV, FeederkA);
+
     }
 
     public static class IntakeValues {
@@ -140,13 +145,13 @@ public class Constants {
 
         public static final PDPPortNumber INTAKE_MOTOR_PDP_SLOT = PDPPortNumber.Port11;
 
-        public static final float IntakeReduction = 1f / (18f/36f);
+        public static final float IntakeReduction = 1f / (36f/18f);
         private static final Gearbox IntakeGearbox = new Gearbox(IntakeReduction);
         public static final WheeledPowerTrain IntakePowertrain = new WheeledPowerTrain(IntakeGearbox, Motor.kNEO550, 1, Units.inchesToMeters(2));
 
-        private static final double kS = 0.0;
-        private static final double kV = 0.0;
-        private static final double kA = 0.0;
+        private static final double kS = 0.01;
+        private static final double kV = Motor.kNEO550.kv;
+        private static final double kA = 0.001;
 
         public static final SimpleMotorFeedforward FF = new SimpleMotorFeedforward(kS, kV, kA);
     }
@@ -163,13 +168,12 @@ public class Constants {
         private static final Gearbox SpinGearbox = new Gearbox(SpinReduction);
         public static final WheeledPowerTrain SpinPowertrain = new WheeledPowerTrain(SpinGearbox, Motor.kNEO, 1, Units.inchesToMeters(20));
 
-        public static final double SpinkP = 0;
-        public static final double SpinkF = 0;
+        public static final double SpinkP = 0.01;
 
-        public static Constraints Constraints = new Constraints(2, 8);
+        public static final double PositionkP = 2.0;
 
-        public static final double PositionkP = 0;
-        public static final double PositionkF = 0;
+        public static Constraints Constraints = new Constraints(SpinPowertrain.calculateMotorRpmFromWheelRpm(90), SpinPowertrain.calculateMotorRpmFromWheelRpm(180));
+
     }
 
     public static class ClimberValues {
@@ -177,20 +181,19 @@ public class Constants {
         public static final int DEPLOY_CAN_ID = 8;
 
         public static final PDPPortNumber WINCH_PDP_PORT = PDPPortNumber.Port13;
-        public static final PDPPortNumber DEPLOY_PDP_PORT = PDPPortNumber.Port14;
+        public static final PDPPortNumber DEPLOY_PDP_PORT = PDPPortNumber.Port11;
 
         public static final float ExtendReduction = 1f / (5f/1f);
         private static final Gearbox ExtendGearbox = new Gearbox(ExtendReduction);
         public static final WheeledPowerTrain ExtendPowertrain = new WheeledPowerTrain(ExtendGearbox, Motor.kNEO, 1, Units.inchesToMeters(2));
 
-        public static final double MaxExtend = ExtendPowertrain.calculateTicksFromWheelDistance(Units.inchesToMeters(80));
-        public static final double MinExtend = ExtendPowertrain.calculateTicksFromWheelDistance(Units.inchesToMeters(54));
-        public static final double Retract = ExtendPowertrain.calculateTicksFromWheelDistance(Units.inchesToMeters(0));
+        public static final double MaxExtend = -62;
+        public static final double MinExtend = -40;
+        public static final double Retract = -1;
 
-        public static final Constraints ExtendConstraints = new Constraints(ExtendPowertrain.calculateMotorRpmFromSurfaceSpeed(0.5),
-                ExtendPowertrain.calculateMotorRpmFromSurfaceSpeed(1));
+        public static final Constraints ExtendConstraints = new Constraints(120, 480);
 
-        public static final double ExtendkP = 0.001;
+        public static final double ExtendkP = 0.07;
         public static final double ExtendkF = 0.0;
 
     }

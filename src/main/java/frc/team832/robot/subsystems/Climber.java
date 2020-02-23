@@ -21,6 +21,8 @@ public class Climber extends SubsystemBase implements DashboardUpdatable {
 
     private Solenoid climbLock;
 
+    private double extendTarget = Constants.ClimberValues.Retract;
+
     private SmartMCAttachedPDPSlot winchSlot, deploySlot;
 
     private ProfiledPIDController extendPID = new ProfiledPIDController(Constants.ClimberValues.ExtendkP, 0, 0, Constants.ClimberValues.ExtendConstraints);
@@ -40,7 +42,9 @@ public class Climber extends SubsystemBase implements DashboardUpdatable {
         winchMotor.wipeSettings();
         deployMotor.wipeSettings();
 
-        winchMotor.setNeutralMode(NeutralMode.kBrake);
+        deployMotor.rezeroSensor();
+
+        winchMotor.setNeutralMode(NeutralMode.kCoast);
         deployMotor.setNeutralMode(NeutralMode.kBrake);
 
         winchMotor.setInverted(false);
@@ -55,12 +59,17 @@ public class Climber extends SubsystemBase implements DashboardUpdatable {
         initSuccessful = winchMotor.getCANConnection() && deployMotor.getCANConnection();
     }
 
+    @Override
+    public void periodic() {
+        runExtendPID();
+    }
+
     public void unwindWinch() {
-        winchMotor.set(-0.25);
+        winchMotor.set(-0.5);
     }
 
     public void windWinch() {
-        winchMotor.set(0.25);
+        winchMotor.set(0.5);
     }
 
     public void extendHook() {
@@ -68,7 +77,11 @@ public class Climber extends SubsystemBase implements DashboardUpdatable {
     }
 
     public void retractHook() {
-        deployMotor.set(extendPID.calculate(deployMotor.getSensorPosition(), Constants.ClimberValues.Retract));
+        setTargetPosition(Constants.ClimberValues.Retract);
+    }
+
+    public void powerHook(double pow){
+        deployMotor.set(pow);
     }
 
     public void stopExtend() {
@@ -77,7 +90,16 @@ public class Climber extends SubsystemBase implements DashboardUpdatable {
 
     public void adjustHook(double slider) {
         double targetPos = OscarMath.clipMap(slider, -1, 1, Constants.ClimberValues.MinExtend, Constants.ClimberValues.MaxExtend);
-        deployMotor.set(extendPID.calculate(deployMotor.getSensorPosition(), targetPos));
+        setTargetPosition(targetPos);
+
+    }
+
+    private void setTargetPosition(double pos) {
+        extendTarget = pos;
+    }
+
+    private void runExtendPID() {
+        deployMotor.set(extendPID.calculate(deployMotor.getSensorPosition(), extendTarget));
     }
 
     public void climbDown() {
@@ -97,11 +119,15 @@ public class Climber extends SubsystemBase implements DashboardUpdatable {
     }
 
     public void lockClimb() {
-        climbLock.set(true);
+        climbLock.set(false);
     }
 
     public void unlockClimb() {
-        climbLock.set(false);
+        climbLock.set(true);
+    }
+
+    public void zeroDeploy() {
+        deployMotor.rezeroSensor();
     }
 
     @Override
