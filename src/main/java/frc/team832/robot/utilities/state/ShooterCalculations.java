@@ -11,6 +11,9 @@ public class ShooterCalculations implements DashboardUpdatable {
     public double flywheelRPM, exitAngle, turretRotation;
     public double areaToMeters = 0.0001;
 
+    private final double CameraAngle = 45;
+    private final double PowerPortHeightMeters = 2.5;
+
     private NetworkTableEntry dashboard_distance, dashboard_rotation, dashboard_flywheelRPM, dashboard_exitAngle, dashboard_turretRotation;
 
     public ShooterCalculations() {
@@ -21,14 +24,12 @@ public class ShooterCalculations implements DashboardUpdatable {
         dashboard_turretRotation = DashboardManager.addTabItem(this, "Turret Rotation", 0.0);
     }
 
-    public void update(double pitch, double yaw, double area, Pose2d targetPose, Pose2d robotPose) {
+    public void update(double pitch, Pose2d targetPose, Pose2d robotPose) {
         double distance = targetPose.getTranslation().getDistance(robotPose.getTranslation());
-        double rotation = targetPose.getRotation().rotateBy(robotPose.getRotation()).getDegrees() / 360.0;
-        //-targetPose.getRotation().getDegrees() / 360.0;
-        // (yaw / 360.0);//assuming yaw input is -179 to 180
+        double rotation = targetPose.getRotation().rotateBy(robotPose.getRotation()).getDegrees() / 360.0; //-targetPose.getRotation().getDegrees() / 360.0;
 
         flywheelRPM = distance < 2 ? 4000 : 8000;
-        exitAngle = pitch + 5;//needs testing
+        exitAngle = (pitch - CameraAngle) + 5;//needs testing
         turretRotation = rotation;
 
         dashboard_distance.setDouble(distance);
@@ -37,6 +38,21 @@ public class ShooterCalculations implements DashboardUpdatable {
         dashboard_turretRotation.setDouble(turretRotation);
         dashboard_exitAngle.setDouble(exitAngle);
 
+    }
+
+    public void update(double pitch, double yaw, double area) {
+        double rotation = yaw / 360.0;
+        double distance = PowerPortHeightMeters / Math.tan(pitch - CameraAngle);
+
+        flywheelRPM = distance < 2 ? 4000 : 8000;
+        exitAngle = pitch + 5;//needs testing
+        turretRotation = rotation;//assuming yaw input is -179 to 180
+
+        dashboard_distance.setDouble(distance);
+        dashboard_rotation.setDouble(rotation);
+        dashboard_flywheelRPM.setDouble(flywheelRPM);
+        dashboard_turretRotation.setDouble(turretRotation);
+        dashboard_exitAngle.setDouble(exitAngle);
     }
 
     public double getMetersFromArea(double area) {
