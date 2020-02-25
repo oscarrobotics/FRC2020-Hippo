@@ -3,7 +3,6 @@ package frc.team832.robot.subsystems;
 import com.revrobotics.CANPIDController;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.AnalogInput;
-import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.controller.ProfiledPIDController;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -17,7 +16,6 @@ import frc.team832.lib.power.GrouchPDP;
 import frc.team832.lib.power.impl.SmartMCAttachedPDPSlot;
 import frc.team832.lib.sensors.REVThroughBorePWM;
 import frc.team832.lib.util.OscarMath;
-import frc.team832.robot.Constants;
 import frc.team832.robot.Constants.ShooterValues;
 
 public class Shooter extends SubsystemBase implements DashboardUpdatable {
@@ -132,9 +130,9 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
         setTurretTargetRotation(rot);
     }
 
-    public void setDumbPower(double pow) {
-        turretMotor.set(pow);
-//        System.out.println(pow);
+    public void setTurretWithSlider(double slider) {
+        double position = OscarMath.clipMap(slider, -1, 1, ShooterValues.PracticeTurretRightPosition, ShooterValues.PracticeTurretLeftPosition);
+        setDumbTurretPosition(position);
     }
 
     private void setWheelRPM(double wheelTargetRPM) {
@@ -311,11 +309,18 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
         runTurretPID();
     }
 
+    protected TurretSafetyState isTurretSafe(double turretTarget, double turretPosition) {
+        if (turretTarget < ShooterValues.PracticeTurretRightPosition || turretPosition < ShooterValues.PracticeTurretRightPosition) return TurretSafetyState.FarRight;
+        else if (turretTarget > ShooterValues.PracticeTurretLeftPosition || turretPosition > ShooterValues.PracticeTurretLeftPosition) return TurretSafetyState.FarLeft;
+        else return TurretSafetyState.Safe;
+    }
+
     private void runTurretPID() {
         double targetRotations = turretTarget;
-        if (getTurretRotations() < ShooterValues.PracticeTurretRightPosition && targetRotations < ShooterValues.PracticeTurretRightPosition) {
+        TurretSafetyState safety = isTurretSafe(targetRotations, getTurretRotations());
+        if (safety == TurretSafetyState.FarRight) {
             targetRotations = ShooterValues.PracticeTurretRightPosition;
-        } else if (getTurretRotations() > ShooterValues.PracticeTurretLeftPosition && targetRotations > ShooterValues.PracticeTurretLeftPosition) {
+        } else if (safety == TurretSafetyState.FarLeft) {
             targetRotations = ShooterValues.PracticeTurretLeftPosition;
         }
 
@@ -347,10 +352,15 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
         return "Shooter";
     }
 
-
     public enum ShootMode {
         SpinUp,
         Shooting,
         Idle
+    }
+
+    public enum TurretSafetyState {
+        FarLeft,
+        FarRight,
+        Safe
     }
 }

@@ -189,11 +189,11 @@ public class Constants {
 
         public static final double MaxExtend = -62;
         public static final double MinExtend = -40;
-        public static final double Retract = -1;
+        public static final double Retract = -0.5;
 
         public static final Constraints ExtendConstraints = new Constraints(120, 480);
 
-        public static final double ExtendkP = 0.07;
+        public static final double ExtendkP = 0.08;
         public static final double ExtendkF = 0.0;
 
     }

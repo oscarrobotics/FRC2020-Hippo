@@ -33,7 +33,7 @@ public class Vision extends ChameleonVisionSubsystem implements DashboardUpdatab
 	@Override
 	public void consumeTarget (VisionTarget target) {
 		if (target.isValid) {
-			calculations.update(target.pitch, target.yaw, target.area, target.poseMeters, drivetrain.getLatestPose());
+			calculations.update(target.pitch, target.yaw, target.area);
 		}
 	}
 

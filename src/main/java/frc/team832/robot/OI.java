@@ -47,15 +47,15 @@ public class OI {
 //		stratComInterface.getSCMinus().whenHeld(new StartEndCommand(climber::climbDown, climber::stopClimb, climber));
 
 
-//		stratComInterface.getArcadeWhiteLeft().whenPressed(new PrepareShooter(superStructure, pneumatics, shooter, spindexer));
-//		stratComInterface.getArcadeBlackLeft().whenPressed(new ShootCommandGroup(superStructure, pneumatics, shooter, spindexer));
+//		stratComInterface.getArcadeBlackLeft().whenHeld(new StartEndCommand(superStructure::intake, superStructure::idleIntake, superStructure, shooter, spindexer));
+//		stratComInterface.getArcadeBlackLeft().whenHeld(new StartEndCommand(superStructure::outtake, superStructure::idleIntake, superStructure, shooter, spindexer));
 
-//		stratComInterface.getArcadeWhiteRight().whenHeld(new StartEndCommand(superStructure::intake, superStructure::idleIntake, superStructure, intake, spindexer));
-//		stratComInterface.getArcadeBlackRight().whenHeld(new StartEndCommand(superStructure::outtake, superStructure::idleIntake, superStructure, intake, spindexer));
+//		stratComInterface.getArcadeWhiteLeft().whenPressed(new PrepareShooter(superStructure, pneumatics, shooter, spindexer));
+//		stratComInterface.getArcadeWhiteRight().whenPressed(new ShootCommandGroup(superStructure, pneumatics, shooter, spindexer));
 
 //		stratComInterface.getSCSideTop().whenHeld(new StartEndCommand(pneumatics::extendWOFManipulator, pneumatics::retractWOFManipulator, pneumatics));
-//		stratComInterface.getSC1().whenHeld(new StartEndCommand(wheelOfFortune::spinCounterclockwise, wheelOfFortune::stopSpin, wheelOfFortune));
-//		stratComInterface.getSC3().whenHeld(new StartEndCommand(wheelOfFortune::spinClockwise, wheelOfFortune::stopSpin, wheelOfFortune));
+//		stratComInterface.getSC1().whenHeld(new StartEndCommand(wheelOfFortune::spinCounterclockwise, wheelOfFortune::stopSpin, wheelOfFortune));//torque vector up
+//		stratComInterface.getSC3().whenHeld(new StartEndCommand(wheelOfFortune::spinClockwise, wheelOfFortune::stopSpin, wheelOfFortune));//torque vector down
 //		stratComInterface.getSC2().whenHeld(new RunEndCommand(wheelOfFortune::spinThreeTimes, wheelOfFortune::stopSpin, wheelOfFortune));
 
 		//Dumb testing commands
