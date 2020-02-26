@@ -54,7 +54,7 @@ public class Spindexer extends SubsystemBase {
 
 	@Override
 	public void periodic() {
-//	    runSpindexerPID();
+	    runSpindexerPID();
 	}
 
 	public void setDumbPosition(double rot) {
@@ -146,10 +146,6 @@ public class Spindexer extends SubsystemBase {
 
 	public boolean getBallSensor() {
 		return getBallSensorRaw() >= Units.inchesToMeters(3);
-	}
-
-	public boolean isSafe(double feederPos) {
-		return Math.abs(feederPos - getRelativeRotations()) < .05;
 	}
 
 	public boolean isFull() {

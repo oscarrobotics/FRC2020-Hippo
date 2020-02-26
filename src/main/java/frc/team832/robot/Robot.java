@@ -29,6 +29,7 @@ public class Robot extends OscarTimedRobot {
     private static final Notifier drivetrainTelemetryNotifier = new Notifier(drivetrain::updateDashboardData);
     private static final Notifier shooterTelemetryNotifier = new Notifier(shooter::updateDashboardData);
     private static final Notifier intakeTelemetryNotifier = new Notifier(intake::updateDashboardData);
+    private static final Notifier visionTelemetryNotifier = new Notifier(vision::updateDashboardData);
 
     @Override
     public void robotInit() {
@@ -48,6 +49,7 @@ public class Robot extends OscarTimedRobot {
 
         if (vision.initSuccessful) {
             System.out.println("Vision - init OK");
+            visionTelemetryNotifier.startPeriodic(0.02);
         } else {
             System.out.println("Vision - init FAILED");
         }

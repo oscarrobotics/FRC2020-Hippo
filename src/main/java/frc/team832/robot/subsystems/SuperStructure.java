@@ -116,6 +116,10 @@ public class SuperStructure extends SubsystemBase implements DashboardUpdatable 
 		return calculateSpindexerRotRelativeToFeeder(spindexer.getNearestBallPosition().rotations);
 	}
 
+	public boolean isSpindexerReadyShoot(double safePos, double curPos) {
+		return Math.abs(safePos - curPos) < 0.05;
+	}
+
 	public boolean isOverBallSlot() {
 		return Math.abs(spindexer.getRelativeRotations() - getNearestBallRotationRelativeToFeeder()) < 0.05;
 	}
@@ -129,10 +133,12 @@ public class SuperStructure extends SubsystemBase implements DashboardUpdatable 
 	}
 
 	public boolean isShooterPrepared() {
-		return shooter.readyToShoot();
+		return shooter.readyToShoot() && isSpindexerReadyShoot(getNearestSafeRotationRelativeToFeeder(), spindexer.getRelativeRotations());
 	}
 
-    @Override
+
+
+	@Override
     public String getDashboardTabName() {
         return "Superstructure";
     }

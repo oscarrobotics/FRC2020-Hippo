@@ -15,7 +15,7 @@ public class ShootCommandGroup extends SequentialCommandGroup {
                         superStructure::moveSpindexerToSafePos,
                         () -> {},
                         (ignored) -> superStructure.idleSpindexer(),
-                        () -> spindexer.isSafe(superStructure.getNearestSafeRotationRelativeToFeeder()),
+                        () ->superStructure.isSpindexerReadyShoot(superStructure.getNearestSafeRotationRelativeToFeeder(), spindexer.getRelativeRotations()),
                         spindexer),
 
                 new PrepareShooter(superStructure, shooter, spindexer),

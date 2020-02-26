@@ -13,7 +13,7 @@ public class ShooterCalculations implements DashboardUpdatable {
     public double flywheelRPM, exitAngle, turretRotation;
     public double areaToMeters = 0.0001;
 
-    private final double CameraAngle = 45;
+    private final double CameraAngle = 33.47;
     private final double PowerPortHeightMeters = 2.5;
 
     private NetworkTableEntry dashboard_distance, dashboard_rotation, dashboard_flywheelRPM, dashboard_exitAngle, dashboard_turretRotation;

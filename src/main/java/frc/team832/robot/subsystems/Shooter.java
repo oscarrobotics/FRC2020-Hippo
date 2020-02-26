@@ -42,7 +42,7 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
 
     private final SmartMCAttachedPDPSlot primaryFlywheelSlot, secondaryFlywheelSlot, turretSlot, feederSlot;
 
-    private double turretTarget, feedTarget;
+    private double turretPosTarget, feedTarget;
 
     public Shooter(GrouchPDP pdp, Vision vision) {
         DashboardManager.addTab(this, this);
@@ -77,7 +77,7 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
         hoodPID.reset();
         feedPID.reset();
 
-        turretTarget = getTurretRotations();
+        turretPosTarget = getTurretRotations();
 
         dashboard_wheelRPM = DashboardManager.addTabItem(this, "Flywheel RPM", 0.0);
         dashboard_wheelTargetRPM = DashboardManager.addTabItem(this, "Target Flywheel RPM", 0.0);
@@ -123,7 +123,7 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
         dashboard_feedWheelRPM.setDouble(feedMotor.getSensorVelocity());
         dashboard_turretPos.setDouble(getTurretRotations());
         dashboard_turretPow.setDouble(turretMotor.getOutputVoltage());
-        dashboard_turretTarget.setDouble(turretTarget);
+        dashboard_turretTarget.setDouble(turretPosTarget);
     }
 
     public void setDumbTurretPosition(double rot) {
@@ -188,7 +188,7 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
 
     private void setFeedTargetRPM(double rpm) { feedTarget = rpm; }
 
-    public void setTurretTargetRotation(double pos){ turretTarget = pos; }
+    public void setTurretTargetRotation(double pos){ turretPosTarget = pos; }
 
     public void setHood(double pow) {
         hoodServo.setSpeed(pow);
@@ -228,7 +228,9 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
 
     private void turretTrackTarget() {
         setHeadingRotation(vision.calculations.turretRotation);
+
     }
+
 
     public boolean readyToShoot() {
         return atShootingRpm() && atTurretTarget() && atHoodTarget() && atFeedRpm();
@@ -316,7 +318,7 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
     }
 
     private void runTurretPID() {
-        double targetRotations = turretTarget;
+        double targetRotations = turretPosTarget;
         TurretSafetyState safety = isTurretSafe(targetRotations, getTurretRotations());
         if (safety == TurretSafetyState.FarRight) {
             targetRotations = ShooterValues.PracticeTurretRightPosition;

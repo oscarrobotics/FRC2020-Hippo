@@ -18,7 +18,10 @@ public class Vision extends ChameleonVisionSubsystem implements DashboardUpdatab
 	private final NetworkTableEntry dashboard_pitch, dashboard_yaw, dashboard_area, dashboard_isValid;
 
 	public Vision(Drivetrain drivetrain) {
-		super("ACTUALLY DO THIS LATER", 0);//TODO: fix this
+		super("OscarEye", 0);//TODO: fix this
+
+		DashboardManager.addTab(this, this);
+
 
 		dashboard_area = DashboardManager.addTabItem(this, "Area", 0.0);
 		dashboard_pitch = DashboardManager.addTabItem(this, "Pitch", 0.0);
@@ -28,6 +31,11 @@ public class Vision extends ChameleonVisionSubsystem implements DashboardUpdatab
 		this.drivetrain = drivetrain;
 
 		initSuccessful = true;
+	}
+
+	@Override
+	public void periodic(){
+		updateDashboardData();
 	}
 
 	@Override
