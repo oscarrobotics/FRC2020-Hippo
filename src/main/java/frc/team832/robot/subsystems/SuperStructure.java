@@ -1,6 +1,9 @@
 package frc.team832.robot.subsystems;
 
 import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.FunctionalCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.team832.lib.driverstation.dashboard.DashboardManager;
 import frc.team832.lib.driverstation.dashboard.DashboardUpdatable;
@@ -8,6 +11,7 @@ import frc.team832.lib.motors.Motor;
 import frc.team832.lib.util.OscarMath;
 import frc.team832.robot.Constants;
 import frc.team832.robot.utilities.positions.BallPosition;
+import frc.team832.robot.utilities.state.SpindexerStatus;
 
 public class SuperStructure extends SubsystemBase implements DashboardUpdatable {
 
@@ -16,6 +20,10 @@ public class SuperStructure extends SubsystemBase implements DashboardUpdatable 
 	private Spindexer spindexer;
 
 	private NetworkTableEntry dashboard_mode, dashboard_lastMode;
+	private SuperstructureState _state;
+
+	private PrepareShootCommand prepareShootCommand = new PrepareShootCommand();
+	private ShootCommand shootCommand = new ShootCommand();
 
 	public SuperStructure(Intake intake, Shooter shooter, Spindexer spindexer) {
 		this.intake = intake;
@@ -30,9 +38,7 @@ public class SuperStructure extends SubsystemBase implements DashboardUpdatable 
 
 	@Override
 	public void periodic() {
-		spindexer.updateStatus(isOverBallSlot());
-		spindexerAntiStall();
-		if (spindexer.isFull()) spindexer.setTargetRotation(getNearestSafeRotationRelativeToFeeder());
+		handleState();
 	}
 
 	public void intake() {
@@ -59,13 +65,13 @@ public class SuperStructure extends SubsystemBase implements DashboardUpdatable 
 
 	public void prepareShoot() {
 		spindexer.setTargetRotation(getNearestSafeRotationRelativeToFeeder());
-		shooter.spinUp();
+		shooter.setMode(Shooter.ShootMode.SpinUp);
 //		Drivetrain.propUp();
 	}
 
 	public void shoot() {
 		shooter.setMode(Shooter.ShootMode.Shooting);
-		spindexer.setSpinRPM(Constants.SpindexerValues.SpinPowertrain.calculateMotorRpmFromWheelRpm(120), Spindexer.SpinnerDirection.CounterClockwise);
+		spindexer.setSpinRPM(Constants.SpindexerValues.SpinPowertrain.calculateMotorRpmFromWheelRpm(60), Spindexer.SpinnerDirection.CounterClockwise);
 	}
 
 	public void idleIntake() {
@@ -74,10 +80,11 @@ public class SuperStructure extends SubsystemBase implements DashboardUpdatable 
 	}
 
 	public void idleSpindexer() {
-		spindexer.setSpinRPM(Constants.SpindexerValues.SpinPowertrain.calculateMotorRpmFromWheelRpm(30), Spindexer.SpinnerDirection.CounterClockwise);
+		spindexer.stopSpin();
+//		spindexer.setSpinRPM(Constants.SpindexerValues.SpinPowertrain.calculateMotorRpmFromWheelRpm(30), Spindexer.SpinnerDirection.CounterClockwise);
 	}
 
-	public void idleShooter(){
+	public void idleShooter() {
 		shooter.idle();
 //		Drivetrain.retractProp();
 	}
@@ -150,4 +157,83 @@ public class SuperStructure extends SubsystemBase implements DashboardUpdatable 
 
     }
 
+    private class IntakeCommand extends CommandBase {
+
+	}
+
+    private class PrepareShootCommand extends SequentialCommandGroup {
+		public PrepareShootCommand() {
+			addCommands(
+					new FunctionalCommand(
+							SuperStructure.this::moveSpindexerToSafePos,
+							() -> {},
+							(ignored) -> idleSpindexer(),
+							() -> isSpindexerReadyShoot(getNearestSafeRotationRelativeToFeeder(), spindexer.getRelativeRotations())
+					)
+			);
+		}
+	}
+
+    private class ShootCommand extends CommandBase {
+		public ShootCommand() {
+			addRequirements(shooter, intake, spindexer);
+		}
+
+		@Override
+		public void initialize() {
+			shooter.setMode(Shooter.ShootMode.Shooting);
+		}
+
+		@Override
+		public void execute() {
+		}
+
+		@Override
+		public void end(boolean interrupted) {
+
+		}
+
+		@Override
+		public boolean isFinished() {
+			return spindexer.getState().equals(SpindexerStatus.SpindexerState.EMPTY);
+		}
+	}
+
+    public void trackTarget() {
+        isVision = true;
+        vision.driverMode(false);
+        hoodTrackTarget();
+    }
+
+    public void stopTrackTarget() {
+        isVision = false;
+        vision.driverMode(true);
+    }
+
+    public void setState(SuperstructureState state) {
+		_state = state;
+	}
+
+	private void handleState() {
+		switch (_state) {
+			case IDLE:
+				idleAll();
+				break;
+			case INTAKE:
+				intake();
+
+				break;
+			case TARGETING:
+				break;
+			case SHOOTING:
+				break;
+		}
+	}
+
+    public enum SuperstructureState {
+		IDLE,
+		INTAKE,
+		TARGETING,
+		SHOOTING
+	}
 }

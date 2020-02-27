@@ -15,6 +15,7 @@ import frc.team832.lib.motors.Motor;
 import frc.team832.lib.power.PDPPortNumber;
 import frc.team832.lib.util.ClosedLoopConfig;
 import frc.team832.lib.util.OscarMath;
+import frc.team832.robot.subsystems.Turret;
 
 import java.nio.channels.ClosedSelectorException;
 
@@ -76,18 +77,15 @@ public class Constants {
     public static class ShooterValues {
         public static final int PRIMARY_CAN_ID = 2;
         public static final int SECONDARY_CAN_ID = 3;
-        public static final int TURRET_CAN_ID = 4;
         public static final int FEED_MOTOR_CAN_ID = 6;
 
         public static final PDPPortNumber PRIMARY_PDP_SLOT = PDPPortNumber.Port2;
         public static final PDPPortNumber SECONDARY_PDP_SLOT = PDPPortNumber.Port3;
-        public static final PDPPortNumber TURRET_PDP_SLOT = PDPPortNumber.Port4;
         public static final PDPPortNumber FEEDER_PDP_SLOT = PDPPortNumber.Port6;
 
         //Shooter
         public static final int HOOD_SERVO_PWM_CHANNEL = 0;
         public static final int HOOD_POTENTIOMETER_ANALOG_CHANNEL = 0;
-        public static final int TURRET_ENCODER_DIO_CHANNEL = 0;
 
         public static final double HoodTopVoltage = 2.0;
         public static final double HoodBottomVoltage = 4.5;
@@ -109,28 +107,8 @@ public class Constants {
 
         public static final SimpleMotorFeedforward FlywheelFF = new SimpleMotorFeedforward(FlywheelkS, FlywheelkV, FlywheelkA);
 
-        //Turret
-        public static final float TurretReduction = 1f / (200f/1f);
-        private static final Gearbox TurretGearbox = new Gearbox(TurretReduction);
-        public static final WheeledPowerTrain TurretPowerTrain = new WheeledPowerTrain(TurretGearbox, Motor.kNEO550, 1, Units.inchesToMeters(10));
-
-        public static final Constraints TurretConstraints = new Constraints(TurretPowerTrain.calculateMotorRpmFromWheelRpm(300),/*was 90*/
-                TurretPowerTrain.calculateMotorRpmFromWheelRpm(9000));//was 450
-
-        public static final double TurretkP = 12;
-        public static final double TurretClockwisekF = 0.05;//.1542
-        public static final double TurretCounterClockwisekF = 0.055;//.1645
-
-
         public static final double FeedkP = 0.0003;
         public static final double FeedkF = 0;
-
-        public static final double PracticeTurretLeftPosition = 0.27;
-        public static final double PracticeTurretRightPosition = 0.73;
-        public static final double PracticeTurretForwardPosition = OscarMath.average(PracticeTurretRightPosition, PracticeTurretLeftPosition);
-
-        public static final double PracticeTurretLeftVisionPosition = 0.37;
-        public static final double PracticeTurretRightVisionPosition = 0.58;
 
         //Feeder
         public static final float FeedReduction = 1f;
@@ -144,6 +122,34 @@ public class Constants {
         private static final double FeederkA = 0.0;
 
         public static final SimpleMotorFeedforward FeederFF = new SimpleMotorFeedforward(FeederkS, FeederkV, FeederkA);
+
+    }
+
+    public static class TurretValues {
+        public static final int TURRET_MOTOR_CAN_ID = 4;
+        public static final int TURRET_ENCODER_DIO_CHANNEL = 0;
+
+        public static final PDPPortNumber TURRET_PDP_SLOT = PDPPortNumber.Port4;
+
+        public static final double TurretCenterPosition = convertRotationsToDegrees(0.5);
+        public static final double PracticeTurretLeftPosition = convertRotationsToDegrees(0.27);
+        public static final double PracticeTurretRightPosition = convertRotationsToDegrees(0.73);
+
+        public static final double PracticeTurretLeftVisionPosition = convertRotationsToDegrees(0.37);
+        public static final double PracticeTurretRightVisionPosition = convertRotationsToDegrees(0.58);
+
+        public static final double TurretkP = 12;
+        public static final double TurretClockwisekF = 0.05;//.1542
+        public static final double TurretCounterClockwisekF = 0.055;//.1645
+
+        public static double convertRotationsToDegrees(double rotations) {
+            return OscarMath.map(rotations, 0, 1, -180, 180);
+        }
+
+        public static double convertDegreesToRotation(double degrees){
+            return OscarMath.map(degrees, -180, 180, 0,1);
+        }
+
 
     }
 

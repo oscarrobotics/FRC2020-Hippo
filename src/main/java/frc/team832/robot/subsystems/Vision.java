@@ -46,6 +46,10 @@ public class Vision extends ChameleonVisionSubsystem implements DashboardUpdatab
 		target.yaw = getYawEntry().getDouble(0);
 	}
 
+	public void driverMode(boolean enable) {
+		getDriverModeEntry().setBoolean(enable);
+	}
+
 	@Override
 	public void consumeTarget (VisionTarget target) {
 		if (target.isValid) {
