@@ -70,11 +70,10 @@ public class OI {
 		stratComInterface.getSingleToggle().whenHeld(new RunEndCommand(() -> shooter.setDumbRPM(OscarMath.clipMap(stratComInterface.getRightSlider(), -1, 1, 0, 5000)), shooter::idle));
 		stratComInterface.getSingleToggle().whenHeld(new RunEndCommand(() -> shooter.setFeedRPM(OscarMath.clipMap(stratComInterface.getLeftSlider(), -1, 1, 0, 4000)), shooter::idle));
 
-		stratComInterface.getArcadeBlackRight().whenHeld(new StartEndCommand(() -> shooter.setHood(-0.5), shooter::idleHood));
-		stratComInterface.getArcadeWhiteRight().whenHeld(new StartEndCommand(() -> shooter.setHood(0.5), shooter::idleHood));
+//		stratComInterface.getArcadeBlackRight().whenHeld(new StartEndCommand(() -> shooter.setHood(-0.5), shooter::idleHood));
+//		stratComInterface.getArcadeWhiteRight().whenHeld(new StartEndCommand(() -> shooter.setHood(0.5), shooter::idleHood));
 
-//		stratComInterface.getDoubleToggleUp().whenHeld(new RunEndCommand(() -> shooter.setTurretWithSlider(stratComInterface.getLeftSlider()), shooter::idleTurret));
-
+		stratComInterface.getDoubleToggleUp().whenHeld(new RunEndCommand(superStructure::trackTarget, superStructure::stopTrackTarget));
 
 //		stratComInterface.getSingleToggle().whenHeld(new RunEndCommand(() -> climber.adjustHook(stratComInterface.getLeftSlider()), climber::stopExtend));
 //		stratComInterface.getSingleToggle().whenReleased(new InstantCommand(climber::retractHook));
