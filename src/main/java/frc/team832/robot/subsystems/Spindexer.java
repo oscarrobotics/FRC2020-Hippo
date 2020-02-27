@@ -110,6 +110,10 @@ public class Spindexer extends SubsystemBase {
 		spindexerTargetVelocity = rpm;
 	}
 
+	public boolean getHallEffect() {
+		return hallEffect.get();
+	}
+
 	public void zeroSpindexer() {
 		spinMotor.rezeroSensor();
 	}

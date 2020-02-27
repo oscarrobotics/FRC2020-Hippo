@@ -6,13 +6,13 @@ import frc.team832.lib.driverstation.dashboard.DashboardManager;
 import frc.team832.lib.driverstation.dashboard.DashboardUpdatable;
 
 public class ShooterCalculations implements DashboardUpdatable {
-    public static double flywheelRPM, exitAngle, visionRotation;
+    public static double flywheelRPM, exitAngle, visionYaw;
     public static double areaToMeters = 0.0001;
 
     private static final double CameraAngle = 33.47;
     private static final double PowerPortHeightMeters = 2.5;
 
-    private static NetworkTableEntry dashboard_distance, dashboard_rotation, dashboard_flywheelRPM, dashboard_exitAngle, dashboard_turretRotation;
+    private static NetworkTableEntry dashboard_distance, dashboard_rotation, dashboard_flywheelRPM, dashboard_exitAngle, dashboard_turretYaw;
 
     static {
         ShooterCalculations me = new ShooterCalculations();
@@ -21,7 +21,7 @@ public class ShooterCalculations implements DashboardUpdatable {
         dashboard_rotation = DashboardManager.addTabItem(me, "Rotation", 0.0);
         dashboard_flywheelRPM = DashboardManager.addTabItem(me, "Flywheel RPM", 0.0);
         dashboard_exitAngle = DashboardManager.addTabItem(me, "Hood Exit Angle", 0.0);
-        dashboard_turretRotation = DashboardManager.addTabItem(me, "Turret Rotation", 0.0);
+        dashboard_turretYaw = DashboardManager.addTabItem(me, "Turret Rotation", 0.0);
     }
 
     private ShooterCalculations() {
@@ -34,12 +34,12 @@ public class ShooterCalculations implements DashboardUpdatable {
 
         flywheelRPM = distance < 2 ? 4000 : 8000;
         exitAngle = (pitch - CameraAngle) + 5;//needs testing
-        visionRotation = rotation;
+        visionYaw = rotation;
 
         dashboard_distance.setDouble(distance);
         dashboard_rotation.setDouble(rotation);
         dashboard_flywheelRPM.setDouble(flywheelRPM);
-        dashboard_turretRotation.setDouble(visionRotation);
+        dashboard_turretYaw.setDouble(visionYaw);
         dashboard_exitAngle.setDouble(exitAngle);
 
     }
@@ -50,26 +50,25 @@ public class ShooterCalculations implements DashboardUpdatable {
 
         flywheelRPM = distance < 2 ? 4000 : 8000;
         exitAngle = pitch + 5;//needs testing
-        visionRotation = rotation;//assuming yaw input is -179 to 180
+        visionYaw = rotation;//assuming yaw input is -179 to 180
 
         dashboard_distance.setDouble(distance);
         dashboard_rotation.setDouble(rotation);
         dashboard_flywheelRPM.setDouble(flywheelRPM);
-        dashboard_turretRotation.setDouble(visionRotation);
+        dashboard_turretYaw.setDouble(visionYaw);
         dashboard_exitAngle.setDouble(exitAngle);
     }
 
     public static void update(double pitch, double yaw) {
         double distance = PowerPortHeightMeters / Math.tan(pitch - CameraAngle);
-        double rotation = yaw / 360.0;
 
         flywheelRPM = distance < 2 ? 4000 : 8000;
         exitAngle = pitch + 5;//needs testing
-        visionRotation = rotation;
+        visionYaw = yaw;
 
         dashboard_distance.setDouble(distance);
         dashboard_flywheelRPM.setDouble(flywheelRPM);
-        dashboard_turretRotation.setDouble(visionRotation);
+        dashboard_turretYaw.setDouble(visionYaw);
         dashboard_exitAngle.setDouble(exitAngle);
 
     }

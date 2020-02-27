@@ -68,12 +68,10 @@ public class OI {
 //		stratComInterface.getDoubleToggleDown().whenHeld(new RunEndCommand(() -> intake.setPower(stratComInterface.getLeftSlider()), superStructure::dumbIntakeIdle, superStructure, intake));
 
 		stratComInterface.getSingleToggle().whenHeld(new RunEndCommand(() -> shooter.setDumbRPM(OscarMath.clipMap(stratComInterface.getRightSlider(), -1, 1, 0, 5000)), shooter::idle));
-		stratComInterface.getSingleToggle().whenHeld(new RunEndCommand(() -> shooter.setDumbFeedRPM(OscarMath.clipMap(stratComInterface.getLeftSlider(), -1, 1, 0, 4000)), shooter::idle));
+		stratComInterface.getSingleToggle().whenHeld(new RunEndCommand(() -> shooter.setFeedRPM(OscarMath.clipMap(stratComInterface.getLeftSlider(), -1, 1, 0, 4000)), shooter::idle));
 
 		stratComInterface.getArcadeBlackRight().whenHeld(new StartEndCommand(() -> shooter.setHood(-0.5), shooter::idleHood));
 		stratComInterface.getArcadeWhiteRight().whenHeld(new StartEndCommand(() -> shooter.setHood(0.5), shooter::idleHood));
-//
-		stratComInterface.getDoubleToggleUp().whenHeld(new RunEndCommand(superStructure::trackTarget, () -> shooter.setTurretTargetRotation(Constants.ShooterValues.PracticeTurretForwardPosition)));
 
 //		stratComInterface.getDoubleToggleUp().whenHeld(new RunEndCommand(() -> shooter.setTurretWithSlider(stratComInterface.getLeftSlider()), shooter::idleTurret));
 

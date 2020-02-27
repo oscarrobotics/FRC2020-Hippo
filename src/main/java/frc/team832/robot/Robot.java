@@ -21,11 +21,12 @@ public class Robot extends OscarTimedRobot {
     static final Drivetrain drivetrain = new Drivetrain(pdp);
     static final Vision vision = new Vision(drivetrain);
     static final Intake intake = new Intake(pdp);
-    static final Shooter shooter = new Shooter(pdp, vision);
+    static final Shooter shooter = new Shooter(pdp);
     static final Spindexer spindexer = new Spindexer(pdp);
+    static final Turret turret = new Turret(pdp);
     static final Climber climber = new Climber(pdp);
     static final WheelOfFortune wheelOfFortune = new WheelOfFortune();
-    static final SuperStructure superStructure = new SuperStructure(intake, shooter, spindexer);
+    static final SuperStructure superStructure = new SuperStructure(intake, shooter, spindexer, turret, vision);
 
 
     public static final OI oi = new OI();
@@ -105,7 +106,7 @@ public class Robot extends OscarTimedRobot {
         NeutralMode mode = NeutralMode.kCoast;
         drivetrain.setNeutralMode(mode);
         shooter.setFlyheelNeutralMode(mode);
-        shooter.setTurretNeutralMode(mode);
+        shooter.setFeederNeutralMode(mode);
         spindexer.setNeutralMode(mode);
         climber.lockClimb();
     }
@@ -124,8 +125,8 @@ public class Robot extends OscarTimedRobot {
         NeutralMode mode = NeutralMode.kBrake;
         drivetrain.setNeutralMode(mode);
         shooter.setFlyheelNeutralMode(mode);
-        shooter.setTurretNeutralMode(mode);
-        shooter.holdTurretPosition();
+        shooter.setFeederNeutralMode(mode);
+        turret.holdTurretPosition();
         spindexer.setNeutralMode(mode);
         climber.zeroDeploy();
     }

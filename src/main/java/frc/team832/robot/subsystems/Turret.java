@@ -81,7 +81,7 @@ public class Turret extends SubsystemBase implements DashboardUpdatable {
     }
 
     private boolean atTarget() {
-        return Math.abs(getDegrees() - ShooterCalculations.visionRotation) < 2;
+        return Math.abs(getDegrees() - ShooterCalculations.visionYaw) < 2;
     }
 
     private void handleSafety(boolean isVisionMode) {

@@ -26,7 +26,7 @@ public class SpindexerStatus implements DashboardUpdatable {
     public SpindexerState state;
     private Spindexer.SpinnerDirection spinDirection;
 
-    NetworkTableEntry ballSlot0, ballSlot1, ballSlot2, ballSlot3, ballSlot4, dashboard_state;
+    NetworkTableEntry ballSlot0, ballSlot1, ballSlot2, ballSlot3, ballSlot4, dashboard_state, dashboard_hallEffect;
 
     public SpindexerStatus(GrouchPDP pdp, Spindexer spindexer, CANSparkMax spinMotor) {
 
@@ -45,6 +45,7 @@ public class SpindexerStatus implements DashboardUpdatable {
         ballSlot3 = DashboardManager.addTabItem(this, "Slot 3", false, DashboardWidget.BooleanBox);
         ballSlot4 = DashboardManager.addTabItem(this, "Slot 4", false, DashboardWidget.BooleanBox);
         dashboard_state = DashboardManager.addTabItem(this, "State", "Default");
+        dashboard_hallEffect = DashboardManager.addTabItem(this, "Hall Effect", false, DashboardWidget.BooleanBox);
     }
 
     public void update(boolean isOverSlot) {
@@ -133,6 +134,7 @@ public class SpindexerStatus implements DashboardUpdatable {
         ballSlot3.setBoolean(getSlot(3));
         ballSlot4.setBoolean(getSlot(4));
         dashboard_state.setString(state.toString());
+        dashboard_hallEffect.setBoolean(spindexer.getHallEffect());
     }
 
     public enum SpindexerState {

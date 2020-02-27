@@ -37,13 +37,17 @@ public class Vision extends ChameleonVisionSubsystem implements DashboardUpdatab
 	public void periodic(){
 		updateDashboardData();
 		updateVision();
-		consumeTarget(target);
 	}
 
 	private void updateVision() {
 		target.isValid = getIsValidEntry().getBoolean(false);
 		target.pitch = getPitchEntry().getDouble(0);
 		target.yaw = getYawEntry().getDouble(0);
+		ShooterCalculations.update(target.pitch, target.yaw);
+	}
+
+	public VisionTarget getTarget() {
+		return target;
 	}
 
 	public void driverMode(boolean enable) {
@@ -52,9 +56,7 @@ public class Vision extends ChameleonVisionSubsystem implements DashboardUpdatab
 
 	@Override
 	public void consumeTarget (VisionTarget target) {
-		if (target.isValid) {
-			ShooterCalculations.update(target.pitch, target.yaw);
-		}
+
 	}
 
 	@Override

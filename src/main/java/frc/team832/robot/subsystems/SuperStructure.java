@@ -11,6 +11,7 @@ import frc.team832.lib.motors.Motor;
 import frc.team832.lib.util.OscarMath;
 import frc.team832.robot.Constants;
 import frc.team832.robot.utilities.positions.BallPosition;
+import frc.team832.robot.utilities.state.ShooterCalculations;
 import frc.team832.robot.utilities.state.SpindexerStatus;
 
 public class SuperStructure extends SubsystemBase implements DashboardUpdatable {
@@ -18,6 +19,8 @@ public class SuperStructure extends SubsystemBase implements DashboardUpdatable 
 	private Intake intake;
 	private Shooter shooter;
 	private Spindexer spindexer;
+	private Turret turret;
+	private Vision vision;
 
 	private NetworkTableEntry dashboard_mode, dashboard_lastMode;
 	private SuperstructureState _state;
@@ -25,10 +28,11 @@ public class SuperStructure extends SubsystemBase implements DashboardUpdatable 
 	private PrepareShootCommand prepareShootCommand = new PrepareShootCommand();
 	private ShootCommand shootCommand = new ShootCommand();
 
-	public SuperStructure(Intake intake, Shooter shooter, Spindexer spindexer) {
+	public SuperStructure(Intake intake, Shooter shooter, Spindexer spindexer, Turret turret, Vision vision) {
 		this.intake = intake;
 		this.shooter = shooter;
 		this.spindexer = spindexer;
+		this.turret = turret;
 
         DashboardManager.addTab(this, this);
 
@@ -95,6 +99,18 @@ public class SuperStructure extends SubsystemBase implements DashboardUpdatable 
 		idleSpindexer();
 	}
 
+    public void trackTarget() {
+        vision.driverMode(false);
+	    if (vision.getTarget().isValid) {
+            turret.setTurretTargetDegrees(ShooterCalculations.visionYaw, true);
+        }
+    }
+
+    public void stopTrackTarget() {
+        turret.setTurretTargetDegrees(turret.getDegrees(), false);
+        vision.driverMode(true);
+    }
+
 	public void moveSpindexerToSafePos() {
 		spindexer.setTargetRotation(getNearestSafeRotationRelativeToFeeder());
 	}
@@ -108,11 +124,11 @@ public class SuperStructure extends SubsystemBase implements DashboardUpdatable 
 	}
 
 	public double getSpindexerRotationRelativeToFeeder() {
-		return spindexer.getRelativeRotations() - shooter.getTurretRotations();
+		return spindexer.getRelativeRotations() - turret.getRotations();
 	}
 
 	public double calculateSpindexerRotRelativeToFeeder(double targetPos) {
-		return targetPos - shooter.getTurretRotations();
+		return targetPos - turret.getRotations();
 	}
 
 	public double getNearestSafeRotationRelativeToFeeder() {
@@ -141,10 +157,6 @@ public class SuperStructure extends SubsystemBase implements DashboardUpdatable 
 
 	public boolean isShooterPrepared() {
 		return shooter.readyToShoot() && isSpindexerReadyShoot(getNearestSafeRotationRelativeToFeeder(), spindexer.getRelativeRotations());
-	}
-
-	public void trackTarget() {
-		shooter.trackTarget();
 	}
 
 	@Override
@@ -198,17 +210,6 @@ public class SuperStructure extends SubsystemBase implements DashboardUpdatable 
 			return spindexer.getState().equals(SpindexerStatus.SpindexerState.EMPTY);
 		}
 	}
-
-    public void trackTarget() {
-        isVision = true;
-        vision.driverMode(false);
-        hoodTrackTarget();
-    }
-
-    public void stopTrackTarget() {
-        isVision = false;
-        vision.driverMode(true);
-    }
 
     public void setState(SuperstructureState state) {
 		_state = state;

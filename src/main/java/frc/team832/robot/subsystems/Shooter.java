@@ -25,7 +25,6 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
 
     public boolean isVision = false;
 
-    private final Vision vision;
     private final CANSparkMax primaryMotor, secondaryMotor, feederMotor;
     private final REVSmartServo_Continuous hoodServo;
 
@@ -43,9 +42,8 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
 
     private double feedTarget;
 
-    public Shooter(GrouchPDP pdp, Vision vision) {
+    public Shooter(GrouchPDP pdp) {
         DashboardManager.addTab(this, this);
-        this.vision = vision;
 
         primaryMotor = new CANSparkMax(ShooterValues.PRIMARY_CAN_ID, Motor.kNEO);
         secondaryMotor = new CANSparkMax(ShooterValues.SECONDARY_CAN_ID, Motor.kNEO);
@@ -130,6 +128,10 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
         setMode(ShootMode.Idle);
 //        setRPM(2000);
         feederMotor.set(0);
+    }
+
+    public void setFeedRPM(double rpm) {
+        feedTarget = rpm;
     }
 
     // good
