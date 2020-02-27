@@ -21,12 +21,15 @@ public class ShooterTests {
         double turretTarget = 0.06;
         double turretPosition = 0.05;
 
-        boolean valid = shooter.isTurretSafe(turretTarget, turretPosition) == Shooter.TurretSafetyState.FarRight;
+        boolean valid = shooter.isTurretSafe(turretTarget, turretPosition) == Shooter.TurretSafetyState.FarLeft;
         boolean invalid = shooter.isTurretSafe(turretTarget, turretPosition) == Shooter.TurretSafetyState.Safe;
 
         assertTrue("InRange \"double\" failed on valid!", valid);
         assertFalse("InRange \"double\" failed on invalid!", invalid);
     }
 
+    @Test
+    public void visionTest() {
 
+    }
 }

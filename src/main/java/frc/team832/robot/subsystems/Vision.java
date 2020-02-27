@@ -13,15 +13,15 @@ import frc.team832.robot.utilities.state.ShooterCalculations;
 public class Vision extends ChameleonVisionSubsystem implements DashboardUpdatable {
 	public final boolean initSuccessful;
 
-	public final ShooterCalculations calculations = new ShooterCalculations();
 	private final Drivetrain drivetrain;
 	private final NetworkTableEntry dashboard_pitch, dashboard_yaw, dashboard_area, dashboard_isValid;
+	private VisionTarget target = new VisionTarget();
+//	private ShooterCalculations calculations = new ShooterCalculations();
 
 	public Vision(Drivetrain drivetrain) {
-		super("OscarEye", 0);//TODO: fix this
+		super("USB Camera-B4.09.24.1", 0.05);//TODO: fix this
 
 		DashboardManager.addTab(this, this);
-
 
 		dashboard_area = DashboardManager.addTabItem(this, "Area", 0.0);
 		dashboard_pitch = DashboardManager.addTabItem(this, "Pitch", 0.0);
@@ -36,12 +36,20 @@ public class Vision extends ChameleonVisionSubsystem implements DashboardUpdatab
 	@Override
 	public void periodic(){
 		updateDashboardData();
+		updateVision();
+		consumeTarget(target);
+	}
+
+	private void updateVision() {
+		target.isValid = getIsValidEntry().getBoolean(false);
+		target.pitch = getPitchEntry().getDouble(0);
+		target.yaw = getYawEntry().getDouble(0);
 	}
 
 	@Override
 	public void consumeTarget (VisionTarget target) {
 		if (target.isValid) {
-			calculations.update(target.pitch, target.yaw, target.area);
+			ShooterCalculations.update(target.pitch, target.yaw);
 		}
 	}
 

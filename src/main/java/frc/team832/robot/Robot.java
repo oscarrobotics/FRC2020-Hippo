@@ -1,9 +1,11 @@
 package frc.team832.robot;
 
+import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.team832.lib.CANDevice;
 import frc.team832.lib.OscarTimedRobot;
+import frc.team832.lib.control.PCM;
 import frc.team832.lib.motorcontrol.NeutralMode;
 import frc.team832.lib.power.GrouchPDP;
 import frc.team832.robot.subsystems.*;
@@ -13,6 +15,7 @@ import frc.team832.robot.utilities.state.SpindexerStatus;
 public class Robot extends OscarTimedRobot {
 
     public static final GrouchPDP pdp = new GrouchPDP(0);
+    private static final Compressor pcm = new Compressor(0);
 
     // Subsystems
     static final Drivetrain drivetrain = new Drivetrain(pdp);
@@ -24,6 +27,7 @@ public class Robot extends OscarTimedRobot {
     static final WheelOfFortune wheelOfFortune = new WheelOfFortune();
     static final SuperStructure superStructure = new SuperStructure(intake, shooter, spindexer);
 
+
     public static final OI oi = new OI();
 
     private static final Notifier drivetrainTelemetryNotifier = new Notifier(drivetrain::updateDashboardData);
@@ -33,6 +37,9 @@ public class Robot extends OscarTimedRobot {
 
     @Override
     public void robotInit() {
+
+        pcm.setClosedLoopControl(true);
+
         if (drivetrain.initSuccessful) {
             System.out.println("Drivetrain - init OK");
             drivetrainTelemetryNotifier.startPeriodic(0.02);
@@ -118,6 +125,7 @@ public class Robot extends OscarTimedRobot {
         drivetrain.setNeutralMode(mode);
         shooter.setFlyheelNeutralMode(mode);
         shooter.setTurretNeutralMode(mode);
+        shooter.holdTurretPosition();
         spindexer.setNeutralMode(mode);
         climber.zeroDeploy();
     }

@@ -136,7 +136,9 @@ public class SuperStructure extends SubsystemBase implements DashboardUpdatable 
 		return shooter.readyToShoot() && isSpindexerReadyShoot(getNearestSafeRotationRelativeToFeeder(), spindexer.getRelativeRotations());
 	}
 
-
+	public void trackTarget() {
+		shooter.trackTarget();
+	}
 
 	@Override
     public String getDashboardTabName() {

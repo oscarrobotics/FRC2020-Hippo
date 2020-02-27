@@ -89,6 +89,9 @@ public class Constants {
         public static final int HOOD_POTENTIOMETER_ANALOG_CHANNEL = 0;
         public static final int TURRET_ENCODER_DIO_CHANNEL = 0;
 
+        public static final double HoodTopVoltage = 2.0;
+        public static final double HoodBottomVoltage = 4.5;
+
         public static final float FlywheelReduction = 50f / 26f;
         private static final Gearbox FlywheelGearbox = new Gearbox(FlywheelReduction);
         public static final WheeledPowerTrain FlywheelPowerTrain = new WheeledPowerTrain(FlywheelGearbox, Motor.kNEO, 2, Units.inchesToMeters(4));
@@ -114,17 +117,20 @@ public class Constants {
         public static final Constraints TurretConstraints = new Constraints(TurretPowerTrain.calculateMotorRpmFromWheelRpm(300),/*was 90*/
                 TurretPowerTrain.calculateMotorRpmFromWheelRpm(9000));//was 450
 
-        public static final double TurretkP = 2.0;
+        public static final double TurretkP = 12;
         public static final double TurretClockwisekF = 0.05;//.1542
         public static final double TurretCounterClockwisekF = 0.055;//.1645
 
 
-        public static final double FeedkP = 0.0001;
+        public static final double FeedkP = 0.0003;
         public static final double FeedkF = 0;
 
-        public static final double PracticeTurretLeftPosition = 0.53;
-        public static final double PracticeTurretRightPosition = 0.12;
-        public static final double PracticeTurretForwardPosition = (1.0/3.0);
+        public static final double PracticeTurretLeftPosition = 0.27;
+        public static final double PracticeTurretRightPosition = 0.73;
+        public static final double PracticeTurretForwardPosition = OscarMath.average(PracticeTurretRightPosition, PracticeTurretLeftPosition);
+
+        public static final double PracticeTurretLeftVisionPosition = 0.37;
+        public static final double PracticeTurretRightVisionPosition = 0.58;
 
         //Feeder
         public static final float FeedReduction = 1f;
