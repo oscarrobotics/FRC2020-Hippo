@@ -10,7 +10,7 @@ import frc.team832.robot.commands.ShootCommandGroup;
 import frc.team832.robot.subsystems.*;
 
 public class ComplexAutonomous extends SequentialCommandGroup {
-	public ComplexAutonomous(SuperStructure superStructure, Drivetrain drivetrain, Shooter shooter, Spindexer spindexer) {
+	public ComplexAutonomous(SuperStructure superStructure, Drivetrain drivetrain, Shooter shooter, Spindexer spindexer, Turret turret) {
 
 		Trajectory ToStart = PathHelper.generatePath(drivetrain.getLatestPose(), Constants.FieldPositions.StartCenter);
 		Trajectory ToCloseSideTrench = PathHelper.generatePath(drivetrain.getLatestPose(), Constants.FieldPositions.CloseSideTrench);
@@ -18,18 +18,18 @@ public class ComplexAutonomous extends SequentialCommandGroup {
 		Trajectory ToShieldGenCloseToTrench = PathHelper.generatePath(drivetrain.getLatestPose(), Constants.FieldPositions.ShieldGenCloseToTrench);
 		
 		addCommands(
-			new ShootCommandGroup(superStructure, shooter, spindexer),
+			new ShootCommandGroup(superStructure),
 			new FollowPath(ToFarSideTrench, drivetrain),
 			new InstantCommand(superStructure::intake),
 			new FollowPath(ToCloseSideTrench, drivetrain),
 			new InstantCommand(superStructure::idleIntake),
 			new FollowPath(ToFarSideTrench, drivetrain),
-			new ShootCommandGroup(superStructure, shooter, spindexer),
+			new ShootCommandGroup(superStructure),
 			new InstantCommand(superStructure::intake),
 			new FollowPath(ToShieldGenCloseToTrench, drivetrain),
 			new InstantCommand(superStructure::idleIntake),
 			new FollowPath(ToFarSideTrench, drivetrain),
-			new ShootCommandGroup(superStructure, shooter, spindexer)
+			new ShootCommandGroup(superStructure)
 		);
 		addRequirements(superStructure, drivetrain, shooter, spindexer);
 	}

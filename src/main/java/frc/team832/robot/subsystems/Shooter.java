@@ -109,8 +109,6 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
         double batteryVoltage = primaryMotor.getInputVoltage();
         double ff = ShooterValues.FlywheelFF.calculate(motorTargetRpm) / batteryVoltage;
 
-        if (wheelTargetRPM < primaryMotor.getSensorVelocity() - 50 && mode == ShootMode.Idle) motorTargetRpm = 0;
-
         dashboard_flywheelFF.setDouble(ff);
         dashboard_wheelTargetRPM.setDouble(wheelTargetRPM * ShooterValues.FlywheelReduction);
 
@@ -119,18 +117,13 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
 
     // testing
     public void setDumbRPM(double rpm) {
-        if (rpm < primaryMotor.getSensorVelocity() - 50)
-            setMode(ShootMode.Idle);
-        else
-            setMode(ShootMode.Shooting);
-
         setWheelRPM(rpm);
     }
 
     // nuke - handleMode()?
     public void idle() {
         setMode(ShootMode.Idle);
-        setDumbRPM(2000);
+        setDumbRPM(0);
         setFeedRPM(0);
     }
 
@@ -237,6 +230,10 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
     @Override
     public String getDashboardTabName() {
         return "Shooter";
+    }
+
+    public double getPotentiometer() {
+        return potentiometer.getVoltage();
     }
 
 

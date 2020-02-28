@@ -117,7 +117,7 @@ public class Constants {
         private static final double FlywheelkA = 0.00103;
 
         public static final ClosedLoopConfig ShootingConfig = new ClosedLoopConfig(0.0005, 0, 0, 0.0);
-        public static final ClosedLoopConfig IdleConfig = new ClosedLoopConfig(0.000001, 0, 0, 0.0);
+        public static final ClosedLoopConfig IdleConfig = new ClosedLoopConfig(0.0, 0, 0, 0.0);
         public static final ClosedLoopConfig SpinupConfig = new ClosedLoopConfig(0.0007, 0, 0, 0.0);
 
         public static final SimpleMotorFeedforward FlywheelFF = new SimpleMotorFeedforward(FlywheelkS, FlywheelkV, FlywheelkA);
@@ -146,12 +146,16 @@ public class Constants {
 
         public static final PDPPortNumber TURRET_PDP_SLOT = PDPPortNumber.Port4;
 
-        public static final double TurretCenterPosition = convertRotationsToDegrees(0.5);
         public static final double PracticeTurretLeftPosition = convertRotationsToDegrees(0.27);
         public static final double PracticeTurretRightPosition = convertRotationsToDegrees(0.73);
 
-        public static final double PracticeTurretLeftVisionPosition = convertRotationsToDegrees(0.37);
-        public static final double PracticeTurretRightVisionPosition = convertRotationsToDegrees(0.58);
+
+        public static final int VisionTargetingRange = 120;
+        public static final int MaximumRange = 180;
+
+        public static final int PracticeTurretLeftVisionPosition = -(VisionTargetingRange / 2);
+        public static final int PracticeTurretRightVisionPosition = VisionTargetingRange / 2;
+        public static final int TurretCenterVisionPosition = 0;
 
         public static final double TurretkP = 0.03;
         public static final double TurretClockwisekFF = 0.07;//.1542

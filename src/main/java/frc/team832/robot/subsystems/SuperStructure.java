@@ -18,14 +18,17 @@ public class SuperStructure extends SubsystemBase implements DashboardUpdatable 
 	private final Turret turret;
 	private final Vision vision;
 
-	private final NetworkTableEntry dashboard_mode;
-	private SuperstructureState _state = SuperstructureState.IDLE;
+	private final NetworkTableEntry dashboard_mode, dashboard_hoodVolts, dashboard_hoodTargetVolts;
+	private SuperstructureState _state = SuperstructureState.IDLE, _lastState = SuperstructureState.IDLE;
 	private ShootingState _shootingState = ShootingState.PREPARE;
 
 	public final IdleCommand idleCommand;
 	public final TargetingCommand targetingCommand;
 	public final ShootCommand shootCommand;
 	public final IntakeCommand intakeCommand;
+
+	private double flywheelRpm  = 5000, hoodVoltage = 2.72;
+
 
 	public SuperStructure(Intake intake, Shooter shooter, Spindexer spindexer, Turret turret, Vision vision) {
 		this.intake = intake;
@@ -41,6 +44,8 @@ public class SuperStructure extends SubsystemBase implements DashboardUpdatable 
 
 		DashboardManager.addTab(this, this);
 		dashboard_mode = DashboardManager.addTabItem(this, "State", SuperstructureState.INVALID.toString());
+		dashboard_hoodTargetVolts = DashboardManager.addTabItem(this, "Target Volts", 0.0);
+		dashboard_hoodVolts = DashboardManager.addTabItem(this, "Current Volts", 0.0);
 
 		vision.driverMode(false);
 	}
@@ -105,9 +110,13 @@ public class SuperStructure extends SubsystemBase implements DashboardUpdatable 
 	}
 
     public void trackTarget() {
+		turret.setVisionMode(true);
 	    if (vision.getTarget().isValid) {
             turret.setTurretTargetDegrees(ShooterCalculations.visionYaw + turret.getDegrees(), true);
-        }
+        } else {
+	    	turret.setTurretTargetDegrees(0.0, true);
+		}
+
     }
 
     public void stopTrackTarget() {
@@ -170,7 +179,8 @@ public class SuperStructure extends SubsystemBase implements DashboardUpdatable 
     @Override
     public void updateDashboardData() {
 		dashboard_mode.setString(_state.toString());
-
+		dashboard_hoodTargetVolts.setDouble(hoodVoltage);
+		dashboard_hoodVolts.setDouble(shooter.getPotentiometer());
     }
 
 	private class IdleCommand extends InstantCommand {
@@ -181,6 +191,14 @@ public class SuperStructure extends SubsystemBase implements DashboardUpdatable 
 		@Override
 		public void initialize() {
 			idleAll();
+			turret.setVisionMode(false);
+			_shootingState = ShootingState.PREPARE;
+			if(_lastState == SuperstructureState.INTAKE){
+				turret.setIntake();
+			} else {
+				turret.setTurretTargetDegrees(0, false);
+			}
+//			turret.setTurretTargetDegrees(0, false);
 		}
 	}
 
@@ -193,10 +211,15 @@ public class SuperStructure extends SubsystemBase implements DashboardUpdatable 
 		public void initialize() {
 			shooter.setDumbRPM(0);
 			shooter.setFeedRPM(0);
-			spindexer.setSpinRPM(15, Spindexer.SpinnerDirection.Clockwise);
+			spindexer.setSpinRPM(25, Spindexer.SpinnerDirection.Clockwise);
 			intake.extendIntake();
 			intake.intake(1.0);
-			turret.setTurretTargetDegrees(Constants.TurretValues.IntakeOrientationDegrees, false);
+			vision.driverMode(true);
+			turret.setIntake();
+		}
+
+		@Override
+		public void end(boolean interrupted) {
 		}
 	}
 
@@ -207,8 +230,10 @@ public class SuperStructure extends SubsystemBase implements DashboardUpdatable 
 
 		@Override
 		public void initialize() {
+			vision.driverMode(false);
 			shooter.idle();
 			spindexer.idle();
+			turret.setForward(true);
 		}
 
 		@Override
@@ -224,22 +249,38 @@ public class SuperStructure extends SubsystemBase implements DashboardUpdatable 
 
 		@Override
 		public void initialize() {
-//			shooter.setMode(Shooter.ShootMode.Shooting);
+			shooter.setMode(Shooter.ShootMode.Shooting);
 			shooter.setDumbRPM(5000);
 			shooter.setFeedRPM(3000);
+			turret.setForward(true);
+			vision.driverMode(false);
 		}
 
 		@Override
 		public void execute() {
 			trackTarget();
-
+			shooter.setHood(hoodVoltage);
+			shooter.setDumbRPM(flywheelRpm);
 			if (_shootingState == ShootingState.FIRING) {
 				spindexer.setSpinRPM(70, Spindexer.SpinnerDirection.Clockwise);
+			} else {
+				spindexer.setSpinRPM(0, Spindexer.SpinnerDirection.Clockwise);
 			}
 		}
 	}
 
+	public void setShooterParametersSlider(double rpmSlider, double hoodSlider) {
+		flywheelRpm = OscarMath.clipMap(rpmSlider, -1, 1, 0, 5000);
+		hoodVoltage = OscarMath.clipMap(hoodSlider, -1, 1, Constants.ShooterValues.HoodMax, Constants.ShooterValues.HoodMin);
+	}
+
+	public void setShooterParametersdefault() {
+		flywheelRpm = 5000;
+		hoodVoltage = 2.72;
+	}
+
     public void setState(SuperstructureState state) {
+		_lastState = _state;
 		_state = state;
 	}
 

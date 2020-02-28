@@ -2,12 +2,14 @@ package frc.team832.robot;
 
 import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.Notifier;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.team832.lib.CANDevice;
 import frc.team832.lib.OscarTimedRobot;
 import frc.team832.lib.control.PCM;
 import frc.team832.lib.motorcontrol.NeutralMode;
 import frc.team832.lib.power.GrouchPDP;
+import frc.team832.robot.commands.ShootCommandGroup;
 import frc.team832.robot.subsystems.*;
 import frc.team832.robot.utilities.state.SpindexerStatus;
 
@@ -36,6 +38,8 @@ public class Robot extends OscarTimedRobot {
     private static final Notifier turretTelemetryNotifier = new Notifier(turret::updateDashboardData);
     private static final Notifier visionTelemetryNotifier = new Notifier(vision::updateDashboardData);
     private static final Notifier superStructureTelemetryNotifier = new Notifier(superStructure::updateDashboardData);
+
+    private Command autoCommand;
 
     @Override
     public void robotInit() {
@@ -107,6 +111,17 @@ public class Robot extends OscarTimedRobot {
 
     @Override
     public void autonomousInit() {
+        NeutralMode mode = NeutralMode.kBrake;
+        drivetrain.setNeutralMode(mode);
+        shooter.setFlyheelNeutralMode(mode);
+        shooter.setFeederNeutralMode(mode);
+        turret.holdTurretPosition();
+        spindexer.setNeutralMode(mode);
+        turret.setNeutralMode(mode);
+        shooter.setHood(2.7);
+        climber.zeroDeploy();
+        autoCommand = new ShootCommandGroup(superStructure);
+        autoCommand.schedule();
     }
 
     @Override
@@ -131,6 +146,7 @@ public class Robot extends OscarTimedRobot {
 
     @Override
     public void teleopInit() {
+        autoCommand.cancel();
         NeutralMode mode = NeutralMode.kBrake;
         drivetrain.setNeutralMode(mode);
         shooter.setFlyheelNeutralMode(mode);

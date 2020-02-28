@@ -83,33 +83,45 @@ public class Turret extends SubsystemBase implements DashboardUpdatable {
     }
 
     private boolean atTarget() {
-        return Math.abs(getDegrees() - ShooterCalculations.visionYaw) < 2;
+        return Math.abs(getDegrees() - ShooterCalculations.visionYaw) < 0.75;
+    }
+
+    protected double calculateSafePosition(boolean isVision, double degrees) {
+        double rightBound = isVision ? TurretValues.PracticeTurretRightVisionPosition : TurretValues.PracticeTurretRightPosition;
+        double leftBound = isVision ? TurretValues.PracticeTurretLeftVisionPosition : TurretValues.PracticeTurretLeftPosition;
+
+        boolean rightBoundExceeded = degrees > rightBound;
+        boolean leftBoundExceeded = degrees < leftBound;
+
+        double safeValue;
+
+        if (rightBoundExceeded) {
+            safeValue = rightBound;
+        } else if (leftBoundExceeded) {
+            safeValue = leftBound;
+        } else {
+            safeValue = degrees;
+        }
+
+        return safeValue;
     }
 
     private void handleSafety(boolean isVisionMode) {
-        double rightBound = isVisionMode ? TurretValues.PracticeTurretRightVisionPosition : TurretValues.PracticeTurretRightPosition;
-        double leftBound = isVisionMode ? TurretValues.PracticeTurretLeftVisionPosition : TurretValues.PracticeTurretLeftPosition;
+        double safeTarget = calculateSafePosition(isVisionMode, turretTargetDeg);
+        double safeActual = calculateSafePosition(isVisionMode, getDegrees());
 
-        boolean isRightUnsafe = getDegrees() > rightBound || turretTargetDeg > rightBound;
-        boolean isLeftUnsafe = getDegrees() < leftBound || turretTargetDeg < leftBound;
-
-        if (isRightUnsafe) {
-            if (turretTargetDeg > rightBound) {
-                turretTargetDeg = rightBound;
-            } else if (getDegrees() > rightBound) {
-                turretTargetDeg = rightBound - 5;
-            }
-        } else if (isLeftUnsafe) {
-            if (turretTargetDeg < leftBound) {
-                turretTargetDeg = leftBound;
-            } else if (getDegrees() < leftBound) {
-                turretTargetDeg = leftBound + 5;
-            }
+        if(safeActual != getDegrees()){
+            turretTargetDeg = safeActual + 3;
+        } else {
+            turretTargetDeg = safeTarget;
         }
     }
 
-    private double getFF() {
+    public void setVisionMode(boolean visionMode){
+        isVision = visionMode;
+    }
 
+    private double getFF() {
         boolean isFF = Math.abs(getDegrees() - turretTargetDeg) > 5;
         if ((getDegrees() - turretTargetDeg) > 0 && isFF) return TurretValues.TurretClockwisekFF;
         else if ((getDegrees() - turretTargetDeg) > 0 && isFF) return -TurretValues.TurretClockwisekFF;
@@ -117,9 +129,8 @@ public class Turret extends SubsystemBase implements DashboardUpdatable {
     }
 
     private void runPID() {
-
-        motor.set(PID.calculate(getDegrees(), turretTargetDeg) + getFF());
         handleSafety(isVision);
+        motor.set(PID.calculate(getDegrees(), turretTargetDeg) + getFF());
     }
 
     public void stop() {
@@ -133,6 +144,14 @@ public class Turret extends SubsystemBase implements DashboardUpdatable {
 
     public void setNeutralMode(NeutralMode mode) {
         motor.setNeutralMode(mode);
+    }
+
+    public void setForward(boolean isVision) {
+        setTurretTargetDegrees(TurretValues.TurretCenterVisionPosition, isVision);
+    }
+
+    public void setIntake() {
+        setTurretTargetDegrees(Constants.TurretValues.IntakeOrientationDegrees, false);
     }
 }
 
