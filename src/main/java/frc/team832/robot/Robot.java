@@ -28,13 +28,14 @@ public class Robot extends OscarTimedRobot {
     static final WheelOfFortune wheelOfFortune = new WheelOfFortune();
     static final SuperStructure superStructure = new SuperStructure(intake, shooter, spindexer, turret, vision);
 
-
-    public static final OI oi = new OI();
+    public static final OI oi = new OI(superStructure);
 
     private static final Notifier drivetrainTelemetryNotifier = new Notifier(drivetrain::updateDashboardData);
     private static final Notifier shooterTelemetryNotifier = new Notifier(shooter::updateDashboardData);
     private static final Notifier intakeTelemetryNotifier = new Notifier(intake::updateDashboardData);
+    private static final Notifier turretTelemetryNotifier = new Notifier(turret::updateDashboardData);
     private static final Notifier visionTelemetryNotifier = new Notifier(vision::updateDashboardData);
+    private static final Notifier superStructureTelemetryNotifier = new Notifier(superStructure::updateDashboardData);
 
     @Override
     public void robotInit() {
@@ -43,33 +44,38 @@ public class Robot extends OscarTimedRobot {
 
         if (drivetrain.initSuccessful) {
             System.out.println("Drivetrain - init OK");
-            drivetrainTelemetryNotifier.startPeriodic(0.02);
         } else {
             System.out.println("Drivetrain - init FAILED");
         }
+        drivetrainTelemetryNotifier.startPeriodic(0.02);
 
         if (intake.initSuccessful) {
             System.out.println("Intake - init OK");
-            intakeTelemetryNotifier.startPeriodic(0.02);
         } else {
             System.out.println("Intake - init FAILED");
         }
+        intakeTelemetryNotifier.startPeriodic(0.02);
 
         if (vision.initSuccessful) {
             System.out.println("Vision - init OK");
-            visionTelemetryNotifier.startPeriodic(0.02);
         } else {
             System.out.println("Vision - init FAILED");
         }
+        visionTelemetryNotifier.startPeriodic(0.02);
 
         if (shooter.initSuccessful) {
             System.out.println("Shooter - init OK");
-            shooterTelemetryNotifier.startPeriodic(0.02);
         } else {
             System.out.println("Shooter - init FAILED");
-            shooterTelemetryNotifier.startPeriodic(0.02);
-
         }
+        shooterTelemetryNotifier.startPeriodic(0.02);
+
+        if (turret.initSuccessful) {
+            System.out.println("Turret - init OK");
+        } else {
+            System.out.println("Turret - init FAILED");
+        }
+        turretTelemetryNotifier.startPeriodic(0.02);
 
         if (spindexer.initSuccessful) {
             System.out.println("Spindexer - init OK");
@@ -88,6 +94,8 @@ public class Robot extends OscarTimedRobot {
         } else {
             System.out.println("WheelOfFortune - init FAILED");
         }
+
+        superStructureTelemetryNotifier.startPeriodic(0.02);
 
         CANDevice.printMissingDevices();
     }
@@ -108,6 +116,7 @@ public class Robot extends OscarTimedRobot {
         shooter.setFlyheelNeutralMode(mode);
         shooter.setFeederNeutralMode(mode);
         spindexer.setNeutralMode(mode);
+        turret.setNeutralMode(mode);
         climber.lockClimb();
     }
 
@@ -128,6 +137,8 @@ public class Robot extends OscarTimedRobot {
         shooter.setFeederNeutralMode(mode);
         turret.holdTurretPosition();
         spindexer.setNeutralMode(mode);
+        turret.setNeutralMode(mode);
+        shooter.setHood(2.7);
         climber.zeroDeploy();
     }
 

@@ -98,7 +98,7 @@ public class Intake extends SubsystemBase implements DashboardUpdatable {
 		return "Intake";
 	}
 
-	public void setPower(double leftSlider) {
+	public void setDumbPower(double leftSlider) {
 		extendIntake();
 		intake(OscarMath.map(leftSlider,-1.0, 1.0, 0.0, 1.0));
 	}

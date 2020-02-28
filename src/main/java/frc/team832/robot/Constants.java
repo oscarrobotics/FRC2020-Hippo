@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.wpilibj.trajectory.constraint.DifferentialDriveVoltageConstraint;
 import edu.wpi.first.wpilibj.util.Units;
 import frc.team832.lib.drive.ClosedLoopDT;
+import frc.team832.lib.motors.GearReduction;
 import frc.team832.lib.motors.WheeledPowerTrain;
 import frc.team832.lib.motors.Gearbox;
 import frc.team832.lib.motors.Motor;
@@ -90,11 +91,25 @@ public class Constants {
         public static final double HoodTopVoltage = 2.0;
         public static final double HoodBottomVoltage = 4.5;
 
+        public static double hoodPotVoltageToRotations(double voltage) {
+            return OscarMath.map(voltage, 0, 5, 0, 3);
+        }
+
+//        public static double
+
         public static final float FlywheelReduction = 50f / 26f;
         private static final Gearbox FlywheelGearbox = new Gearbox(FlywheelReduction);
+
         public static final WheeledPowerTrain FlywheelPowerTrain = new WheeledPowerTrain(FlywheelGearbox, Motor.kNEO, 2, Units.inchesToMeters(4));
 
-        public static final double HoodkP = 0;
+        static final GearReduction HoodReduction = new GearReduction(34, 340);
+        public static final Gearbox HoodGearbox = new Gearbox(HoodReduction);
+        public static final double HoodkP = 8.0;
+
+
+
+        public static final double HoodMin = 4.554;
+        public static final double HoodMax = 2.092;
 
         // TODO: Recharacterize with 1 for encoder ratio and with correct units
         private static final double FlywheelkS = 0.0437;
@@ -138,9 +153,11 @@ public class Constants {
         public static final double PracticeTurretLeftVisionPosition = convertRotationsToDegrees(0.37);
         public static final double PracticeTurretRightVisionPosition = convertRotationsToDegrees(0.58);
 
-        public static final double TurretkP = 12;
-        public static final double TurretClockwisekF = 0.05;//.1542
-        public static final double TurretCounterClockwisekF = 0.055;//.1645
+        public static final double TurretkP = 0.03;
+        public static final double TurretClockwisekFF = 0.07;//.1542
+        public static final double TurretCounterClockwisekFF = 0.055;//.1645
+
+        public static final double IntakeOrientationDegrees = -90;
 
         public static double convertRotationsToDegrees(double rotations) {
             return OscarMath.map(rotations, 0, 1, -180, 180);

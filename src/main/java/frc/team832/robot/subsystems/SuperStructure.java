@@ -1,10 +1,7 @@
 package frc.team832.robot.subsystems;
 
 import edu.wpi.first.networktables.NetworkTableEntry;
-import edu.wpi.first.wpilibj2.command.CommandBase;
-import edu.wpi.first.wpilibj2.command.FunctionalCommand;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.*;
 import frc.team832.lib.driverstation.dashboard.DashboardManager;
 import frc.team832.lib.driverstation.dashboard.DashboardUpdatable;
 import frc.team832.lib.motors.Motor;
@@ -12,32 +9,40 @@ import frc.team832.lib.util.OscarMath;
 import frc.team832.robot.Constants;
 import frc.team832.robot.utilities.positions.BallPosition;
 import frc.team832.robot.utilities.state.ShooterCalculations;
-import frc.team832.robot.utilities.state.SpindexerStatus;
 
 public class SuperStructure extends SubsystemBase implements DashboardUpdatable {
 
-	private Intake intake;
-	private Shooter shooter;
-	private Spindexer spindexer;
-	private Turret turret;
-	private Vision vision;
+	private final Intake intake;
+	private final Shooter shooter;
+	private final Spindexer spindexer;
+	private final Turret turret;
+	private final Vision vision;
 
-	private NetworkTableEntry dashboard_mode, dashboard_lastMode;
-	private SuperstructureState _state;
+	private final NetworkTableEntry dashboard_mode;
+	private SuperstructureState _state = SuperstructureState.IDLE;
+	private ShootingState _shootingState = ShootingState.PREPARE;
 
-	private PrepareShootCommand prepareShootCommand = new PrepareShootCommand();
-	private ShootCommand shootCommand = new ShootCommand();
+	public final IdleCommand idleCommand;
+	public final TargetingCommand targetingCommand;
+	public final ShootCommand shootCommand;
+	public final IntakeCommand intakeCommand;
 
 	public SuperStructure(Intake intake, Shooter shooter, Spindexer spindexer, Turret turret, Vision vision) {
 		this.intake = intake;
 		this.shooter = shooter;
 		this.spindexer = spindexer;
 		this.turret = turret;
+		this.vision = vision;
 
-        DashboardManager.addTab(this, this);
+		idleCommand = new IdleCommand();
+		targetingCommand = new TargetingCommand();
+		shootCommand = new ShootCommand();
+		intakeCommand = new IntakeCommand();
 
-		dashboard_mode = DashboardManager.addTabItem(this, "Mode", "Default");
-		dashboard_lastMode = DashboardManager.addTabItem(this, "Last Mode", "Default");
+		DashboardManager.addTab(this, this);
+		dashboard_mode = DashboardManager.addTabItem(this, "State", SuperstructureState.INVALID.toString());
+
+		vision.driverMode(false);
 	}
 
 	@Override
@@ -100,15 +105,13 @@ public class SuperStructure extends SubsystemBase implements DashboardUpdatable 
 	}
 
     public void trackTarget() {
-        vision.driverMode(false);
 	    if (vision.getTarget().isValid) {
-            turret.setTurretTargetDegrees(ShooterCalculations.visionYaw, true);
+            turret.setTurretTargetDegrees(ShooterCalculations.visionYaw + turret.getDegrees(), true);
         }
     }
 
     public void stopTrackTarget() {
         turret.setTurretTargetDegrees(turret.getDegrees(), false);
-        vision.driverMode(true);
     }
 
 	public void moveSpindexerToSafePos() {
@@ -166,48 +169,73 @@ public class SuperStructure extends SubsystemBase implements DashboardUpdatable 
 
     @Override
     public void updateDashboardData() {
+		dashboard_mode.setString(_state.toString());
 
     }
 
-    private class IntakeCommand extends CommandBase {
-
-	}
-
-    private class PrepareShootCommand extends SequentialCommandGroup {
-		public PrepareShootCommand() {
-			addCommands(
-					new FunctionalCommand(
-							SuperStructure.this::moveSpindexerToSafePos,
-							() -> {},
-							(ignored) -> idleSpindexer(),
-							() -> isSpindexerReadyShoot(getNearestSafeRotationRelativeToFeeder(), spindexer.getRelativeRotations())
-					)
-			);
-		}
-	}
-
-    private class ShootCommand extends CommandBase {
-		public ShootCommand() {
-			addRequirements(shooter, intake, spindexer);
+	private class IdleCommand extends InstantCommand {
+		IdleCommand() {
+			addRequirements(shooter, intake, spindexer, turret, SuperStructure.this);
 		}
 
 		@Override
 		public void initialize() {
-			shooter.setMode(Shooter.ShootMode.Shooting);
+			idleAll();
+		}
+	}
+
+    private class IntakeCommand extends InstantCommand {
+		IntakeCommand() {
+			addRequirements(shooter, intake, spindexer, turret, SuperStructure.this);
+		}
+
+		@Override
+		public void initialize() {
+			shooter.setDumbRPM(0);
+			shooter.setFeedRPM(0);
+			spindexer.setSpinRPM(15, Spindexer.SpinnerDirection.Clockwise);
+			intake.extendIntake();
+			intake.intake(1.0);
+			turret.setTurretTargetDegrees(Constants.TurretValues.IntakeOrientationDegrees, false);
+		}
+	}
+
+    private class TargetingCommand extends SequentialCommandGroup {
+		TargetingCommand() {
+			addRequirements(shooter, intake, spindexer, turret, SuperStructure.this);
+		}
+
+		@Override
+		public void initialize() {
+			shooter.idle();
+			spindexer.idle();
 		}
 
 		@Override
 		public void execute() {
+			trackTarget();
+		}
+	}
+
+    private class ShootCommand extends CommandBase {
+		ShootCommand() {
+			addRequirements(shooter, intake, spindexer, turret, SuperStructure.this);
 		}
 
 		@Override
-		public void end(boolean interrupted) {
-
+		public void initialize() {
+//			shooter.setMode(Shooter.ShootMode.Shooting);
+			shooter.setDumbRPM(5000);
+			shooter.setFeedRPM(3000);
 		}
 
 		@Override
-		public boolean isFinished() {
-			return spindexer.getState().equals(SpindexerStatus.SpindexerState.EMPTY);
+		public void execute() {
+			trackTarget();
+
+			if (_shootingState == ShootingState.FIRING) {
+				spindexer.setSpinRPM(70, Spindexer.SpinnerDirection.Clockwise);
+			}
 		}
 	}
 
@@ -215,26 +243,37 @@ public class SuperStructure extends SubsystemBase implements DashboardUpdatable 
 		_state = state;
 	}
 
+	public void setShootingState(ShootingState state){
+		_shootingState = state;
+	}
+
 	private void handleState() {
 		switch (_state) {
 			case IDLE:
-				idleAll();
+				idleCommand.schedule();
 				break;
 			case INTAKE:
-				intake();
-
+				intakeCommand.schedule();
 				break;
 			case TARGETING:
+				targetingCommand.schedule();
 				break;
 			case SHOOTING:
+				shootCommand.schedule();
 				break;
 		}
 	}
 
     public enum SuperstructureState {
+		INVALID,
 		IDLE,
 		INTAKE,
 		TARGETING,
 		SHOOTING
+	}
+
+	public enum ShootingState {
+		PREPARE,
+		FIRING
 	}
 }
