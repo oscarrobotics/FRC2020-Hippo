@@ -219,6 +219,10 @@ public class Spindexer extends SubsystemBase {
 		}
 	}
 
+	public void idle() {
+		setTargetVelocity(0);
+	}
+
 	public enum SpinnerDirection {
 		Clockwise,
 		CounterClockwise

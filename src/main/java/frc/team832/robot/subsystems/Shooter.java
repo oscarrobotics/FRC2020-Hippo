@@ -29,7 +29,7 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
     private final REVSmartServo_Continuous hoodServo;
 
     private final NetworkTableEntry dashboard_wheelRPM, dashboard_flywheelFF, dashboard_hoodPos, dashboard_wheelTargetRPM,
-            dashboard_feedWheelRPM, dashboard_feedWheelTargetRPM, dashboard_feedFF;
+            dashboard_feedWheelRPM, dashboard_feedWheelTargetRPM, dashboard_feedFF, dashboard_potRotations;
 
     private ShootMode mode = ShootMode.Shooting, lastMode = ShootMode.Shooting;
 
@@ -40,7 +40,7 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
 
     private final SmartMCAttachedPDPSlot primaryFlywheelSlot, secondaryFlywheelSlot, feederSlot;
 
-    private double feedTarget;
+    private double feedTarget, hoodTarget;
 
     public Shooter(GrouchPDP pdp) {
         DashboardManager.addTab(this, this);
@@ -81,6 +81,7 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
         dashboard_feedWheelTargetRPM = DashboardManager.addTabItem(this, "Feeder/Target RPM", 0.0);
         dashboard_feedFF = DashboardManager.addTabItem(this, "Feeder/FF", 0.0);
         dashboard_hoodPos = DashboardManager.addTabItem(this, "Hood/Position", 0.0);
+        dashboard_potRotations = DashboardManager.addTabItem(this, "Hood/Rotations", 0.0);
 
         initSuccessful = primaryMotor.getCANConnection() && secondaryMotor.getCANConnection() && feederMotor.getCANConnection();
     }
@@ -96,6 +97,9 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
         dashboard_wheelRPM.setDouble(primaryMotor.getSensorVelocity() * ShooterValues.FlywheelReduction);
         dashboard_feedWheelRPM.setDouble(feederMotor.getSensorVelocity());
         dashboard_hoodPos.setDouble(potentiometer.getVoltage());
+        var potRotations = OscarMath.map(potentiometer.getVoltage(), 0, 5, 0, 3);
+        dashboard_potRotations.setDouble(potRotations);
+//        var hoodAngle = ((potRotations / 3) * 1080) /
     }
 
     // good
@@ -126,8 +130,8 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
     // nuke - handleMode()?
     public void idle() {
         setMode(ShootMode.Idle);
-//        setRPM(2000);
-        feederMotor.set(0);
+        setDumbRPM(2000);
+        setFeedRPM(0);
     }
 
     public void setFeedRPM(double rpm) {
@@ -139,8 +143,8 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
         hoodServo.setSpeed(hoodPID.calculate(getHoodAngle(), degrees));
     }
 
-    public void setHood(double pow) {
-        hoodServo.setSpeed(pow);
+    public void setHood(double potVoltage) {
+        hoodTarget = potVoltage;
     }
 
     public void idleHood() {
@@ -149,10 +153,6 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
 
     private double getHoodAngle() {
         return OscarMath.map(potentiometer.getVoltage(), 0, 5, 10, 80);
-    }
-
-    private void hoodTrackTarget() {
-        setExitAngle(ShooterCalculations.exitAngle);
     }
 
     //superstructure
@@ -216,9 +216,13 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
 
     private void handlePID() {
         runFeederPID();
+        runHoodPID();
     }
 
-
+    private void runHoodPID() {
+        double speed = OscarMath.clip(hoodPID.calculate(potentiometer.getVoltage(), hoodTarget), -0.99, 0.99);
+        hoodServo.setSpeed(speed);
+    }
 
     private void runFeederPID() {
         double rpm = feedTarget;

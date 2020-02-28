@@ -11,6 +11,7 @@ import frc.team832.lib.motors.Motor;
 import frc.team832.lib.power.GrouchPDP;
 import frc.team832.lib.power.PDPSlot;
 import frc.team832.lib.sensors.REVThroughBorePWM;
+import frc.team832.robot.Constants;
 import frc.team832.robot.Constants.TurretValues;
 import frc.team832.robot.utilities.state.ShooterCalculations;
 
@@ -30,6 +31,7 @@ public class Turret extends SubsystemBase implements DashboardUpdatable {
     private final PIDController PID = new PIDController(TurretValues.TurretkP, 0, 0);
 
     public Turret(GrouchPDP pdp) {
+        DashboardManager.addTab(this, this);
         motor = new CANSparkMax(TurretValues.TURRET_MOTOR_CAN_ID, Motor.kNEO550);
         encoder = new REVThroughBorePWM(TurretValues.TURRET_ENCODER_DIO_CHANNEL);
         pdpSlot = pdp.addDevice(TurretValues.TURRET_PDP_SLOT, motor);
@@ -44,9 +46,9 @@ public class Turret extends SubsystemBase implements DashboardUpdatable {
         // keep turret at init position
         turretTargetDeg = getRotations();
 
-        dashboard_turretPos = DashboardManager.addTabItem(this, "Turret/Position", 0.0);
-        dashboard_turretPow = DashboardManager.addTabItem(this, "Turret/Power", 0.0);
-        dashboard_turretTarget = DashboardManager.addTabItem(this, "Turret/Target", 0.0);
+        dashboard_turretPos = DashboardManager.addTabItem(this, "Position", 0.0);
+        dashboard_turretPow = DashboardManager.addTabItem(this, "Power", 0.0);
+        dashboard_turretTarget = DashboardManager.addTabItem(this, "Target", 0.0);
 
         initSuccessful = motor.getCANConnection();
     }
@@ -58,7 +60,7 @@ public class Turret extends SubsystemBase implements DashboardUpdatable {
 
     @Override
     public void updateDashboardData() {
-        dashboard_turretPos.setDouble(getRotations());
+        dashboard_turretPos.setDouble(getDegrees());
         dashboard_turretPow.setDouble(motor.getOutputVoltage());
         dashboard_turretTarget.setDouble(turretTargetDeg);
     }
@@ -106,8 +108,17 @@ public class Turret extends SubsystemBase implements DashboardUpdatable {
         }
     }
 
+    private double getFF() {
+
+        boolean isFF = Math.abs(getDegrees() - turretTargetDeg) > 5;
+        if ((getDegrees() - turretTargetDeg) > 0 && isFF) return TurretValues.TurretClockwisekFF;
+        else if ((getDegrees() - turretTargetDeg) > 0 && isFF) return -TurretValues.TurretClockwisekFF;
+        else return 0;
+    }
+
     private void runPID() {
-        motor.set(PID.calculate(getDegrees(), turretTargetDeg));
+
+        motor.set(PID.calculate(getDegrees(), turretTargetDeg) + getFF());
         handleSafety(isVision);
     }
 
@@ -118,6 +129,10 @@ public class Turret extends SubsystemBase implements DashboardUpdatable {
     @Override
     public String getDashboardTabName() {
         return "Turret";
+    }
+
+    public void setNeutralMode(NeutralMode mode) {
+        motor.setNeutralMode(mode);
     }
 }
 
