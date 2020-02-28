@@ -13,13 +13,17 @@ public class SpindexerTests {
     static Shooter shooter;
     static Intake intake;
     static Spindexer spindexer;
+    static Turret turret;
+    static Vision vision;
 
     @Before
     public void init() {
-        shooter = new Shooter(new GrouchPDP(0), new Vision(new Drivetrain(new GrouchPDP(0))));
+        shooter = new Shooter(new GrouchPDP(0));
         intake = new Intake(new GrouchPDP(0));
         spindexer = new Spindexer(new GrouchPDP(0));
-        superStructure = new SuperStructure(intake, shooter, spindexer);
+        turret = new Turret(new GrouchPDP(0));
+        vision = new Vision(new Drivetrain(new GrouchPDP(0)));
+        superStructure = new SuperStructure(intake, shooter, spindexer, turret, vision);
 
     }
 
