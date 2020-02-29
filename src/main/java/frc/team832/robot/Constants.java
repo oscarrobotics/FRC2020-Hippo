@@ -16,9 +16,6 @@ import frc.team832.lib.motors.Motor;
 import frc.team832.lib.power.PDPPortNumber;
 import frc.team832.lib.util.ClosedLoopConfig;
 import frc.team832.lib.util.OscarMath;
-import frc.team832.robot.subsystems.Turret;
-
-import java.nio.channels.ClosedSelectorException;
 
 public class Constants {
     public static class DrivetrainValues {
@@ -88,11 +85,8 @@ public class Constants {
         public static final int HOOD_SERVO_PWM_CHANNEL = 0;
         public static final int HOOD_POTENTIOMETER_ANALOG_CHANNEL = 0;
 
-        public static final double HoodTopVoltage = 2.0;
-        public static final double HoodBottomVoltage = 4.5;
-
         public static double hoodPotVoltageToRotations(double voltage) {
-            return OscarMath.map(voltage, 0, 5, 0, 3);
+            return OscarMath.map(voltage, HoodBottom, 5, 0, 3);
         }
 
 //        public static double
@@ -106,10 +100,8 @@ public class Constants {
         public static final Gearbox HoodGearbox = new Gearbox(HoodReduction);
         public static final double HoodkP = 8.0;
 
-
-
-        public static final double HoodMin = 4.554;
-        public static final double HoodMax = 2.092;
+        public static final double HoodBottom = 4.554;
+        public static final double HoodTop = 2.092;
 
         // TODO: Recharacterize with 1 for encoder ratio and with correct units
         private static final double FlywheelkS = 0.0437;

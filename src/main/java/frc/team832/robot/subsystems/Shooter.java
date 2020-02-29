@@ -123,7 +123,6 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
     // nuke - handleMode()?
     public void idle() {
         setMode(ShootMode.Idle);
-        setDumbRPM(0);
         setFeedRPM(0);
     }
 

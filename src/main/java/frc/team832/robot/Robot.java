@@ -146,7 +146,7 @@ public class Robot extends OscarTimedRobot {
 
     @Override
     public void teleopInit() {
-        autoCommand.cancel();
+//        autoCommand.cancel();
         NeutralMode mode = NeutralMode.kBrake;
         drivetrain.setNeutralMode(mode);
         shooter.setFlyheelNeutralMode(mode);
