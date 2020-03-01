@@ -29,7 +29,7 @@ public class Constants {
         public static final PDPPortNumber RIGHT_MASTER_PDP_PORT = PDPPortNumber.Port0;
         public static final PDPPortNumber RIGHT_SLAVE_PDP_PORT = PDPPortNumber.Port1;
 
-        public static final double StickDriveMultiplier = 1.0;
+        public static final double StickDriveMultiplier = 0.8;
         public static final double StickRotateOnCenterMultiplier = 0.6;
         public static final double StickRotateMultiplier = 0.8;
 

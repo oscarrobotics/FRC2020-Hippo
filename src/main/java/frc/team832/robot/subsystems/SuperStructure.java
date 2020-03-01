@@ -27,7 +27,7 @@ public class SuperStructure extends SubsystemBase implements DashboardUpdatable 
 	public final ShootCommand shootCommand;
 	public final IntakeCommand intakeCommand;
 
-	private double flywheelRpm  = 5000, hoodVoltage = 2.72, spindexerRpm = 15;
+	private double flywheelRpm  = 5000, hoodVoltage = 2.72, spindexerRpm = 15, intakePower = 0.9;
 
 
 	public SuperStructure(Intake intake, Shooter shooter, Spindexer spindexer, Turret turret, Vision vision) {
@@ -200,8 +200,6 @@ public class SuperStructure extends SubsystemBase implements DashboardUpdatable 
 			shooter.setDumbRPM(0);
 			shooter.setFeedRPM(0);
 			intake.extendIntake();
-			intake.intake(1.0);
-			vision.driverMode(true);
 			turret.setIntake();
 			if (Math.signum(spindexerRpm) == -1) {
 				spindexer.setSpinRPM(-spindexerRpm, Spindexer.SpinnerDirection.CounterClockwise);
@@ -211,7 +209,8 @@ public class SuperStructure extends SubsystemBase implements DashboardUpdatable 
 		}
 
 		@Override
-		public void end(boolean interrupted) {
+		public void execute() {
+			intake.intake(intakePower);
 		}
 	}
 
@@ -222,7 +221,6 @@ public class SuperStructure extends SubsystemBase implements DashboardUpdatable 
 
 		@Override
 		public void initialize() {
-			vision.driverMode(false);
 			shooter.idle();
 			spindexer.idle();
 			turret.setForward(true);
@@ -245,8 +243,7 @@ public class SuperStructure extends SubsystemBase implements DashboardUpdatable 
 			shooter.setMode(Shooter.ShootMode.Shooting);
 			shooter.setFeedRPM(4000);
 			turret.setForward(true);
-			vision.driverMode(false);
-			spindexer.setSpinRPM(60, Spindexer.SpinnerDirection.CounterClockwise);
+			setShootingState(ShootingState.FIRING);
 		}
 
 		@Override
@@ -254,6 +251,17 @@ public class SuperStructure extends SubsystemBase implements DashboardUpdatable 
 			trackTarget();
 			shooter.setHood(hoodVoltage);
 			shooter.setDumbRPM(flywheelRpm);
+			if(_shootingState == ShootingState.FIRING){
+				spindexer.setSpinRPM(50, Spindexer.SpinnerDirection.CounterClockwise);
+			} else {
+				spindexer.setSpinRPM(0, Spindexer.SpinnerDirection.CounterClockwise);
+
+			}
+		}
+
+		@Override
+		public void end(boolean interrupted) {
+			setShootingState(ShootingState.PREPARE);
 		}
 	}
 
@@ -266,8 +274,9 @@ public class SuperStructure extends SubsystemBase implements DashboardUpdatable 
 		}
 	}
 
-	public void setSpindexerIntakeRPMSlider(double slider) {
-		spindexerRpm = OscarMath.clipMap(slider, -1 , 1, -20, 20);
+	public void configureIntakeRPMSlider(double spindexerSlider, double intakeSlider, boolean isKey) {
+		spindexerRpm = OscarMath.clipMap(spindexerSlider, -1 , 1, -15, 15);
+		if (isKey) intakePower = OscarMath.map(intakeSlider,-1, 1, 0.5, 1);
 	}
 
 	public void setShooterParametersDefault () {
@@ -277,6 +286,7 @@ public class SuperStructure extends SubsystemBase implements DashboardUpdatable 
 
 	public void setSpindexerIntakeRpmDefault() {
 		spindexerRpm = 10;
+		intakePower = 0.9;
 	}
 
     public void setState(SuperstructureState state) {

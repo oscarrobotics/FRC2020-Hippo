@@ -10,6 +10,7 @@ import frc.team832.lib.control.PCM;
 import frc.team832.lib.motorcontrol.NeutralMode;
 import frc.team832.lib.power.GrouchPDP;
 import frc.team832.robot.commands.ShootCommandGroup;
+import frc.team832.robot.commands.auto.BasicAutonomous;
 import frc.team832.robot.subsystems.*;
 import frc.team832.robot.utilities.state.SpindexerStatus;
 
@@ -102,6 +103,7 @@ public class Robot extends OscarTimedRobot {
         superStructureTelemetryNotifier.startPeriodic(0.02);
 
         CANDevice.printMissingDevices();
+        autoCommand = new BasicAutonomous(superStructure, drivetrain);
     }
 
     @Override
@@ -120,7 +122,6 @@ public class Robot extends OscarTimedRobot {
         turret.setNeutralMode(mode);
         shooter.setHood(2.7);
         climber.zeroDeploy();
-        autoCommand = new ShootCommandGroup(superStructure);
         autoCommand.schedule();
     }
 
@@ -146,7 +147,7 @@ public class Robot extends OscarTimedRobot {
 
     @Override
     public void teleopInit() {
-//        autoCommand.cancel();
+        autoCommand.cancel();
         NeutralMode mode = NeutralMode.kBrake;
         drivetrain.setNeutralMode(mode);
         shooter.setFlyheelNeutralMode(mode);

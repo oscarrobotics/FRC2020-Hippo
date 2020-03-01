@@ -69,7 +69,11 @@ public class Climber extends SubsystemBase implements DashboardUpdatable {
     }
 
     public void windWinch() {
-        winchMotor.set(0.5);
+        if (isWinchSafe()) winchMotor.set(0.7);
+    }
+
+    public boolean isWinchSafe() {
+        return deployMotor.getSensorPosition() > Constants.ClimberValues.MinExtend;
     }
 
     public void extendHook() {

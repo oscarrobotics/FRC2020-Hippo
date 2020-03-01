@@ -35,7 +35,7 @@ public class Spindexer extends SubsystemBase {
 	public Spindexer(GrouchPDP pdp) {
 		spinMotor = new CANSparkMax(SpindexerValues.SPIN_MOTOR_CAN_ID, Motor.kNEO);
 		spinMotor.wipeSettings();
-		setCurrentLimit(30); //this might change
+		setCurrentLimit(10); //this might change
 		spinMotor.setInverted(false); //these might change
 		spinMotor.setSensorPhase(true);
 		spinMotor.setNeutralMode(NeutralMode.kBrake);

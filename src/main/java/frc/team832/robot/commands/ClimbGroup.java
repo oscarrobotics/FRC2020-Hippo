@@ -10,7 +10,7 @@ public class ClimbGroup extends SequentialCommandGroup {
     public ClimbGroup(Climber climber, boolean climbUp){
         addCommands(
                 new InstantCommand(climber::unlockClimb, climber),
-                new WaitCommand(0.05),
+                new WaitCommand(0.2),
                 new RunEndCommand(climbUp ? climber::windWinch : climber::unwindWinch, climber::stopClimb)
         );
     }

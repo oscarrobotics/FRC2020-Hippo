@@ -44,8 +44,8 @@ public class OI {
 
 		stratComInterface.getArcadeBlackLeft().whenHeld(new RunEndCommand(() -> superStructure.setState(SuperStructure.SuperstructureState.INTAKE),
 				() -> superStructure.setState(SuperStructure.SuperstructureState.IDLE)));
-		stratComInterface.getArcadeBlackLeft().whenHeld(new RunEndCommand(() -> superStructure.setSpindexerIntakeRPMSlider(stratComInterface.getRightSlider()),
-				superStructure::setSpindexerIntakeRpmDefault));
+		stratComInterface.getArcadeBlackLeft().whenHeld(new RunEndCommand(() -> superStructure.configureIntakeRPMSlider(stratComInterface.getRightSlider(),
+				stratComInterface.getLeftSlider(), stratComInterface.getKeySwitch().get()), superStructure::setSpindexerIntakeRpmDefault));
 
 		stratComInterface.getArcadeWhiteLeft().whenHeld(new RunEndCommand(() -> superStructure.setState(SuperStructure.SuperstructureState.TARGETING),
 				() -> superStructure.setState(SuperStructure.SuperstructureState.IDLE)));

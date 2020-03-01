@@ -19,10 +19,11 @@ public class ShootCommandGroup extends SequentialCommandGroup {
 //                        spindexer),
 
                 new InstantCommand(() -> superStructure.setState(SuperStructure.SuperstructureState.SHOOTING)),
-                new WaitCommand(3),
+                new WaitCommand(2),
                 new InstantCommand(() -> superStructure.setShootingState(SuperStructure.ShootingState.FIRING)),
-                new WaitCommand(5),
+                new WaitCommand(4),
                 new InstantCommand(() -> superStructure.setState(SuperStructure.SuperstructureState.IDLE))
+
         );
     }
 }
