@@ -23,7 +23,6 @@ public class BasicAutonomous extends SequentialCommandGroup {
                 new InstantCommand(() -> drivetrain.setWheelVolts(4.0, 4.0)),
                 new WaitCommand(1),
                 new InstantCommand(() -> drivetrain.setWheelVolts(0.0, 0.0))
-
         );
         addRequirements(drivetrain);
     }

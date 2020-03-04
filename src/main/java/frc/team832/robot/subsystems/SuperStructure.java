@@ -27,7 +27,7 @@ public class SuperStructure extends SubsystemBase implements DashboardUpdatable 
 	public final ShootCommand shootCommand;
 	public final IntakeCommand intakeCommand;
 
-	private double flywheelRpm  = 5000, hoodVoltage = 2.72, spindexerRpm = 15, intakePower = 0.9;
+	private double flywheelRpm  = 5000, hoodVoltage = 2.72, spindexerRpm = 15, intakePower = 0.95;
 
 
 	public SuperStructure(Intake intake, Shooter shooter, Spindexer spindexer, Turret turret, Vision vision) {
@@ -100,7 +100,7 @@ public class SuperStructure extends SubsystemBase implements DashboardUpdatable 
     public void trackTarget() {
 		turret.setVisionMode(true);
 	    if (vision.getTarget().isValid) {
-            turret.setTurretTargetDegrees(ShooterCalculations.visionYaw + turret.getDegrees(), true);
+            turret.setTurretTargetDegrees(ShooterCalculations.visionYaw + turret.getDegrees() + 3, true);
         } else {
 	    	turret.setTurretTargetDegrees(0.0, true);
 		}
@@ -156,7 +156,7 @@ public class SuperStructure extends SubsystemBase implements DashboardUpdatable 
 	}
 
 	public boolean isShooterPrepared() {
-		return shooter.readyToShoot() && isSpindexerReadyShoot(getNearestSafeRotationRelativeToFeeder(), spindexer.getRelativeRotations());
+		return shooter.dumbReadyToShoot(flywheelRpm);//shooter.readyToShoot() && isSpindexerReadyShoot(getNearestSafeRotationRelativeToFeeder(), spindexer.getRelativeRotations());
 	}
 
 	@Override
@@ -252,7 +252,7 @@ public class SuperStructure extends SubsystemBase implements DashboardUpdatable 
 			shooter.setHood(hoodVoltage);
 			shooter.setDumbRPM(flywheelRpm);
 			if(_shootingState == ShootingState.FIRING){
-				spindexer.setSpinRPM(50, Spindexer.SpinnerDirection.CounterClockwise);
+				spindexer.setSpinRPM(40, Spindexer.SpinnerDirection.CounterClockwise);
 			} else {
 				spindexer.setSpinRPM(0, Spindexer.SpinnerDirection.CounterClockwise);
 
@@ -276,7 +276,7 @@ public class SuperStructure extends SubsystemBase implements DashboardUpdatable 
 
 	public void configureIntakeRPMSlider(double spindexerSlider, double intakeSlider, boolean isKey) {
 		spindexerRpm = OscarMath.clipMap(spindexerSlider, -1 , 1, -15, 15);
-		if (isKey) intakePower = OscarMath.map(intakeSlider,-1, 1, 0.5, 1);
+//		if (isKey) intakePower = OscarMath.map(intakeSlider,-1, 1, 0.5, 1);
 	}
 
 	public void setShooterParametersDefault () {

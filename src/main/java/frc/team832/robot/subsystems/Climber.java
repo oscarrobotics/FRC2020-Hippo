@@ -1,5 +1,6 @@
 package frc.team832.robot.subsystems;
 
+import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.controller.ProfiledPIDController;
@@ -7,6 +8,7 @@ import edu.wpi.first.wpilibj.util.Units;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.team832.lib.driverstation.dashboard.DashboardManager;
 import frc.team832.lib.driverstation.dashboard.DashboardUpdatable;
+import frc.team832.lib.driverstation.dashboard.DashboardWidget;
 import frc.team832.lib.motorcontrol.NeutralMode;
 import frc.team832.lib.motorcontrol2.vendor.CANSparkMax;
 import frc.team832.lib.motors.Motor;
@@ -24,6 +26,8 @@ public class Climber extends SubsystemBase implements DashboardUpdatable {
     private double extendTarget = Constants.ClimberValues.Retract;
 
     private SmartMCAttachedPDPSlot winchSlot, deploySlot;
+
+    private final NetworkTableEntry dashboard_isSafe;
 
     private ProfiledPIDController extendPID = new ProfiledPIDController(Constants.ClimberValues.ExtendkP, 0, 0, Constants.ClimberValues.ExtendConstraints);
 
@@ -56,6 +60,8 @@ public class Climber extends SubsystemBase implements DashboardUpdatable {
         winchMotor.limitInputCurrent(40);
         deployMotor.limitInputCurrent(30);
 
+        dashboard_isSafe = DashboardManager.addTabItem(this, "Is Safe", false, DashboardWidget.BooleanBox);
+
         initSuccessful = winchMotor.getCANConnection() && deployMotor.getCANConnection();
     }
 
@@ -69,7 +75,7 @@ public class Climber extends SubsystemBase implements DashboardUpdatable {
     }
 
     public void windWinch() {
-        if (isWinchSafe()) winchMotor.set(0.7);
+        winchMotor.set(0.7);
     }
 
     public boolean isWinchSafe() {
@@ -141,6 +147,6 @@ public class Climber extends SubsystemBase implements DashboardUpdatable {
 
     @Override
     public void updateDashboardData() {
-
+        dashboard_isSafe.setBoolean(isWinchSafe());
     }
 }

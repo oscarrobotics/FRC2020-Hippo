@@ -16,6 +16,7 @@ import frc.team832.lib.power.GrouchPDP;
 import frc.team832.lib.power.impl.SmartMCAttachedPDPSlot;
 import frc.team832.lib.sensors.REVThroughBorePWM;
 import frc.team832.lib.util.OscarMath;
+import frc.team832.robot.Constants;
 import frc.team832.robot.Constants.ShooterValues;
 import frc.team832.robot.utilities.state.ShooterCalculations;
 
@@ -148,8 +149,12 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
     }
 
     //superstructure
-    boolean readyToShoot() {
+    public boolean readyToShoot() {
         return atShootingRpm() && atHoodTarget() && atFeedRpm();
+    }
+
+    public boolean dumbReadyToShoot(double flywheelTarget) {
+        return (Math.abs(primaryMotor.getSensorVelocity() - (flywheelTarget / ShooterValues.FlywheelReduction)) < 250);
     }
 
     private boolean atShootingRpm() {

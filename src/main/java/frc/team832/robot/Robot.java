@@ -38,6 +38,7 @@ public class Robot extends OscarTimedRobot {
     private static final Notifier intakeTelemetryNotifier = new Notifier(intake::updateDashboardData);
     private static final Notifier turretTelemetryNotifier = new Notifier(turret::updateDashboardData);
     private static final Notifier visionTelemetryNotifier = new Notifier(vision::updateDashboardData);
+    private static final Notifier climberTelemetryNotifier = new Notifier(climber::updateDashboardData);
     private static final Notifier superStructureTelemetryNotifier = new Notifier(superStructure::updateDashboardData);
 
     private Command autoCommand;
@@ -93,6 +94,7 @@ public class Robot extends OscarTimedRobot {
         } else {
             System.out.println("Climber - init FAILED");
         }
+        climberTelemetryNotifier.startPeriodic(0.05);
 
         if (wheelOfFortune.initSuccessful) {
             System.out.println("WheelOfFortune - init OK");
