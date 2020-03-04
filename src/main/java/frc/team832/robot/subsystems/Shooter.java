@@ -116,7 +116,6 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
         primaryMotor.setTargetVelocity(motorTargetRpm, ShooterValues.FlywheelFF.calculate(motorTargetRpm), CANPIDController.ArbFFUnits.kVoltage);
     }
 
-    // testing
     public void setDumbRPM(double rpm) {
         setWheelRPM(rpm);
     }
@@ -125,6 +124,18 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
     public void idle() {
         setMode(ShootMode.Idle);
         setFeedRPM(0);
+    }
+
+    public void prepareShoot() {
+        setMode(ShootMode.SpinUp);
+        setFeedRPM(0);
+        setDumbRPM(5000);
+    }
+
+    public void shoot(double flywheelRPM) {
+        setMode(ShootMode.Shooting);
+        setFeedRPM(3000);
+        setDumbRPM(flywheelRPM);
     }
 
     public void setFeedRPM(double rpm) {

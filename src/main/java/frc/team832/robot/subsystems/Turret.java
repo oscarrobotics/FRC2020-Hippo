@@ -66,7 +66,7 @@ public class Turret extends SubsystemBase implements DashboardUpdatable {
     }
 
     public void setTurretTargetDegrees(double pos, boolean isVision) {
-        this.isVision = isVision;
+        setVisionMode(isVision);
         turretTargetDeg = pos;
     }
 
@@ -117,7 +117,7 @@ public class Turret extends SubsystemBase implements DashboardUpdatable {
         }
     }
 
-    public void setVisionMode(boolean visionMode){
+    private void setVisionMode(boolean visionMode){
         isVision = visionMode;
     }
 

@@ -52,7 +52,7 @@ public class SuperStructure extends SubsystemBase implements DashboardUpdatable 
 
 	@Override
 	public void periodic() {
-		handleState();
+
 	}
 
 	public void intake() {
@@ -98,13 +98,11 @@ public class SuperStructure extends SubsystemBase implements DashboardUpdatable 
 	}
 
     public void trackTarget() {
-		turret.setVisionMode(true);
 	    if (vision.getTarget().isValid) {
             turret.setTurretTargetDegrees(ShooterCalculations.visionYaw + turret.getDegrees() + 3, true);
         } else {
 	    	turret.setTurretTargetDegrees(0.0, true);
 		}
-
     }
 
     public void stopTrackTarget() {
@@ -179,14 +177,8 @@ public class SuperStructure extends SubsystemBase implements DashboardUpdatable 
 		@Override
 		public void initialize() {
 			idleAll();
-			turret.setVisionMode(false);
 			_shootingState = ShootingState.PREPARE;
-			if(_lastState == SuperstructureState.INTAKE){
-				turret.setIntake();
-			} else {
-				turret.setTurretTargetDegrees(0, false);
-			}
-//			turret.setTurretTargetDegrees(0, false);
+			turret.setTurretTargetDegrees(0, false);
 		}
 	}
 
@@ -197,7 +189,6 @@ public class SuperStructure extends SubsystemBase implements DashboardUpdatable 
 
 		@Override
 		public void initialize() {
-			shooter.setDumbRPM(0);
 			shooter.setFeedRPM(0);
 			intake.extendIntake();
 			turret.setIntake();
@@ -212,6 +203,11 @@ public class SuperStructure extends SubsystemBase implements DashboardUpdatable 
 		public void execute() {
 			intake.intake(intakePower);
 		}
+
+		@Override
+		public void end(boolean interrupted) {
+			idleIntake();
+		}
 	}
 
     private class TargetingCommand extends SequentialCommandGroup {
@@ -221,9 +217,9 @@ public class SuperStructure extends SubsystemBase implements DashboardUpdatable 
 
 		@Override
 		public void initialize() {
-			shooter.idle();
 			spindexer.idle();
 			turret.setForward(true);
+			shooter.prepareShoot();
 		}
 
 		@Override
@@ -240,8 +236,6 @@ public class SuperStructure extends SubsystemBase implements DashboardUpdatable 
 
 		@Override
 		public void initialize() {
-			shooter.setMode(Shooter.ShootMode.Shooting);
-			shooter.setFeedRPM(4000);
 			turret.setForward(true);
 			setShootingState(ShootingState.FIRING);
 		}
@@ -250,7 +244,7 @@ public class SuperStructure extends SubsystemBase implements DashboardUpdatable 
 		public void execute() {
 			trackTarget();
 			shooter.setHood(hoodVoltage);
-			shooter.setDumbRPM(flywheelRpm);
+			shooter.shoot(flywheelRpm);
 			if(_shootingState == ShootingState.FIRING){
 				spindexer.setSpinRPM(40, Spindexer.SpinnerDirection.CounterClockwise);
 			} else {
@@ -262,6 +256,7 @@ public class SuperStructure extends SubsystemBase implements DashboardUpdatable 
 		@Override
 		public void end(boolean interrupted) {
 			setShootingState(ShootingState.PREPARE);
+			idleShooter();
 		}
 	}
 
@@ -290,15 +285,18 @@ public class SuperStructure extends SubsystemBase implements DashboardUpdatable 
 	}
 
     public void setState(SuperstructureState state) {
-		_lastState = _state;
-		_state = state;
+		if (state != _state) {
+			_lastState = _state;
+			_state = state;
+			updateState();
+		}
 	}
 
 	public void setShootingState(ShootingState state){
 		_shootingState = state;
 	}
 
-	private void handleState() {
+	private void updateState() {
 		switch (_state) {
 			case IDLE:
 				idleCommand.schedule();
@@ -312,8 +310,7 @@ public class SuperStructure extends SubsystemBase implements DashboardUpdatable 
 			case SHOOTING:
 				shootCommand.schedule();
 				break;
-		}
-	}
+		}	}
 
     public enum SuperstructureState {
 		INVALID,
