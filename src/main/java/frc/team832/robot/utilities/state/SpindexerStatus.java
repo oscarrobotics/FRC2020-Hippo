@@ -1,9 +1,5 @@
 package frc.team832.robot.utilities.state;
 
-import edu.wpi.first.networktables.NetworkTableEntry;
-import frc.team832.lib.driverstation.dashboard.DashboardManager;
-import frc.team832.lib.driverstation.dashboard.DashboardUpdatable;
-import frc.team832.lib.driverstation.dashboard.DashboardWidget;
 import frc.team832.lib.motorcontrol2.vendor.CANSparkMax;
 import frc.team832.lib.power.GrouchPDP;
 import frc.team832.lib.power.impl.SmartMCAttachedPDPSlot;
@@ -11,10 +7,8 @@ import frc.team832.lib.power.monitoring.StallDetector;
 import frc.team832.lib.util.OscarMath;
 import frc.team832.robot.Constants;
 import frc.team832.robot.subsystems.Spindexer;
-import frc.team832.robot.subsystems.SuperStructure;
-import frc.team832.robot.utilities.positions.BallPosition;
 
-public class SpindexerStatus implements DashboardUpdatable {
+public class SpindexerStatus {
     private final Spindexer spindexer;
     private final CANSparkMax spinMotor;
     private final GrouchPDP pdp;
@@ -23,10 +17,8 @@ public class SpindexerStatus implements DashboardUpdatable {
 
     private boolean[] ballPositions = new boolean[5];
     private double absoluteRotations = 0;
-    public SpindexerState state;
+    public SpindexerState state = SpindexerState.EMPTY;
     private Spindexer.SpinnerDirection spinDirection;
-
-    NetworkTableEntry ballSlot0, ballSlot1, ballSlot2, ballSlot3, ballSlot4, dashboard_state, dashboard_hallEffect;
 
     public SpindexerStatus(GrouchPDP pdp, Spindexer spindexer, CANSparkMax spinMotor) {
 
@@ -39,17 +31,10 @@ public class SpindexerStatus implements DashboardUpdatable {
         spinStall.setMinStallMillis(500);
         spinStall.setStallCurrent(30);
 
-        ballSlot0 = DashboardManager.addTabItem(this, "Slot 0", false, DashboardWidget.BooleanBox);
-        ballSlot1 = DashboardManager.addTabItem(this, "Slot 1", false, DashboardWidget.BooleanBox);
-        ballSlot2 = DashboardManager.addTabItem(this, "Slot 2", false, DashboardWidget.BooleanBox);
-        ballSlot3 = DashboardManager.addTabItem(this, "Slot 3", false, DashboardWidget.BooleanBox);
-        ballSlot4 = DashboardManager.addTabItem(this, "Slot 4", false, DashboardWidget.BooleanBox);
-        dashboard_state = DashboardManager.addTabItem(this, "State", "Default");
-        dashboard_hallEffect = DashboardManager.addTabItem(this, "Hall Effect", false, DashboardWidget.BooleanBox);
     }
 
-    public void update(boolean isOverSlot) {
-        boolean currentSlotHasBall = spindexer.getBallSensor() && isOverSlot;
+    public void update() {
+        boolean currentSlotHasBall = spindexer.isBall() && spindexer.isOverSlot();
         ballPositions[spindexer.getNearestBallPosition().slotNumber] = currentSlotHasBall;
 
         if (isFull())
@@ -61,9 +46,9 @@ public class SpindexerStatus implements DashboardUpdatable {
 
         spinStall.updateStallStatus();
 
-//        if (spindexer.getHallEffect()) {
-//           onHallEffect();
-//        }
+        if (spindexer.getHallEffect()) {
+           onHallEffect();
+        }
 
         spinDirection = Math.signum(spinMotor.getSensorVelocity()) == 1 ? Spindexer.SpinnerDirection.Clockwise : Spindexer.SpinnerDirection.CounterClockwise;
     }
@@ -119,22 +104,6 @@ public class SpindexerStatus implements DashboardUpdatable {
 
     public Spindexer.SpinnerDirection getSpinDirection() {
         return spinDirection;
-    }
-
-    @Override
-    public String getDashboardTabName() {
-        return "Spindexer Status";
-    }
-
-    @Override
-    public void updateDashboardData() {
-        ballSlot0.setBoolean(getSlot(0));
-        ballSlot1.setBoolean(getSlot(1));
-        ballSlot2.setBoolean(getSlot(2));
-        ballSlot3.setBoolean(getSlot(3));
-        ballSlot4.setBoolean(getSlot(4));
-        dashboard_state.setString(state.toString());
-        dashboard_hallEffect.setBoolean(spindexer.getHallEffect());
     }
 
     public enum SpindexerState {

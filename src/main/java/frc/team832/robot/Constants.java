@@ -74,7 +74,7 @@ public class Constants {
 
     public static class ShooterValues {
         public static final int PRIMARY_CAN_ID = 2;
-        public static final int SECONDARY_CAN_ID = 8;
+        public static final int SECONDARY_CAN_ID = 3;
         public static final int FEED_MOTOR_CAN_ID = 6;
 
         public static final PDPPortNumber PRIMARY_PDP_SLOT = PDPPortNumber.Port2;
@@ -86,10 +86,8 @@ public class Constants {
         public static final int HOOD_POTENTIOMETER_ANALOG_CHANNEL = 0;
 
         public static double hoodPotVoltageToRotations(double voltage) {
-            return OscarMath.map(voltage, HoodBottom, 5, 0, 3);
+            return OscarMath.map(voltage, HoodTop, HoodBottom, 0, 3);
         }
-
-//        public static double
 
         public static final float FlywheelReduction = 50f / 26f;
         private static final Gearbox FlywheelGearbox = new Gearbox(FlywheelReduction);
@@ -204,7 +202,7 @@ public class Constants {
 
     public static class ClimberValues {
         public static final int WINCH_CAN_ID = 7;
-        public static final int DEPLOY_CAN_ID = 3;
+        public static final int DEPLOY_CAN_ID = 8;
 
         public static final PDPPortNumber WINCH_PDP_PORT = PDPPortNumber.Port13;
         public static final PDPPortNumber DEPLOY_PDP_PORT = PDPPortNumber.Port11;

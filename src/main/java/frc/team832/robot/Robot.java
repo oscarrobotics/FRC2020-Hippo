@@ -21,7 +21,7 @@ public class Robot extends OscarTimedRobot {
 
     PigeonIMU imu = new PigeonIMU(0);
     public static final GrouchPDP pdp = new GrouchPDP(0);
-    private static final Compressor pcm = new Compressor(0);
+//    private static final Compressor pcm = new Compressor(0);
 
     // Subsystems
     static final Drivetrain drivetrain = new Drivetrain(pdp);
@@ -37,19 +37,20 @@ public class Robot extends OscarTimedRobot {
     public static final OI oi = new OI(superStructure);
 
     private static final Notifier drivetrainTelemetryNotifier = new Notifier(drivetrain::updateDashboardData);
-    private static final Notifier shooterTelemetryNotifier = new Notifier(shooter::updateDashboardData);
-    private static final Notifier intakeTelemetryNotifier = new Notifier(intake::updateDashboardData);
-    private static final Notifier turretTelemetryNotifier = new Notifier(turret::updateDashboardData);
-    private static final Notifier visionTelemetryNotifier = new Notifier(vision::updateDashboardData);
-    private static final Notifier climberTelemetryNotifier = new Notifier(climber::updateDashboardData);
-    private static final Notifier superStructureTelemetryNotifier = new Notifier(superStructure::updateDashboardData);
+//    private static final Notifier shooterTelemetryNotifier = new Notifier(shooter::updateDashboardData);
+//    private static final Notifier intakeTelemetryNotifier = new Notifier(intake::updateDashboardData);
+//    private static final Notifier turretTelemetryNotifier = new Notifier(turret::updateDashboardData);
+//    private static final Notifier visionTelemetryNotifier = new Notifier(vision::updateDashboardData);
+//    private static final Notifier climberTelemetryNotifier = new Notifier(climber::updateDashboardData);
+    private static final Notifier spindexerTelemetryNotifier = new Notifier(spindexer::updateDashboardData);
+//    private static final Notifier superStructureTelemetryNotifier = new Notifier(superStructure::updateDashboardData);
 
     private Command autoCommand;
 
     @Override
     public void robotInit() {
 
-        pcm.setClosedLoopControl(true);
+//        pcm.setClosedLoopControl(true);
 
         if (drivetrain.initSuccessful) {
             System.out.println("Drivetrain - init OK");
@@ -63,41 +64,42 @@ public class Robot extends OscarTimedRobot {
         } else {
             System.out.println("Intake - init FAILED");
         }
-        intakeTelemetryNotifier.startPeriodic(0.02);
+//        intakeTelemetryNotifier.startPeriodic(0.02);
 
         if (vision.initSuccessful) {
             System.out.println("Vision - init OK");
         } else {
             System.out.println("Vision - init FAILED");
         }
-        visionTelemetryNotifier.startPeriodic(0.02);
+//        visionTelemetryNotifier.startPeriodic(0.02);
 
         if (shooter.initSuccessful) {
             System.out.println("Shooter - init OK");
         } else {
             System.out.println("Shooter - init FAILED");
         }
-        shooterTelemetryNotifier.startPeriodic(0.02);
+//        shooterTelemetryNotifier.startPeriodic(0.02);
 
         if (turret.initSuccessful) {
             System.out.println("Turret - init OK");
         } else {
             System.out.println("Turret - init FAILED");
         }
-        turretTelemetryNotifier.startPeriodic(0.02);
+//        turretTelemetryNotifier.startPeriodic(0.02);
 
         if (spindexer.initSuccessful) {
             System.out.println("Spindexer - init OK");
         } else {
             System.out.println("Spindexer - init FAILED");
         }
+        spindexerTelemetryNotifier.startPeriodic(0.02);
 
         if (climber.initSuccessful) {
             System.out.println("Climber - init OK");
         } else {
             System.out.println("Climber - init FAILED");
         }
-        climberTelemetryNotifier.startPeriodic(0.05);
+//        climberTelemetryNotifier.startPeriodic(0.02);
 
         if (wheelOfFortune.initSuccessful) {
             System.out.println("WheelOfFortune - init OK");
@@ -105,7 +107,7 @@ public class Robot extends OscarTimedRobot {
             System.out.println("WheelOfFortune - init FAILED");
         }
 
-        superStructureTelemetryNotifier.startPeriodic(0.02);
+//        superStructureTelemetryNotifier.startPeriodic(0.02);
 
         CANDevice.printMissingDevices();
         autoCommand = new BasicAutonomous(superStructure, drivetrain);
@@ -166,5 +168,6 @@ public class Robot extends OscarTimedRobot {
 
     @Override
     public void teleopPeriodic() {
+
     }
 }

@@ -1,9 +1,15 @@
 package frc.team832.robot.subsystems;
 
+import com.cuforge.libcu.Lasershark;
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.controller.ProfiledPIDController;
 import edu.wpi.first.wpilibj.util.Units;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.team832.lib.driverstation.dashboard.DashboardManager;
+import frc.team832.lib.driverstation.dashboard.DashboardUpdatable;
+import frc.team832.lib.driverstation.dashboard.DashboardWidget;
 import frc.team832.lib.motorcontrol.NeutralMode;
 import frc.team832.lib.motorcontrol2.vendor.CANSparkMax;
 import frc.team832.lib.motors.Motor;
@@ -16,17 +22,20 @@ import frc.team832.robot.utilities.positions.BallPosition;
 import frc.team832.robot.utilities.state.SpindexerStatus;
 
 
-public class Spindexer extends SubsystemBase {
+public class Spindexer extends SubsystemBase implements DashboardUpdatable {
 	public final boolean initSuccessful;
 
 	private final CANSparkMax spinMotor;
 	private final HallEffect hallEffect;
 	private final LasersharkDistance ballSensor;
+	private final DigitalInput shark;
 	private final PIDController spinPID = new PIDController(SpindexerValues.SpinkP, 0, 0);
 	private final ProfiledPIDController positionPID = new ProfiledPIDController(SpindexerValues.PositionkP, 0, 0, SpindexerValues.Constraints);
 
-	private SpindexerStatus spindexerStatus;
+	private final SpindexerStatus spindexerStatus;
 	private SpinMode spinMode;
+
+	private final NetworkTableEntry ballSlot0, ballSlot1, ballSlot2, ballSlot3, ballSlot4, dashboard_state, dashboard_hallEffect, dashboard_laserShark;
 
 	private double tempSpindexerRotations = 0;
 	private double lastSpinSpeed = 0;
@@ -45,16 +54,44 @@ public class Spindexer extends SubsystemBase {
 		spindexerStatus = new SpindexerStatus(pdp, this, spinMotor);
 
 		hallEffect = new HallEffect(SpindexerValues.HALL_EFFECT_DIO_CHANNEL);
+		shark = new DigitalInput(2);
 		ballSensor = new LasersharkDistance(SpindexerValues.LASERSHARK_DIO_CHANNEL);
 
-		hallEffect.setupInterrupts(spindexerStatus::onHallEffect);
+//		hallEffect.setupInterrupts(spindexerStatus::onHallEffect);
 
-		initSuccessful = spinMotor.getCANConnection() && ballSensor.getDistanceMeters() != 0;
+		hallEffect.setupInterrupts(() -> {
+			System.out.println("HALL");
+		});
+
+		DashboardManager.addTab(this, this);
+		ballSlot0 = DashboardManager.addTabItem(this, "Spindexer/Slot 0", false, DashboardWidget.BooleanBox);
+		ballSlot1 = DashboardManager.addTabItem(this, "Spindexer/Slot 1", false, DashboardWidget.BooleanBox);
+		ballSlot2 = DashboardManager.addTabItem(this, "Spindexer/Slot 2", false, DashboardWidget.BooleanBox);
+		ballSlot3 = DashboardManager.addTabItem(this, "Spindexer/Slot 3", false, DashboardWidget.BooleanBox);
+		ballSlot4 = DashboardManager.addTabItem(this, "Spindexer/Slot 4", false, DashboardWidget.BooleanBox);
+		dashboard_state = DashboardManager.addTabItem(this, "State", "Default");
+		dashboard_hallEffect = DashboardManager.addTabItem(this, "Hall Effect", false, DashboardWidget.BooleanBox);
+		dashboard_laserShark = DashboardManager.addTabItem(this, "Laser Shark Meters", 0.0);
+
+		initSuccessful = spinMotor.getCANConnection();// && ballSensor.getDistanceMeters() != 0;
 	}
 
 	@Override
 	public void periodic() {
 	    runSpindexerPID();
+	    spindexerStatus.update();
+	}
+
+	@Override
+	public void updateDashboardData() {
+		ballSlot0.setBoolean(spindexerStatus.getSlot(0));
+		ballSlot1.setBoolean(spindexerStatus.getSlot(1));
+		ballSlot2.setBoolean(spindexerStatus.getSlot(2));
+		ballSlot3.setBoolean(spindexerStatus.getSlot(3));
+		ballSlot4.setBoolean(spindexerStatus.getSlot(4));
+		dashboard_state.setString(spindexerStatus.state.toString());
+		dashboard_hallEffect.setBoolean(getHallEffect());
+		dashboard_laserShark.setDouble(getBallSensorMeters());
 	}
 
 	public void setDumbPosition(double rot) {
@@ -96,10 +133,6 @@ public class Spindexer extends SubsystemBase {
 		}
 	}
 
-	public void updateStatus(boolean isOverSlot) {
-		spindexerStatus.update(isOverSlot);
-	}
-
 	public void setTargetRotation(double rot) {
 		spinMode = SpinMode.Position;
 		spindexerTargetPosition = rot;
@@ -111,7 +144,7 @@ public class Spindexer extends SubsystemBase {
 	}
 
 	public boolean getHallEffect() {
-		return hallEffect.get();
+		return !hallEffect.get();
 	}
 
 	public void zeroSpindexer() {
@@ -144,12 +177,24 @@ public class Spindexer extends SubsystemBase {
 		spinMotor.set(OscarMath.clip(pow, 0, 1));
 	}
 
+	public boolean isOverSlot() {
+		return Math.abs(getRelativeRotations() - BallPosition.Position0.rotations) < 0.05
+				|| Math.abs(getRelativeRotations() - BallPosition.Position1.rotations) < 0.05
+				|| Math.abs(getRelativeRotations() - BallPosition.Position2.rotations) < 0.05
+				|| Math.abs(getRelativeRotations() - BallPosition.Position3.rotations) < 0.05
+				|| Math.abs(getRelativeRotations() - BallPosition.Position4.rotations) < 0.05;
+	}
+
 	public double getBallSensorRaw() {
 		return ballSensor.getPercentageDistance();
 	}
 
-	public boolean getBallSensor() {
-		return getBallSensorRaw() >= Units.inchesToMeters(3);
+	public boolean isBall() {
+		return getBallSensorMeters() <= 0.15 && getBallSensorMeters() >= 0.02;
+	}
+
+	public double getBallSensorMeters() {
+		return ballSensor.getDistanceMeters();
 	}
 
 	public boolean isFull() {
@@ -221,6 +266,15 @@ public class Spindexer extends SubsystemBase {
 
 	public void idle() {
 		setTargetVelocity(0);
+	}
+
+	@Override
+	public String getDashboardTabName() {
+		return "Spindexer";
+	}
+
+	public CANSparkMax getSpinMotor() {
+		return spinMotor;
 	}
 
 	public enum SpinnerDirection {
