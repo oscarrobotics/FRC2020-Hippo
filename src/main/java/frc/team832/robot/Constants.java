@@ -187,8 +187,8 @@ public class Constants {
 
         public static final PDPPortNumber SPIN_MOTOR_PDP_SLOT = PDPPortNumber.Port5;
 
-        public static final int HALL_EFFECT_DIO_CHANNEL = 2;
-        public static final int LASERSHARK_DIO_CHANNEL = 1;
+        public static final int HALL_EFFECT_DIO_CHANNEL = 1;
+        public static final int LASERSHARK_DIO_CHANNEL = 2;
 
         public static final float SpinReduction = 1f / (56f/1f);
         private static final Gearbox SpinGearbox = new Gearbox(SpinReduction);
