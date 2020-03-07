@@ -1,5 +1,6 @@
 package frc.team832.robot;
 
+import com.ctre.phoenix.sensors.PigeonIMU;
 import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -17,6 +18,8 @@ import frc.team832.robot.utilities.state.SpindexerStatus;
 @SuppressWarnings("WeakerAccess")
 public class Robot extends OscarTimedRobot {
 
+
+    PigeonIMU imu = new PigeonIMU(0);
     public static final GrouchPDP pdp = new GrouchPDP(0);
     private static final Compressor pcm = new Compressor(0);
 
