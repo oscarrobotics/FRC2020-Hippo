@@ -19,6 +19,7 @@ public class Turret extends SubsystemBase implements DashboardUpdatable {
 
     public final boolean initSuccessful;
     private double turretTargetDeg;
+    private double turretFF = 0;
 
     private final CANSparkMax motor;
     private final REVThroughBorePWM encoder;
@@ -28,7 +29,7 @@ public class Turret extends SubsystemBase implements DashboardUpdatable {
 
     private NetworkTableEntry dashboard_turretPos, dashboard_turretPow, dashboard_turretTarget;
 
-    private final PIDController PID = new PIDController(TurretValues.TurretkP, 0, 0);
+    private final PIDController PID = new PIDController(TurretValues.kP, TurretValues.kI, TurretValues.kD);
 
     public Turret(GrouchPDP pdp) {
         DashboardManager.addTab(this, this);
@@ -41,6 +42,9 @@ public class Turret extends SubsystemBase implements DashboardUpdatable {
 
         motor.limitInputCurrent(25);
         motor.setNeutralMode(NeutralMode.kBrake);
+
+        PID.setIntegratorRange(-0.05, 0.05);
+        PID.setTolerance(0.5);
 
 
         // keep turret at init position
@@ -63,6 +67,11 @@ public class Turret extends SubsystemBase implements DashboardUpdatable {
         dashboard_turretPos.setDouble(getDegrees());
         dashboard_turretPow.setDouble(motor.getOutputVoltage());
         dashboard_turretTarget.setDouble(turretTargetDeg);
+    }
+
+    public void trackTarget(double spindexerRPM) {
+        updateFF(spindexerRPM);
+        setTurretTargetDegrees(ShooterCalculations.visionYaw + getDegrees(), true);
     }
 
     protected double calculateSafePosition(boolean isVision, double degrees) {
@@ -96,21 +105,18 @@ public class Turret extends SubsystemBase implements DashboardUpdatable {
         }
     }
 
-    private double getFF() {
-        boolean isFF = Math.abs(getDegrees() - turretTargetDeg) > 5;
-        if ((getDegrees() - turretTargetDeg) > 0 && isFF) return TurretValues.TurretFF;
-        else if ((getDegrees() - turretTargetDeg) > 0 && isFF) return -TurretValues.TurretFF;
-        else return 0;
+    public void setTurretTargetDegrees(double pos, boolean isVision) {
+        setVisionMode(isVision);
+        turretTargetDeg = pos;
+    }
+
+    private double updateFF(double spindexerRPM) {
+        return PID.getPositionError() > 5  ? spindexerRPM * TurretValues.FFMultiplier : 0;
     }
 
     private void runPID() {
         handleSafety(isVision);
-        motor.set(PID.calculate(getDegrees(), turretTargetDeg) + getFF());
-    }
-
-    public void setTurretTargetDegrees(double pos, boolean isVision) {
-        setVisionMode(isVision);
-        turretTargetDeg = pos;
+        motor.set(PID.calculate(getDegrees(), turretTargetDeg) + turretFF);
     }
 
     public void setForward(boolean isVision) { setTurretTargetDegrees(TurretValues.TurretCenterVisionPosition, isVision); }

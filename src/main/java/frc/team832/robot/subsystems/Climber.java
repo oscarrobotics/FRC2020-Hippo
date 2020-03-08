@@ -24,12 +24,15 @@ public class Climber extends SubsystemBase implements DashboardUpdatable {
     private Solenoid climbLock;
 
     private double extendTarget = Constants.ClimberValues.Retract;
+    private double climbTargetVelocity = 0;
 
     private SmartMCAttachedPDPSlot winchSlot, deploySlot;
 
     private final NetworkTableEntry dashboard_isSafe;
 
     private ProfiledPIDController extendPID = new ProfiledPIDController(Constants.ClimberValues.ExtendkP, 0, 0, Constants.ClimberValues.ExtendConstraints);
+
+    private ProfiledPIDController climbPID = new ProfiledPIDController(Constants.ClimberValues.ClimbkP, 0, 0, Constants.ClimberValues.ClimbConstraints);
 
     public Climber(GrouchPDP pdp) {
         DashboardManager.addTab(this, this);
@@ -67,31 +70,21 @@ public class Climber extends SubsystemBase implements DashboardUpdatable {
 
     @Override
     public void periodic() {
-        runExtendPID();
+        runPID();
     }
 
     public void unwindWinch() {
-        winchMotor.set(-0.5);
+        setClimbTargetVelocity(-Constants.ClimberValues.ClimbVelocity);
     }
 
-    public void windWinch() {
-        winchMotor.set(0.7);
-    }
+    public void windWinch() { setClimbTargetVelocity(Constants.ClimberValues.ClimbVelocity); }
 
     public boolean isWinchSafe() {
         return deployMotor.getSensorPosition() > Constants.ClimberValues.MinExtend;
     }
 
-    public void extendHook() {
-        deployMotor.set(extendPID.calculate(deployMotor.getSensorPosition(), Constants.ClimberValues.MinExtend));
-    }
-
     public void retractHook() {
         setTargetPosition(Constants.ClimberValues.Retract);
-    }
-
-    public void powerHook(double pow){
-        deployMotor.set(pow);
     }
 
     public void stopExtend() {
@@ -108,23 +101,21 @@ public class Climber extends SubsystemBase implements DashboardUpdatable {
         extendTarget = pos;
     }
 
+    public void setClimbTargetVelocity(double RPS) { climbTargetVelocity = RPS; }
+
+    private void runPID() {
+        runExtendPID();
+        runClimbPID();
+    }
+
+    private void runClimbPID() { winchMotor.set(climbPID.calculate(winchMotor.getSensorVelocity(), climbTargetVelocity)); }
+
     private void runExtendPID() {
         deployMotor.set(extendPID.calculate(deployMotor.getSensorPosition(), extendTarget));
     }
 
-    public void climbDown() {
-        unlockClimb();
-        unwindWinch();
-    }
-
-    public void climbUp() {
-        retractHook();
-        unlockClimb();
-        windWinch();
-    }
-
     public void stopClimb() {
-        winchMotor.set(0);
+        setClimbTargetVelocity(0);
         lockClimb();
     }
 

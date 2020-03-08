@@ -12,9 +12,9 @@ public class ShootCommandGroup extends SequentialCommandGroup {
     public ShootCommandGroup(SuperStructure superStructure) {
         addCommands(
                 new InstantCommand(() -> superStructure.setState(SuperStructure.SuperstructureState.TARGETING)),
-                new WaitCommand(1),
+                new WaitCommand(1.5),
                 new InstantCommand(() -> superStructure.setState(SuperStructure.SuperstructureState.SHOOTING)),
-                new WaitCommand(4),
+                new WaitCommand(3.5),
                 new InstantCommand(() -> superStructure.setState(SuperStructure.SuperstructureState.IDLE))
         );
         addRequirements(superStructure);

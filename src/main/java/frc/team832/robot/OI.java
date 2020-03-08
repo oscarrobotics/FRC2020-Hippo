@@ -3,7 +3,7 @@ package frc.team832.robot;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunEndCommand;
-import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import frc.team832.lib.driverinput.controllers.*;
 import frc.team832.lib.driverinput.oi.DriverOI;
 import frc.team832.lib.driverinput.oi.SticksDriverOI;
@@ -40,23 +40,19 @@ public class OI {
 
 	private void configureBrandonLayout() {
 
-		stratComInterface.getArcadeBlackRight().whenHeld(new RunEndCommand(() -> superStructure.setState(SuperStructure.SuperstructureState.IDLE),
+		stratComInterface.getArcadeBlackRight().whenHeld(new StartEndCommand(() -> superStructure.setState(SuperStructure.SuperstructureState.IDLE),
 				() -> superStructure.setState(SuperStructure.SuperstructureState.IDLE)));
 
-		stratComInterface.getArcadeBlackLeft().whenHeld(new RunEndCommand(() -> superStructure.setState(SuperStructure.SuperstructureState.INTAKE),
+		stratComInterface.getArcadeBlackLeft().whenHeld(new StartEndCommand(() -> superStructure.setState(SuperStructure.SuperstructureState.INTAKE),
 				() -> superStructure.setState(SuperStructure.SuperstructureState.IDLE)));
-		stratComInterface.getArcadeBlackLeft().whenHeld(new RunEndCommand(() -> superStructure.configureIntakeRPMSlider(stratComInterface.getRightSlider(),
-				stratComInterface.getLeftSlider(), stratComInterface.getKeySwitch().get()), superStructure::setSpindexerIntakeRpmDefault));
+		stratComInterface.getArcadeBlackLeft().whenHeld(new RunEndCommand(() -> superStructure.configureSpindexerRPMSlider(stratComInterface.getRightSlider()),
+				superStructure::setSpindexerIntakeRpmDefault));
 
-		stratComInterface.getArcadeWhiteLeft().whenHeld(new RunEndCommand(() -> superStructure.setState(SuperStructure.SuperstructureState.TARGETING),
+		stratComInterface.getArcadeWhiteLeft().whenHeld(new StartEndCommand(() -> superStructure.setState(SuperStructure.SuperstructureState.TARGETING),
 				() -> superStructure.setState(SuperStructure.SuperstructureState.IDLE)));
-		stratComInterface.getArcadeWhiteLeft().whenHeld(new RunEndCommand(() -> superStructure.setShooterParametersSlider(stratComInterface.getLeftSlider(), stratComInterface.getRightSlider(), stratComInterface.getKeySwitch().get()),
-				superStructure::setShooterParametersDefault));
 
-		stratComInterface.getArcadeWhiteRight().whenHeld(new RunEndCommand(() -> superStructure.setState(SuperStructure.SuperstructureState.SHOOTING),
+		stratComInterface.getArcadeWhiteRight().whenHeld(new StartEndCommand(() -> superStructure.setState(SuperStructure.SuperstructureState.SHOOTING),
 				() -> superStructure.setState(SuperStructure.SuperstructureState.IDLE)));
-		stratComInterface.getArcadeWhiteRight().whenHeld(new RunEndCommand(() -> superStructure.setShooterParametersSlider(stratComInterface.getLeftSlider(), stratComInterface.getRightSlider(), stratComInterface.getKeySwitch().get()),
-				superStructure::setShooterParametersDefault));
 
 
 		stratComInterface.getSingleToggle().whenHeld(new RunEndCommand(() -> climber.adjustHook(stratComInterface.getLeftSlider()), climber::stopExtend));
@@ -75,26 +71,7 @@ public class OI {
 	}
 
 	private void configTestingCommands() {
-//		stratComInterface.getArcadeBlackRight().whenHeld(new RunEndCommand(() -> superStructure.setState(SuperStructure.SuperstructureState.IDLE),
-//				() -> superStructure.setState(SuperStructure.SuperstructureState.IDLE)));
-//
-//		stratComInterface.getArcadeBlackLeft().whenHeld(new RunEndCommand(() -> superStructure.setState(SuperStructure.SuperstructureState.INTAKE),
-//				() -> superStructure.setState(SuperStructure.SuperstructureState.IDLE)));
-//		stratComInterface.getArcadeBlackLeft().whenHeld(new RunEndCommand(() -> superStructure.setSpindexerIntakeRPMSlider(stratComInterface.getRightSlider()),
-//				superStructure::setSpindexerIntakeRpmDefault));
-//
-//		stratComInterface.getArcadeWhiteLeft().whenHeld(new RunEndCommand(() -> superStructure.setState(SuperStructure.SuperstructureState.TARGETING),
-//				() -> superStructure.setState(SuperStructure.SuperstructureState.IDLE)));
-//		stratComInterface.getArcadeWhiteLeft().whenHeld(new RunEndCommand(() -> superStructure.setShooterParametersSlider(stratComInterface.getLeftSlider(), stratComInterface.getRightSlider(), stratComInterface.getKeySwitch().get()),
-//				superStructure::setShooterParametersDefault));
-//
-//		stratComInterface.getArcadeWhiteRight().whenHeld(new RunEndCommand(() -> superStructure.setState(SuperStructure.SuperstructureState.SHOOTING),
-//				() -> superStructure.setState(SuperStructure.SuperstructureState.IDLE)));
-//		stratComInterface.getArcadeWhiteRight().whenHeld(new RunEndCommand(() -> superStructure.setShooterParametersSlider(stratComInterface.getLeftSlider(), stratComInterface.getRightSlider(), stratComInterface.getKeySwitch().get()),
-//				superStructure::setShooterParametersDefault));
 
-		stratComInterface.getDoubleToggleUp().whenHeld(new RunEndCommand(() -> shooter.setFeedRPM(OscarMath.map(
-				stratComInterface.getRightSlider(), -1, 1, 0, 4000)), () -> shooter.setFeedRPM(0)));
 	}
 }
 

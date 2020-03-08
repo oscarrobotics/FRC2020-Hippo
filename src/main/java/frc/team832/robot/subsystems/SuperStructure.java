@@ -8,7 +8,6 @@ import frc.team832.lib.motors.Motor;
 import frc.team832.lib.util.OscarMath;
 import frc.team832.robot.Constants;
 import frc.team832.robot.utilities.positions.BallPosition;
-import frc.team832.robot.utilities.state.ShooterCalculations;
 
 public class SuperStructure extends SubsystemBase implements DashboardUpdatable {
 
@@ -20,14 +19,13 @@ public class SuperStructure extends SubsystemBase implements DashboardUpdatable 
 
 	private final NetworkTableEntry dashboard_mode, dashboard_hoodVolts, dashboard_hoodTargetVolts;
 	private SuperstructureState _state = SuperstructureState.IDLE, _lastState = SuperstructureState.IDLE;
-	private ShootingState _shootingState = ShootingState.PREPARE;
 
 	public final IdleCommand idleCommand;
 	public final TargetingCommand targetingCommand;
 	public final ShootCommand shootCommand;
 	public final IntakeCommand intakeCommand;
 
-	private double flywheelRpm  = 5000, hoodVoltage = 2.72, spindexerRpm = 15, intakePower = 0.95;
+	private double hoodVoltage = 2.72, spindexerRpm = 15;
 
 
 	public SuperStructure(Intake intake, Shooter shooter, Spindexer spindexer, Turret turret, Vision vision) {
@@ -67,38 +65,10 @@ public class SuperStructure extends SubsystemBase implements DashboardUpdatable 
 		intake.extendIntake();
 	}
 
-	public void dumbIntake(double slider) {
-		intake.setIntakeRPM(OscarMath.map(slider, -1, 1, 0, Motor.kNEO550.freeSpeed));
-		intake.extendIntake();
-	}
-
-	public void prepareShoot() {
-		spindexer.setTargetRotation(getNearestSafeRotationRelativeToFeeder());
-		shooter.setMode(Shooter.ShootMode.SpinUp);
-	}
-
-	public void idleIntake() {
-		intake.stop();
-		intake.retractIntake();
-	}
-
-	public void idleSpindexer() {
-		spindexer.stopSpin();
-	}
-
-	public void idleShooter() {
-		shooter.idle();
-	}
-
-	public void idleAll() {
-		idleShooter();
-		idleIntake();
-		idleSpindexer();
-	}
-
-    public void trackTarget() {
+    public void trackTarget(boolean isFiring) {
 	    if (vision.getTarget().isValid) {
-            turret.setTurretTargetDegrees(ShooterCalculations.visionYaw + turret.getDegrees() + 3, true);
+            turret.trackTarget(spindexer.getVelocity());
+            shooter.trackTarget(isFiring);
         } else {
 	    	turret.setTurretTargetDegrees(0.0, true);
 		}
@@ -107,10 +77,6 @@ public class SuperStructure extends SubsystemBase implements DashboardUpdatable 
     public void stopTrackTarget() {
         turret.setTurretTargetDegrees(turret.getDegrees(), false);
     }
-
-	public void moveSpindexerToSafePos() {
-		spindexer.setTargetRotation(getNearestSafeRotationRelativeToFeeder());
-	}
 
 	private void spindexerAntiStall() {
 //		if (spindexer.isStalled()) spindexer.switchSpin();
@@ -176,7 +142,6 @@ public class SuperStructure extends SubsystemBase implements DashboardUpdatable 
 		@Override
 		public void initialize() {
 			idleAll();
-			_shootingState = ShootingState.PREPARE;
 			turret.setTurretTargetDegrees(0, false);
 		}
 	}
@@ -190,15 +155,14 @@ public class SuperStructure extends SubsystemBase implements DashboardUpdatable 
 		public void initialize() {
 			shooter.setFeedRPM(0);
 			turret.setIntake();
-
 		}
 
 		@Override
 		public void execute() {
 			if (Math.signum(spindexerRpm) == -1) {
-				intake(intakePower, -spindexerRpm, Spindexer.SpinnerDirection.CounterClockwise);
+				intake(0.7, -spindexerRpm, Spindexer.SpinnerDirection.CounterClockwise);
 			} else {
-				intake(intakePower, spindexerRpm, Spindexer.SpinnerDirection.Clockwise);
+				intake(0.7, spindexerRpm, Spindexer.SpinnerDirection.Clockwise);
 			}
 		}
 
@@ -217,12 +181,12 @@ public class SuperStructure extends SubsystemBase implements DashboardUpdatable 
 		public void initialize() {
 			spindexer.idle();
 			turret.setForward(true);
-			shooter.prepareShoot();
 		}
 
 		@Override
 		public void execute() {
-			trackTarget();
+			trackTarget(false);
+//			spindexer.setTargetRotation(getNearestSafeRotationRelativeToFeeder());might be unnecessary
 		}
 	}
 
@@ -238,9 +202,7 @@ public class SuperStructure extends SubsystemBase implements DashboardUpdatable 
 
 		@Override
 		public void execute() {
-			trackTarget();
-			shooter.setHood(hoodVoltage);
-			shooter.shoot(flywheelRpm);
+			trackTarget(true);
 		}
 
 		@Override
@@ -250,28 +212,31 @@ public class SuperStructure extends SubsystemBase implements DashboardUpdatable 
 		}
 	}
 
-	public void setShooterParametersSlider(double rpmSlider, double hoodSlider, boolean isKeySwitch) {
-		if (isKeySwitch) {
-			flywheelRpm = OscarMath.clipMap(rpmSlider, -1, 1, 0, 5000);
-			hoodVoltage = OscarMath.clipMap(hoodSlider, -1, 1, Constants.ShooterValues.HoodTop, Constants.ShooterValues.HoodBottom);
-		} else {
-			setShooterParametersDefault();
-		}
-	}
-
-	public void configureIntakeRPMSlider(double spindexerSlider, double intakeSlider, boolean isKey) {
+	public void configureSpindexerRPMSlider(double spindexerSlider) {
 		spindexerRpm = OscarMath.clipMap(spindexerSlider, -1 , 1, -15, 15);
-//		if (isKey) intakePower = OscarMath.map(intakeSlider,-1, 1, 0.5, 1);
-	}
-
-	public void setShooterParametersDefault () {
-		flywheelRpm = 5000;
-		hoodVoltage = 2.72;
 	}
 
 	public void setSpindexerIntakeRpmDefault() {
 		spindexerRpm = 10;
-		intakePower = 0.9;
+	}
+
+	public void idleIntake() {
+		intake.stop();
+		intake.retractIntake();
+	}
+
+	public void idleSpindexer() {
+		spindexer.stopSpin();
+	}
+
+	public void idleShooter() {
+		shooter.idle();
+	}
+
+	public void idleAll() {
+		idleShooter();
+		idleIntake();
+		idleSpindexer();
 	}
 
     public void setState(SuperstructureState state) {
@@ -280,10 +245,6 @@ public class SuperStructure extends SubsystemBase implements DashboardUpdatable 
 			_state = state;
 			updateState();
 		}
-	}
-
-	public void setShootingState(ShootingState state){
-		_shootingState = state;
 	}
 
 	private void updateState() {
@@ -308,10 +269,5 @@ public class SuperStructure extends SubsystemBase implements DashboardUpdatable 
 		INTAKE,
 		TARGETING,
 		SHOOTING
-	}
-
-	public enum ShootingState {
-		PREPARE,
-		FIRING
 	}
 }

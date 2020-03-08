@@ -26,7 +26,7 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
     private final CANSparkMax primaryMotor, secondaryMotor, feederMotor;
     private final REVSmartServo_Continuous hoodServo;
 
-    private final NetworkTableEntry dashboard_wheelRPM, dashboard_flywheelFF, dashboard_hoodPos, dashboard_wheelTargetRPM,
+    private final NetworkTableEntry dashboard_wheelRPM, dashboard_flywheelFF, dashboard_hoodPos, dashboard_hoodAngle, dashboard_wheelTargetRPM,
             dashboard_feedWheelRPM, dashboard_feedWheelTargetRPM, dashboard_feedFF, dashboard_potRotations;
 
     private ShootMode mode = ShootMode.Shooting, lastMode = ShootMode.Shooting;
@@ -80,6 +80,7 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
         dashboard_feedFF = DashboardManager.addTabItem(this, "Feeder/FF", 0.0);
         dashboard_hoodPos = DashboardManager.addTabItem(this, "Hood/Position", 0.0);
         dashboard_potRotations = DashboardManager.addTabItem(this, "Hood/Rotations", 0.0);
+        dashboard_hoodAngle = DashboardManager.addTabItem(this, "Hood/Angle", 0.0);
 
         initSuccessful = primaryMotor.getCANConnection() && secondaryMotor.getCANConnection() && feederMotor.getCANConnection();
     }
@@ -89,7 +90,6 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
         handlePID();
     }
 
-    // good
     @Override
     public void updateDashboardData() {
         dashboard_wheelRPM.setDouble(primaryMotor.getSensorVelocity() * ShooterValues.FlywheelReduction);
@@ -97,7 +97,7 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
         dashboard_hoodPos.setDouble(potentiometer.getVoltage());
         var potRotations = OscarMath.map(potentiometer.getVoltage(), 0, 5, 0, 3);
         dashboard_potRotations.setDouble(potRotations);
-//        var hoodAngle = ((potRotations / 3) * 1080) /
+        dashboard_hoodAngle.setDouble(getHoodAngle());
     }
 
     private void setFlywheelRPM(double wheelTargetRPM) {
@@ -107,7 +107,7 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
         double ff = ShooterValues.FlywheelFF.calculate(motorTargetRpm) / batteryVoltage;
 
         dashboard_flywheelFF.setDouble(ff);
-        dashboard_wheelTargetRPM.setDouble(wheelTargetRPM * ShooterValues.FlywheelReduction);
+        dashboard_wheelTargetRPM.setDouble(wheelTargetRPM);
 
         primaryMotor.setTargetVelocity(motorTargetRpm, ShooterValues.FlywheelFF.calculate(motorTargetRpm), CANPIDController.ArbFFUnits.kVoltage);
     }
@@ -120,23 +120,29 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
     public void prepareShoot() {
         setMode(ShootMode.SpinUp);
         setFeedRPM(0);
-        setFlywheelRPM(5000);
+        setFlywheelRPM(ShooterCalculations.flywheelRPM);
+        setHoodAngle(ShooterCalculations.exitAngle);
     }
 
-    public void shoot(double flywheelRPM) {
+    public void shoot() {
         setMode(ShootMode.Shooting);
-        setFeedRPM(3000);
-        setFlywheelRPM(flywheelRPM);
+        setFeedRPM(ShooterValues.FeedRpm);
+        setFlywheelRPM(ShooterCalculations.flywheelRPM);
+        setHoodAngle(ShooterCalculations.exitAngle);
+    }
+
+    public void trackTarget(boolean isFiring) {
+        if (isFiring) {
+            shoot();
+        } else {
+            prepareShoot();
+        }
     }
 
     public void setFeedRPM(double rpm) {
         feedTarget = rpm;
     }
 
-    // good
-    public void setExitAngle(double degrees) {
-        hoodServo.setSpeed(hoodPID.calculate(getHoodAngle(), degrees));
-    }
 
     public void setHood(double potVoltage) {
         hoodTarget = potVoltage;
@@ -146,17 +152,20 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
         hoodServo.setSpeed(0);
     }
 
-    private double getHoodAngle() {
-        return OscarMath.map(potentiometer.getVoltage(), 0, 5, 10, 80);
+    public void setHoodAngle(double degrees) {
+        setHood(calculateVoltageFromAngle(degrees));
     }
 
-    //superstructure
+    private double calculateVoltageFromAngle(double degrees) {
+        return OscarMath.clipMap(degrees, ShooterValues.HoodMinAngle, ShooterValues.HoodMaxAngle, ShooterValues.HoodBottom, ShooterValues.HoodTop);
+    }
+
+    private double getHoodAngle() {
+        return OscarMath.map(potentiometer.getVoltage(), ShooterValues.HoodBottom, ShooterValues.HoodTop, ShooterValues.HoodMinAngle, ShooterValues.HoodMaxAngle);
+    }
+
     public boolean readyToShoot() {
         return atShootingRpm() && atHoodTarget() && atFeedRpm();
-    }
-
-    public boolean dumbReadyToShoot(double flywheelTarget) {
-        return (Math.abs(primaryMotor.getSensorVelocity() - (flywheelTarget / ShooterValues.FlywheelReduction)) < 250);
     }
 
     private boolean atShootingRpm() {
@@ -171,23 +180,11 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
         return Math.abs(getHoodAngle() - ShooterCalculations.exitAngle) < 2;
     }
 
-    public void stopShooter() {
-        primaryMotor.set(0);
-    }
-
-    public void stopAll() {
-        primaryMotor.set(0);
-        secondaryMotor.set(0);
-        feederMotor.set(0);
-    }
-
-    // external set
     public void setFlyheelNeutralMode(NeutralMode mode) {
         primaryMotor.setNeutralMode(mode);
         secondaryMotor.setNeutralMode(mode);
     }
 
-    // external set
     public void setFeederNeutralMode(NeutralMode mode) {
         feederMotor.setNeutralMode(mode);
     }
@@ -241,7 +238,6 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
     public double getPotentiometer() {
         return potentiometer.getVoltage();
     }
-
 
     public enum ShootMode {
         SpinUp,

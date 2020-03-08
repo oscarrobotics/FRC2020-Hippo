@@ -17,6 +17,8 @@ import frc.team832.lib.power.PDPPortNumber;
 import frc.team832.lib.util.ClosedLoopConfig;
 import frc.team832.lib.util.OscarMath;
 
+import javax.swing.plaf.synth.SynthTextAreaUI;
+
 public class Constants {
     public static class DrivetrainValues {
         public static final int LEFT_MASTER_CAN_ID = 1;
@@ -85,23 +87,8 @@ public class Constants {
         public static final int HOOD_SERVO_PWM_CHANNEL = 0;
         public static final int HOOD_POTENTIOMETER_ANALOG_CHANNEL = 0;
 
-        public static double hoodPotVoltageToRotations(double voltage) {
-            return OscarMath.map(voltage, HoodTop, HoodBottom, 0, 3);
-        }
-
         public static final float FlywheelReduction = 50f / 26f;
-        private static final Gearbox FlywheelGearbox = new Gearbox(FlywheelReduction);
 
-        public static final WheeledPowerTrain FlywheelPowerTrain = new WheeledPowerTrain(FlywheelGearbox, Motor.kNEO, 2, Units.inchesToMeters(4));
-
-        static final GearReduction HoodReduction = new GearReduction(34, 340);
-        public static final Gearbox HoodGearbox = new Gearbox(HoodReduction);
-        public static final double HoodkP = 8.0;
-
-        public static final double HoodBottom = 4.554;
-        public static final double HoodTop = 2.092;
-
-        // TODO: Recharacterize with 1 for encoder ratio and with correct units
         private static final double FlywheelkS = 0.0437;
         private static final double FlywheelkV = 0.00217;
         private static final double FlywheelkA = 0.00103;
@@ -112,15 +99,23 @@ public class Constants {
 
         public static final SimpleMotorFeedforward FlywheelFF = new SimpleMotorFeedforward(FlywheelkS, FlywheelkV, FlywheelkA);
 
-        public static final double FeedkP = 0.0003;
-        public static final double FeedkF = 0;
+        //Hood
+        static final GearReduction HoodReduction = new GearReduction(34, 340);
+
+        public static final double HoodkP = 8.0;
+
+        public static final double HoodMaxAngle = 90;
+        public static final double HoodMinAngle = 10;
+
+        public static final double HoodBottom = 4.554;
+        public static final double HoodTop = 2.092;
+
 
         //Feeder
-        public static final float FeedReduction = 1f;
-        private static final Gearbox FeedGearbox = new Gearbox(FeedReduction);
-        public static final WheeledPowerTrain FeedPowertrain = new WheeledPowerTrain(FeedGearbox, Motor.kNEO, 1, Units.inchesToMeters(4));
+        public static final double FeedRpm = 3000;
 
-        public static final double FeedRpm = FeedPowertrain.calculateMotorRpmFromWheelRpm(3000);
+        public static final double FeedkP = 0.0003;
+        public static final double FeedkF = 0;
 
         private static final double FeederkS = 0.0;
         private static final double FeederkV = 0.0;
@@ -144,8 +139,10 @@ public class Constants {
         public static final int PracticeTurretRightVisionPosition = VisionTargetingRange / 2;
         public static final int TurretCenterVisionPosition = 0;
 
-        public static final double TurretkP = 0.03;
-        public static final double TurretFF = 0.07;
+        public static final double kP = 0.03;
+        public static final double kI = 0.0;
+        public static final double kD = 0.0;
+        public static final double FFMultiplier = 0.002;
 
         public static final double IntakeOrientationDegrees = -90;
 
@@ -166,8 +163,6 @@ public class Constants {
         public static final PDPPortNumber INTAKE_MOTOR_PDP_SLOT = PDPPortNumber.Port11;
 
         public static final float IntakeReduction = 1f / (36f/18f);
-        private static final Gearbox IntakeGearbox = new Gearbox(IntakeReduction);
-        public static final WheeledPowerTrain IntakePowertrain = new WheeledPowerTrain(IntakeGearbox, Motor.kNEO550, 1, Units.inchesToMeters(2));
 
         private static final double kS = 0.01;
         private static final double kV = Motor.kNEO550.kv;
@@ -204,18 +199,19 @@ public class Constants {
         public static final PDPPortNumber DEPLOY_PDP_PORT = PDPPortNumber.Port11;
 
         public static final float ExtendReduction = 1f / (5f/1f);
-        private static final Gearbox ExtendGearbox = new Gearbox(ExtendReduction);
-        public static final WheeledPowerTrain ExtendPowertrain = new WheeledPowerTrain(ExtendGearbox, Motor.kNEO, 1, Units.inchesToMeters(2));
 
         public static final double MaxExtend = -62;
         public static final double MinExtend = -40;
-        public static final double Retract = -0.5;
+        public static final double Retract = -0.25;
 
         public static final Constraints ExtendConstraints = new Constraints(120, 480);
+        public static final Constraints ClimbConstraints = new Constraints(10, 20);
+        //velocity might be acceleration and acceleration might be jerk because PID is running on velocity and not position
 
         public static final double ExtendkP = 0.08;
-        public static final double ExtendkF = 0.0;
+        public static final double ClimbkP = 0.01;
 
+        public static double ClimbVelocity = 10;
     }
 
     public static class WOFValues {
