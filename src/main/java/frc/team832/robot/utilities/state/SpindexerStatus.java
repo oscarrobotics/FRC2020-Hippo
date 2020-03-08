@@ -34,7 +34,7 @@ public class SpindexerStatus {
     }
 
     public void update() {
-        boolean currentSlotHasBall = spindexer.isBall() && spindexer.isOverSlot();
+        boolean currentSlotHasBall = spindexer.isBall() && spindexer.isSensorOverSlot();
         ballPositions[spindexer.getNearestBallPosition().slotNumber] = currentSlotHasBall;
 
         if (isFull())
@@ -74,7 +74,7 @@ public class SpindexerStatus {
         return spinStall.getStallStatus().isStalled;
     }
 
-    public double getBallNumber() {
+    public double getBallCount() {
         double count = 0;
         for (int i = 0; i < 5; i++) {
             if (ballPositions[i])

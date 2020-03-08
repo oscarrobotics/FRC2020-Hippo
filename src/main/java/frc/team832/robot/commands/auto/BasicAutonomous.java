@@ -15,11 +15,7 @@ public class BasicAutonomous extends SequentialCommandGroup {
     public BasicAutonomous(SuperStructure superStructure, Drivetrain drivetrain) {
 //        var path = PathHelper.generatePath(drivetrain.getLatestPose(), new Pose2d(-1.0, 0, Rotation2d.fromDegrees(0))); //TODO: Change coordinates
         addCommands(
-                new InstantCommand(() -> superStructure.setState(SuperStructure.SuperstructureState.SHOOTING)),
-                new WaitCommand(2),
-                new InstantCommand(() -> superStructure.setShootingState(SuperStructure.ShootingState.FIRING)),
-                new WaitCommand(4),
-                new InstantCommand(() -> superStructure.setState(SuperStructure.SuperstructureState.IDLE)),
+                new ShootCommandGroup(superStructure),
                 new InstantCommand(() -> drivetrain.setWheelVolts(4.0, 4.0)),
                 new WaitCommand(1),
                 new InstantCommand(() -> drivetrain.setWheelVolts(0.0, 0.0))

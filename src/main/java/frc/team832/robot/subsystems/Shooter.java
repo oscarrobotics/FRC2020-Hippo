@@ -8,15 +8,12 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.team832.lib.control.REVSmartServo_Continuous;
 import frc.team832.lib.driverstation.dashboard.DashboardManager;
 import frc.team832.lib.driverstation.dashboard.DashboardUpdatable;
-import frc.team832.lib.driverstation.dashboard.DashboardWidget;
 import frc.team832.lib.motorcontrol.NeutralMode;
 import frc.team832.lib.motorcontrol2.vendor.CANSparkMax;
 import frc.team832.lib.motors.Motor;
 import frc.team832.lib.power.GrouchPDP;
 import frc.team832.lib.power.impl.SmartMCAttachedPDPSlot;
-import frc.team832.lib.sensors.REVThroughBorePWM;
 import frc.team832.lib.util.OscarMath;
-import frc.team832.robot.Constants;
 import frc.team832.robot.Constants.ShooterValues;
 import frc.team832.robot.utilities.state.ShooterCalculations;
 
@@ -103,8 +100,7 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
 //        var hoodAngle = ((potRotations / 3) * 1080) /
     }
 
-    // good
-    private void setWheelRPM(double wheelTargetRPM) {
+    private void setFlywheelRPM(double wheelTargetRPM) {
         double motorTargetRpm = wheelTargetRPM / ShooterValues.FlywheelReduction;
 
         double batteryVoltage = primaryMotor.getInputVoltage();
@@ -116,11 +112,6 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
         primaryMotor.setTargetVelocity(motorTargetRpm, ShooterValues.FlywheelFF.calculate(motorTargetRpm), CANPIDController.ArbFFUnits.kVoltage);
     }
 
-    public void setDumbRPM(double rpm) {
-        setWheelRPM(rpm);
-    }
-
-    // nuke - handleMode()?
     public void idle() {
         setMode(ShootMode.Idle);
         setFeedRPM(0);
@@ -129,13 +120,13 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
     public void prepareShoot() {
         setMode(ShootMode.SpinUp);
         setFeedRPM(0);
-        setDumbRPM(5000);
+        setFlywheelRPM(5000);
     }
 
     public void shoot(double flywheelRPM) {
         setMode(ShootMode.Shooting);
         setFeedRPM(3000);
-        setDumbRPM(flywheelRPM);
+        setFlywheelRPM(flywheelRPM);
     }
 
     public void setFeedRPM(double rpm) {
@@ -256,11 +247,5 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
         SpinUp,
         Shooting,
         Idle
-    }
-
-    public enum TurretSafetyState {
-        FarLeft,
-        FarRight,
-        Safe
     }
 }

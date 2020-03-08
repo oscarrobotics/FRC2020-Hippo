@@ -55,15 +55,15 @@ public class SuperStructure extends SubsystemBase implements DashboardUpdatable 
 
 	}
 
-	public void intake() {
-		intake.setIntakeRPM(Constants.IntakeValues.IntakePowertrain.calculateMotorRpmFromSurfaceSpeed(10));
-		spindexer.setSpinRPM(60, Spindexer.SpinnerDirection.Clockwise);
+	public void intake(double power, double spinRPM, Spindexer.SpinnerDirection direction) {
+		intake.intake(power);
+		spindexer.setSpinRPM(spinRPM, direction);
 		intake.extendIntake();
 	}
 
-	public void outtake() {
-		intake.setOuttakeRPM(Constants.IntakeValues.IntakePowertrain.calculateMotorRpmFromSurfaceSpeed(5));
-		spindexer.setSpinRPM(60, Spindexer.SpinnerDirection.CounterClockwise);
+	public void outtake(double power, double spinRPM, Spindexer.SpinnerDirection direction) {
+		intake.outtake(power);
+		spindexer.setSpinRPM(spinRPM, direction);
 		intake.extendIntake();
 	}
 
@@ -75,7 +75,6 @@ public class SuperStructure extends SubsystemBase implements DashboardUpdatable 
 	public void prepareShoot() {
 		spindexer.setTargetRotation(getNearestSafeRotationRelativeToFeeder());
 		shooter.setMode(Shooter.ShootMode.SpinUp);
-//		Drivetrain.propUp();
 	}
 
 	public void idleIntake() {
@@ -141,11 +140,11 @@ public class SuperStructure extends SubsystemBase implements DashboardUpdatable 
 		return Math.abs(safePos - curPos) < 0.05;
 	}
 
-	public boolean isOverBallSlot() {
+	public boolean isFeederOverBallSlot() {
 		return Math.abs(spindexer.getRelativeRotations() - getNearestBallRotationRelativeToFeeder()) < 0.05;
 	}
 
-	public boolean isOverBallPosition(BallPosition position) {
+	public boolean isFeederOverBallPosition(BallPosition position) {
 		return Math.abs(spindexer.getRelativeRotations() - position.rotations) < 0.05;
 	}
 
@@ -154,7 +153,7 @@ public class SuperStructure extends SubsystemBase implements DashboardUpdatable 
 	}
 
 	public boolean isShooterPrepared() {
-		return shooter.dumbReadyToShoot(flywheelRpm);//shooter.readyToShoot() && isSpindexerReadyShoot(getNearestSafeRotationRelativeToFeeder(), spindexer.getRelativeRotations());
+		return shooter.readyToShoot() && isSpindexerReadyShoot(getNearestSafeRotationRelativeToFeeder(), spindexer.getRelativeRotations());
 	}
 
 	@Override
@@ -182,7 +181,7 @@ public class SuperStructure extends SubsystemBase implements DashboardUpdatable 
 		}
 	}
 
-    private class IntakeCommand extends InstantCommand {
+    private class IntakeCommand extends CommandBase {
 		IntakeCommand() {
 			addRequirements(shooter, intake, spindexer, turret, SuperStructure.this);
 		}
@@ -190,18 +189,17 @@ public class SuperStructure extends SubsystemBase implements DashboardUpdatable 
 		@Override
 		public void initialize() {
 			shooter.setFeedRPM(0);
-			intake.extendIntake();
 			turret.setIntake();
-			if (Math.signum(spindexerRpm) == -1) {
-				spindexer.setSpinRPM(-spindexerRpm, Spindexer.SpinnerDirection.CounterClockwise);
-			} else {
-				spindexer.setSpinRPM(spindexerRpm, Spindexer.SpinnerDirection.Clockwise);
-			}
+
 		}
 
 		@Override
 		public void execute() {
-			intake.intake(intakePower);
+			if (Math.signum(spindexerRpm) == -1) {
+				intake(intakePower, -spindexerRpm, Spindexer.SpinnerDirection.CounterClockwise);
+			} else {
+				intake(intakePower, spindexerRpm, Spindexer.SpinnerDirection.Clockwise);
+			}
 		}
 
 		@Override
@@ -210,7 +208,7 @@ public class SuperStructure extends SubsystemBase implements DashboardUpdatable 
 		}
 	}
 
-    private class TargetingCommand extends SequentialCommandGroup {
+    private class TargetingCommand extends CommandBase{
 		TargetingCommand() {
 			addRequirements(shooter, intake, spindexer, turret, SuperStructure.this);
 		}
@@ -225,7 +223,6 @@ public class SuperStructure extends SubsystemBase implements DashboardUpdatable 
 		@Override
 		public void execute() {
 			trackTarget();
-			shooter.setDumbRPM(flywheelRpm);
 		}
 	}
 
@@ -236,8 +233,7 @@ public class SuperStructure extends SubsystemBase implements DashboardUpdatable 
 
 		@Override
 		public void initialize() {
-			turret.setForward(true);
-			setShootingState(ShootingState.FIRING);
+			spindexer.setSpinRPM(40, Spindexer.SpinnerDirection.CounterClockwise);
 		}
 
 		@Override
@@ -245,17 +241,11 @@ public class SuperStructure extends SubsystemBase implements DashboardUpdatable 
 			trackTarget();
 			shooter.setHood(hoodVoltage);
 			shooter.shoot(flywheelRpm);
-			if(_shootingState == ShootingState.FIRING){
-				spindexer.setSpinRPM(40, Spindexer.SpinnerDirection.CounterClockwise);
-			} else {
-				spindexer.setSpinRPM(0, Spindexer.SpinnerDirection.CounterClockwise);
-
-			}
 		}
 
 		@Override
 		public void end(boolean interrupted) {
-			setShootingState(ShootingState.PREPARE);
+			idleSpindexer();
 			idleShooter();
 		}
 	}

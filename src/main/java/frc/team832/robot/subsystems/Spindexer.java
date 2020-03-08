@@ -1,6 +1,5 @@
 package frc.team832.robot.subsystems;
 
-import com.cuforge.libcu.Lasershark;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.controller.PIDController;
@@ -177,12 +176,13 @@ public class Spindexer extends SubsystemBase implements DashboardUpdatable {
 		spinMotor.set(OscarMath.clip(pow, 0, 1));
 	}
 
-	public boolean isOverSlot() {
-		return Math.abs(getRelativeRotations() - BallPosition.Position0.rotations) < 0.05
-				|| Math.abs(getRelativeRotations() - BallPosition.Position1.rotations) < 0.05
-				|| Math.abs(getRelativeRotations() - BallPosition.Position2.rotations) < 0.05
-				|| Math.abs(getRelativeRotations() - BallPosition.Position3.rotations) < 0.05
-				|| Math.abs(getRelativeRotations() - BallPosition.Position4.rotations) < 0.05;
+	public boolean isSensorOverSlot() {
+		double sensorOffset = -0.02;
+		return Math.abs(getRelativeRotations() - BallPosition.Position0.rotations + sensorOffset) < 0.05
+				|| Math.abs(getRelativeRotations() - BallPosition.Position1.rotations + sensorOffset) < 0.05
+				|| Math.abs(getRelativeRotations() - BallPosition.Position2.rotations + sensorOffset) < 0.05
+				|| Math.abs(getRelativeRotations() - BallPosition.Position3.rotations + sensorOffset) < 0.05
+				|| Math.abs(getRelativeRotations() - BallPosition.Position4.rotations + sensorOffset) < 0.05;
 	}
 
 	public double getBallSensorRaw() {

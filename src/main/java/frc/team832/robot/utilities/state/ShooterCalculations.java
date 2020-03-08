@@ -32,7 +32,7 @@ public class ShooterCalculations implements DashboardUpdatable {
         double distance = targetPose.getTranslation().getDistance(robotPose.getTranslation());
         double rotation = targetPose.getRotation().rotateBy(robotPose.getRotation()).getDegrees() / 360.0; //-targetPose.getRotation().getDegrees() / 360.0;
 
-        flywheelRPM = distance < 2 ? 4000 : 8000;
+        flywheelRPM = 5000;//distance < 2 ? 4000 : 8000;
         exitAngle = (pitch - CameraAngle) + 5;//needs testing
         visionYaw = rotation;
 
@@ -48,7 +48,7 @@ public class ShooterCalculations implements DashboardUpdatable {
         double rotation = yaw / 360.0;
         double distance = PowerPortHeightMeters / Math.tan(pitch - CameraAngle);
 
-        flywheelRPM = distance < 2 ? 4000 : 8000;
+        flywheelRPM = 5000;//distance < 2 ? 4000 : 8000;
         exitAngle = pitch + 5;//needs testing
         visionYaw = rotation;//assuming yaw input is -179 to 180
 
@@ -62,7 +62,7 @@ public class ShooterCalculations implements DashboardUpdatable {
     public static void update(double pitch, double yaw) {
         double distance = PowerPortHeightMeters / Math.tan(pitch - CameraAngle);
 
-        flywheelRPM = distance < 2 ? 4000 : 8000;
+        flywheelRPM = 5000;//distance < 2 ? 4000 : 8000;
         exitAngle = pitch + 5;//needs testing
         visionYaw = yaw;
 

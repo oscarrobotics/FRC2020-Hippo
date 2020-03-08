@@ -18,18 +18,18 @@ public class ComplexAutonomous extends SequentialCommandGroup {
 		Trajectory ToShieldGenCloseToTrench = PathHelper.generatePath(drivetrain.getLatestPose(), Constants.FieldPositions.ShieldGenCloseToTrench);
 		
 		addCommands(
-			new ShootCommandGroup(superStructure),
-			new FollowPath(ToFarSideTrench, drivetrain),
-			new InstantCommand(superStructure::intake),
-			new FollowPath(ToCloseSideTrench, drivetrain),
-			new InstantCommand(superStructure::idleIntake),
-			new FollowPath(ToFarSideTrench, drivetrain),
-			new ShootCommandGroup(superStructure),
-			new InstantCommand(superStructure::intake),
-			new FollowPath(ToShieldGenCloseToTrench, drivetrain),
-			new InstantCommand(superStructure::idleIntake),
-			new FollowPath(ToFarSideTrench, drivetrain),
-			new ShootCommandGroup(superStructure)
+//			new ShootCommandGroup(superStructure),
+//			new FollowPath(ToFarSideTrench, drivetrain),
+//			new InstantCommand(superStructure::intake),
+//			new FollowPath(ToCloseSideTrench, drivetrain),
+//			new InstantCommand(superStructure::idleIntake),
+//			new FollowPath(ToFarSideTrench, drivetrain),
+//			new ShootCommandGroup(superStructure),
+//			new InstantCommand(superStructure::intake),
+//			new FollowPath(ToShieldGenCloseToTrench, drivetrain),
+//			new InstantCommand(superStructure::idleIntake),
+//			new FollowPath(ToFarSideTrench, drivetrain),
+//			new ShootCommandGroup(superStructure)
 		);
 		addRequirements(superStructure, drivetrain, shooter, spindexer);
 	}

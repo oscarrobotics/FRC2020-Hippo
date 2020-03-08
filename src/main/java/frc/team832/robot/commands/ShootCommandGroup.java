@@ -11,19 +11,12 @@ public class ShootCommandGroup extends SequentialCommandGroup {
 
     public ShootCommandGroup(SuperStructure superStructure) {
         addCommands(
-//                new FunctionalCommand(
-//                        superStructure::moveSpindexerToSafePos,
-//                        () -> {},
-//                        (ignored) -> superStructure.idleSpindexer(),
-//                        () ->superStructure.isSpindexerReadyShoot(superStructure.getNearestSafeRotationRelativeToFeeder(), spindexer.getRelativeRotations()),
-//                        spindexer),
-
+                new InstantCommand(() -> superStructure.setState(SuperStructure.SuperstructureState.TARGETING)),
+                new WaitCommand(1),
                 new InstantCommand(() -> superStructure.setState(SuperStructure.SuperstructureState.SHOOTING)),
-                new WaitCommand(2),
-                new InstantCommand(() -> superStructure.setShootingState(SuperStructure.ShootingState.FIRING)),
                 new WaitCommand(4),
                 new InstantCommand(() -> superStructure.setState(SuperStructure.SuperstructureState.IDLE))
-
         );
+        addRequirements(superStructure);
     }
 }

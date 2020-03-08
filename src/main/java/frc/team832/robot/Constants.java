@@ -136,20 +136,16 @@ public class Constants {
 
         public static final PDPPortNumber TURRET_PDP_SLOT = PDPPortNumber.Port4;
 
-        public static final double PracticeTurretLeftPosition = convertRotationsToDegrees(0.27);
-        public static final double PracticeTurretRightPosition = convertRotationsToDegrees(0.73);
-
+        public static final double PracticeTurretLeftPosition = -83;
+        public static final double PracticeTurretRightPosition = 83;
 
         public static final int VisionTargetingRange = 120;
-        public static final int MaximumRange = 180;
-
         public static final int PracticeTurretLeftVisionPosition = -(VisionTargetingRange / 2);
         public static final int PracticeTurretRightVisionPosition = VisionTargetingRange / 2;
         public static final int TurretCenterVisionPosition = 0;
 
         public static final double TurretkP = 0.03;
-        public static final double TurretClockwisekFF = 0.07;//.1542
-        public static final double TurretCounterClockwisekFF = 0.055;//.1645
+        public static final double TurretFF = 0.07;
 
         public static final double IntakeOrientationDegrees = -90;
 
