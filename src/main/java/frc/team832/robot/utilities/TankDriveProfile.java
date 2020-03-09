@@ -53,7 +53,7 @@ public class TankDriveProfile {
 		DriveAxesSupplier axes = oi.driverOI.getGreenbergDriveAxes();
 		double power;
 
-		power = OscarMath.signumPow(axes.getLeftY() * Constants.DrivetrainValues.StickDriveMultiplier, 2);
+		power = getNormalPower(axes.getLeftY());
 
 		return new StoreDriveSpeeds(power, power);
 	}
@@ -62,8 +62,8 @@ public class TankDriveProfile {
 		DriveAxesSupplier axes = oi.driverOI.getGreenbergDriveAxes();
 		double rightPow, leftPow;
 
-		rightPow = OscarMath.signumPow(axes.getRightY() * Constants.DrivetrainValues.StickDriveMultiplier, 2);
-		leftPow = OscarMath.signumPow(axes.getLeftY() * Constants.DrivetrainValues.StickDriveMultiplier, 2);
+		rightPow = getNormalPower(axes.getRightY());
+		leftPow = getNormalPower(axes.getLeftY());
 
 		return new StoreDriveSpeeds(leftPow, rightPow);
 	}
@@ -96,6 +96,12 @@ public class TankDriveProfile {
 		rotation = OscarMath.signumPow(axes.getRotation() * Constants.DrivetrainValues.StickRotateOnCenterMultiplier, 3);
 
 		return new StoreDriveSpeeds(-rotation, rotation);
+	}
+
+	private double getNormalPower(double stick) {
+		double exponent = -10 * (Math.abs(stick - 0.65));//-9 * (Math.abs(stick - 0.75)); // 1.1 / (1 + (Math.pow(2.718281828459045, exponent)));
+		double power = 1.03 / (1 + (Math.pow(2.718281828459045, exponent)));
+		return power * Math.signum(stick) * Constants.DrivetrainValues.StickDriveMultiplier;
 	}
 
 	private void setSpeeds(double leftPower, double rightPower) {
