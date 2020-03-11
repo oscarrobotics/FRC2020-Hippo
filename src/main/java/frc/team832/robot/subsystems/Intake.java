@@ -15,7 +15,7 @@ import frc.team832.robot.Constants;
 
 public class Intake extends SubsystemBase implements DashboardUpdatable {
 	private final CANTalonFX intakeMotor;
-//	private Solenoid moveIntake;
+	private Solenoid moveIntake;
 	SmartMCAttachedPDPSlot intakeSlot;
 
 	NetworkTableEntry dashboard_intakeTargetRPM, dashboard_intakePow, dashboard_intakeRPM;
@@ -30,7 +30,7 @@ public class Intake extends SubsystemBase implements DashboardUpdatable {
 
 		intakeMotor.wipeSettings();
 
-//		moveIntake = new Solenoid(Constants.PneumaticsValues.PCM_MODULE_NUM, Constants.PneumaticsValues.INTAKE_SOLENOID_ID);
+		moveIntake = new Solenoid(Constants.PneumaticsValues.PCM_MODULE_NUM, Constants.PneumaticsValues.INTAKE_SOLENOID_ID);
 
 		DashboardManager.addTab(this, this);
 
@@ -83,11 +83,11 @@ public class Intake extends SubsystemBase implements DashboardUpdatable {
 	}
 
 	public void extendIntake() {
-//		moveIntake.set(true);
+		moveIntake.set(true);
 	}
 
 	public void retractIntake() {
-//		moveIntake.set(false);
+		moveIntake.set(false);
 	}
 
 	public void setCurrentLimit(int amps) {
