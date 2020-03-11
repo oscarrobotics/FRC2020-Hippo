@@ -11,6 +11,7 @@ import frc.team832.lib.motors.Motor;
 import frc.team832.lib.power.GrouchPDP;
 import frc.team832.lib.power.PDPSlot;
 import frc.team832.lib.sensors.REVThroughBorePWM;
+import frc.team832.lib.util.OscarMath;
 import frc.team832.robot.Constants;
 import frc.team832.robot.Constants.TurretValues;
 import frc.team832.robot.utilities.state.ShooterCalculations;
@@ -44,11 +45,11 @@ public class Turret extends SubsystemBase implements DashboardUpdatable {
         motor.setNeutralMode(NeutralMode.kBrake);
 
         PID.setIntegratorRange(-0.05, 0.05);
-        PID.setTolerance(0.5);
+        PID.setTolerance(1);
 
 
         // keep turret at init position
-        turretTargetDeg = getRotations();
+        turretTargetDeg = getDegrees();
 
         dashboard_turretPos = DashboardManager.addTabItem(this, "Position", 0.0);
         dashboard_turretPow = DashboardManager.addTabItem(this, "Power", 0.0);
@@ -98,8 +99,9 @@ public class Turret extends SubsystemBase implements DashboardUpdatable {
         double safeTarget = calculateSafePosition(isVisionMode, turretTargetDeg);
         double safeActual = calculateSafePosition(isVisionMode, getDegrees());
 
+
         if(safeActual != getDegrees()){
-            turretTargetDeg = safeActual + Math.signum(turretTargetDeg) == 1 ? 3 : -3;
+            turretTargetDeg = safeActual;
         } else {
             turretTargetDeg = safeTarget;
         }
@@ -116,7 +118,9 @@ public class Turret extends SubsystemBase implements DashboardUpdatable {
 
     private void runPID() {
         handleSafety(isVision);
-        motor.set(PID.calculate(getDegrees(), turretTargetDeg) + turretFF);
+        motor.set(PID.calculate(getDegrees(), turretTargetDeg)); //+ turretFF);
+        if (Math.abs(PID.getPositionError()) < 2) PID.setPID(TurretValues.kP, 0, TurretValues.kD);
+        else PID.setPID(TurretValues.kP, TurretValues.kI, TurretValues.kD);
     }
 
     public void setForward(boolean isVision) { setTurretTargetDegrees(TurretValues.TurretCenterVisionPosition, isVision); }
@@ -130,11 +134,11 @@ public class Turret extends SubsystemBase implements DashboardUpdatable {
     }
 
     double getRotations() {
-        return encoder.get();
+        return OscarMath.round(encoder.get(), 3);
     }
 
     double getDegrees() {
-        return TurretValues.convertRotationsToDegrees(encoder.get());
+        return TurretValues.convertRotationsToDegrees(getRotations());
     }
 
     private boolean atTarget() {
@@ -156,6 +160,10 @@ public class Turret extends SubsystemBase implements DashboardUpdatable {
 
     public void setNeutralMode(NeutralMode mode) {
         motor.setNeutralMode(mode);
+    }
+
+    public void setHeadingSlider(double rightSlider) {
+        setTurretTargetDegrees(OscarMath.clipMap(rightSlider,-1, 1, TurretValues.PracticeTurretLeftPosition, TurretValues.PracticeTurretRightPosition), false);
     }
 }
 

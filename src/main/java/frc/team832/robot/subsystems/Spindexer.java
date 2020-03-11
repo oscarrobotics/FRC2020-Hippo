@@ -26,8 +26,8 @@ public class Spindexer extends SubsystemBase implements DashboardUpdatable {
 
 	private final CANSparkMax spinMotor;
 	private final HallEffect hallEffect;
-	private final LasersharkDistance ballSensor;
-	private final DigitalInput shark;
+//	private final LasersharkDistance ballSensor;
+//	private final DigitalInput shark;
 	private final PIDController spinPID = new PIDController(SpindexerValues.SpinkP, 0, 0);
 	private final ProfiledPIDController positionPID = new ProfiledPIDController(SpindexerValues.PositionkP, 0, 0, SpindexerValues.Constraints);
 
@@ -53,8 +53,8 @@ public class Spindexer extends SubsystemBase implements DashboardUpdatable {
 		spindexerStatus = new SpindexerStatus(pdp, this, spinMotor);
 
 		hallEffect = new HallEffect(SpindexerValues.HALL_EFFECT_DIO_CHANNEL);
-		shark = new DigitalInput(2);
-		ballSensor = new LasersharkDistance(SpindexerValues.LASERSHARK_DIO_CHANNEL);
+//		shark = new DigitalInput(2);
+//		ballSensor = new LasersharkDistance(SpindexerValues.LASERSHARK_DIO_CHANNEL);
 
 //		hallEffect.setupInterrupts(spindexerStatus::onHallEffect);
 
@@ -90,7 +90,7 @@ public class Spindexer extends SubsystemBase implements DashboardUpdatable {
 		ballSlot4.setBoolean(spindexerStatus.getSlot(4));
 		dashboard_state.setString(spindexerStatus.state.toString());
 		dashboard_hallEffect.setBoolean(getHallEffect());
-		dashboard_laserShark.setDouble(getBallSensorMeters());
+//		dashboard_laserShark.setDouble(getBallSensorMeters());
 	}
 
 	public void setDumbPosition(double rot) {
@@ -186,7 +186,7 @@ public class Spindexer extends SubsystemBase implements DashboardUpdatable {
 	}
 
 	public double getBallSensorRaw() {
-		return ballSensor.getPercentageDistance();
+		return 0;// ballSensor.getPercentageDistance();
 	}
 
 	public boolean isBall() {
@@ -194,7 +194,7 @@ public class Spindexer extends SubsystemBase implements DashboardUpdatable {
 	}
 
 	public double getBallSensorMeters() {
-		return ballSensor.getDistanceMeters();
+		return 0;// ballSensor.getDistanceMeters();
 	}
 
 	public boolean isFull() {
