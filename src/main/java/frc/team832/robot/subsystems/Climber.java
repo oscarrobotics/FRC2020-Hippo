@@ -1,6 +1,7 @@
 package frc.team832.robot.subsystems;
 
 import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.wpilibj.SlewRateLimiter;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.controller.ProfiledPIDController;
@@ -24,7 +25,7 @@ public class Climber extends SubsystemBase implements DashboardUpdatable {
     private Solenoid climbLock;
 
     private double extendTarget = Constants.ClimberValues.Retract;
-    private double climbTargetVelocity = 0;
+    private double climbPower = 0;
 
     private SmartMCAttachedPDPSlot winchSlot, deploySlot;
 
@@ -32,7 +33,7 @@ public class Climber extends SubsystemBase implements DashboardUpdatable {
 
     private ProfiledPIDController extendPID = new ProfiledPIDController(Constants.ClimberValues.ExtendkP, 0, 0, Constants.ClimberValues.ExtendConstraints);
 
-    private ProfiledPIDController climbPID = new ProfiledPIDController(Constants.ClimberValues.ClimbkP, 0, 0, Constants.ClimberValues.ClimbConstraints);
+    private SlewRateLimiter climbRamp = new SlewRateLimiter(1);
 
     public Climber(GrouchPDP pdp) {
         DashboardManager.addTab(this, this);
@@ -70,14 +71,13 @@ public class Climber extends SubsystemBase implements DashboardUpdatable {
 
     @Override
     public void periodic() {
-        runPID();
+        runExtendPID();
+        runClimbRamp();
     }
 
-    public void unwindWinch() {
-        setClimbTargetVelocity(-Constants.ClimberValues.ClimbVelocity);
-    }
+    public void unwindWinch() { climbPower = -0.25; }
 
-    public void windWinch() { setClimbTargetVelocity(Constants.ClimberValues.ClimbVelocity); }
+    public void windWinch() { climbPower = 0.75; }
 
     public boolean isWinchSafe() {
         return deployMotor.getSensorPosition() > Constants.ClimberValues.MinExtend;
@@ -94,29 +94,22 @@ public class Climber extends SubsystemBase implements DashboardUpdatable {
     public void adjustHook(double slider) {
         double targetPos = OscarMath.clipMap(slider, -1, 1, Constants.ClimberValues.MinExtend, Constants.ClimberValues.MaxExtend);
         setTargetPosition(targetPos);
-
     }
 
     private void setTargetPosition(double pos) {
         extendTarget = pos;
     }
 
-    public void setClimbTargetVelocity(double RPS) { climbTargetVelocity = RPS; }
-
-    private void runPID() {
-        runExtendPID();
-        runClimbPID();
-    }
-
-    private void runClimbPID() { winchMotor.set(climbPID.calculate(winchMotor.getSensorVelocity(), climbTargetVelocity)); }
-
     private void runExtendPID() {
         deployMotor.set(extendPID.calculate(deployMotor.getSensorPosition(), extendTarget));
     }
 
+    private void runClimbRamp() {
+        winchMotor.set(climbRamp.calculate(climbPower));
+    }
+
     public void stopClimb() {
-        setClimbTargetVelocity(0);
-        lockClimb();
+        climbPower = 0;
     }
 
     public void lockClimb() {
