@@ -6,6 +6,7 @@ import edu.wpi.first.wpilibj2.command.RunEndCommand;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import frc.team832.lib.driverinput.controllers.*;
 import frc.team832.lib.driverinput.oi.DriverOI;
+import frc.team832.lib.driverinput.oi.OperatorInterface;
 import frc.team832.lib.driverinput.oi.SticksDriverOI;
 import frc.team832.lib.driverinput.oi.XboxDriverOI;
 import frc.team832.robot.commands.climb.StartClimbGroup;
@@ -36,7 +37,9 @@ public class OI {
 
 		this.superStructure = superStructure;
 
-		configTestingCommands();
+		if (OperatorInterface.getConnectedControllerCount() > 1) {
+			configTestingCommands();
+		}
 	}
 
 	private void configureBrandonLayout() {

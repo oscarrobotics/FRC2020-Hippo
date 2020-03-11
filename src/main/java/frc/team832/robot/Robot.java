@@ -58,10 +58,10 @@ public class Robot extends OscarTimedRobot {
 
         if (intake.initSuccessful) {
             System.out.println("Intake - init OK");
+            intakeTelemetryNotifier.startPeriodic(0.02);
         } else {
             System.out.println("Intake - init FAILED");
         }
-        intakeTelemetryNotifier.startPeriodic(0.02);
 
         if (vision.initSuccessful) {
             System.out.println("Vision - init OK");

@@ -1,14 +1,13 @@
 package frc.team832.robot.subsystems;
 
-import edu.wpi.first.wpilibj.RobotBase;
+import com.ctre.phoenix.sensors.PigeonIMU;
+import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.Solenoid;
-import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveWheelSpeeds;
-import edu.wpi.first.wpilibj2.command.RunEndCommand;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.*;
 import frc.team832.lib.drive.SmartDiffDrive;
 import frc.team832.lib.driverstation.dashboard.DashboardManager;
 import frc.team832.lib.driverstation.dashboard.DashboardUpdatable;
@@ -17,41 +16,68 @@ import frc.team832.lib.motorcontrol.NeutralMode;
 import frc.team832.lib.motorcontrol2.vendor.CANTalonFX;
 import frc.team832.lib.power.GrouchPDP;
 import frc.team832.lib.power.impl.SmartMCAttachedPDPSlot;
-import frc.team832.lib.sensors.NavXMicro;
+import frc.team832.lib.util.MusicBox;
 import frc.team832.robot.Constants;
 
+import frc.team832.robot.Constants.DrivetrainValues;
 import frc.team832.robot.utilities.ArcadeDriveProfile;
 import frc.team832.robot.utilities.TankDriveProfile;
 
+import java.util.Set;
+
+@SuppressWarnings("SameParameterValue")
 public class Drivetrain extends SubsystemBase implements DashboardUpdatable {
     public final boolean initSuccessful;
     private final CANTalonFX rightMaster, rightSlave, leftMaster, leftSlave;
 
-    private static Solenoid propUpRobot;
+    private final PigeonIMU imu;
+    private final double[] ypr = new double[3];
 
-    private SmartDiffDrive diffDrive;
-    public DifferentialDriveOdometry driveOdometry;
+    private final SmartDiffDrive diffDrive;
+    private final DifferentialDriveOdometry driveOdometry;
 
-//    public NavXMicro navX;
+    private Pose2d startingPose = Constants.FieldPositions.StartCenter;
+    private Pose2d robotPose = startingPose;
 
-    private Pose2d pose = new Pose2d();
-    private Pose2d startingPose = new Pose2d();
-
+    @SuppressWarnings("FieldCanBeLocal")
     private double latestLeftWheelVolts, latestRightWheelVolts;
 
-    private TankDriveProfile tankProfile = new TankDriveProfile(false, false);
-    private ArcadeDriveProfile arcadeProfile = new ArcadeDriveProfile();
+    private final TankDriveProfile tankProfile = new TankDriveProfile(false, false);
+    private final ArcadeDriveProfile arcadeProfile = new ArcadeDriveProfile();
 
-    private SmartMCAttachedPDPSlot leftMasterSlot, leftSlaveSlot, rightMasterSlot, rightSlaveSlot;
+    @SuppressWarnings("FieldCanBeLocal")
+    private final SmartMCAttachedPDPSlot leftMasterSlot, leftSlaveSlot, rightMasterSlot, rightSlaveSlot;
+
+    private final NetworkTableEntry dashboard_pigeonIMU_pitch, dashboard_pigeonIMU_roll, dashboard_pigeonIMU_fusedHeading,
+            dashboard_poseX, dashboard_poseY, dashboard_poseRotation, ui_poseX, ui_poseY;
+
+    private final CommandBase dashboardResetPoseCommand = new CommandBase() {
+        @Override
+        public Set<Subsystem> getRequirements() {
+            return super.getRequirements();
+        }
+
+        @Override
+        public boolean runsWhenDisabled() {
+            return true;
+        }
+
+        @Override
+        public void initialize() {
+            Drivetrain.this.resetPoseFromDashboard();
+        }
+    };
+
+    public final MusicBox driveMusic;
 
     public Drivetrain(GrouchPDP pdp) {
-        leftMaster = new CANTalonFX(Constants.DrivetrainValues.LEFT_MASTER_CAN_ID);
-        leftSlave = new CANTalonFX(Constants.DrivetrainValues.LEFT_SLAVE_CAN_ID);
-        rightMaster = new CANTalonFX(Constants.DrivetrainValues.RIGHT_MASTER_CAN_ID);
-        rightSlave = new CANTalonFX(Constants.DrivetrainValues.RIGHT_SLAVE_CAN_ID);
+        leftMaster = new CANTalonFX(DrivetrainValues.LEFT_MASTER_CAN_ID);
+        leftSlave = new CANTalonFX(DrivetrainValues.LEFT_SLAVE_CAN_ID);
+        rightMaster = new CANTalonFX(DrivetrainValues.RIGHT_MASTER_CAN_ID);
+        rightSlave = new CANTalonFX(DrivetrainValues.RIGHT_SLAVE_CAN_ID);
 
-        propUpRobot = new Solenoid(Constants.PneumaticsValues.PCM_MODULE_NUM, Constants.PneumaticsValues.PROP_UP_SOLENOID_ID);
-
+        driveMusic = new MusicBox(leftMaster, leftSlave, rightMaster, rightSlave);
+        driveMusic.loadSong("Mario.chrp");
 
         leftMaster.wipeSettings();
         leftSlave.wipeSettings();
@@ -66,77 +92,98 @@ public class Drivetrain extends SubsystemBase implements DashboardUpdatable {
         rightMaster.setInverted(false);
         leftSlave.setInverted(false);
 
-        leftMasterSlot = pdp.addDevice(Constants.DrivetrainValues.LEFT_MASTER_PDP_PORT, leftMaster);
-        leftSlaveSlot = pdp.addDevice(Constants.DrivetrainValues.LEFT_SLAVE_PDP_PORT, leftSlave);
-        rightMasterSlot = pdp.addDevice(Constants.DrivetrainValues.RIGHT_MASTER_PDP_PORT, rightMaster);
-        rightSlaveSlot = pdp.addDevice(Constants.DrivetrainValues.RIGHT_SLAVE_PDP_PORT, rightSlave);
+        leftMasterSlot = pdp.addDevice(DrivetrainValues.LEFT_MASTER_PDP_PORT, leftMaster);
+        leftSlaveSlot = pdp.addDevice(DrivetrainValues.LEFT_SLAVE_PDP_PORT, leftSlave);
+        rightMasterSlot = pdp.addDevice(DrivetrainValues.RIGHT_MASTER_PDP_PORT, rightMaster);
+        rightSlaveSlot = pdp.addDevice(DrivetrainValues.RIGHT_SLAVE_PDP_PORT, rightSlave);
 
         setNeutralMode(NeutralMode.kBrake);
-
         setCurrentLimit(40);
+        DrivetrainValues.ClosedLoopDT.setFFAccel(0.1);
 
-        if (RobotBase.isReal()) {
-//            navX = new NavXMicro(NavXMicro.NavXPort.I2C_onboard);
-        }
+        imu = new PigeonIMU(0);
 
-        DashboardManager.addTab(this, this);
-
-        Constants.DrivetrainValues.ClosedLoopDT.setFFAccel(0.1);
-
-        diffDrive = new SmartDiffDrive(leftMaster, rightMaster, Constants.DrivetrainValues.ClosedLoopDT, Constants.DrivetrainValues.MaxRpm);
+        diffDrive = new SmartDiffDrive(leftMaster, rightMaster, DrivetrainValues.ClosedLoopDT, DrivetrainValues.MaxRpm);
         driveOdometry = new DifferentialDriveOdometry(getDriveHeading(), startingPose);
         resetPose();
+
+        DashboardManager.addTab(this, this);
+        dashboard_pigeonIMU_pitch = DashboardManager.addTabItem(this, "IMU/Pitch", 0.0);
+        dashboard_pigeonIMU_roll = DashboardManager.addTabItem(this, "IMU/Roll", 0.0);
+        dashboard_pigeonIMU_fusedHeading = DashboardManager.addTabItem(this, "IMU/FusedHeading", 0.0);
+        dashboard_poseX = DashboardManager.addTabItem(this, "Pose/X", 0.0);
+        dashboard_poseY = DashboardManager.addTabItem(this, "Pose/Y", 0.0);
+        dashboard_poseRotation = DashboardManager.addTabItem(this, "Pose/Rotation", 0.0);
+        ui_poseX = DashboardManager.addTabItem(this, "Starting Pose X", startingPose.getTranslation().getX());
+        ui_poseY = DashboardManager.addTabItem(this, "Starting Pose Y", startingPose.getTranslation().getY());
+
+        DashboardManager.getTab(this).add("Pose", dashboardResetPoseCommand);
+
+//        DashboardManager.addTabButton(this, "Reset Pose", this::resetPoseFromDashboard);
 
         setDefaultCommand(new RunEndCommand(this::tankDrive, this::stopDrive, this));
 
         initSuccessful = leftMaster.getCANConnection() && leftSlave.getCANConnection() &&
-                rightMaster.getCANConnection() && rightSlave.getCANConnection();
+                rightMaster.getCANConnection() && rightSlave.getCANConnection() && imu.getState() != PigeonIMU.PigeonState.NoComm;
     }
 
-    public void tankDrive() {
+    @Override
+    public void periodic() {
+        updatePose();
+    }
+
+    private void tankDrive() {
         tankProfile.calculateTankSpeeds();
         diffDrive.tankDrive(tankProfile.leftPower, tankProfile.rightPower, tankProfile.loopMode);
     }
 
+    @SuppressWarnings("unused")
     public void arcadeDrive() {
         arcadeProfile.calculateArcadeSpeeds();
         diffDrive.arcadeDrive(arcadeProfile.xPow, arcadeProfile.rotPow, arcadeProfile.loopMode);
     }
 
+    @SuppressWarnings("unused")
     public void xBoxDrive() {
         arcadeProfile.calculateArcadeSpeeds();
         diffDrive.arcadeDrive(arcadeProfile.xPow, arcadeProfile.rotPow, arcadeProfile.loopMode);
     }
 
-    public void stopDrive() {
+    private void stopDrive() {
         leftMaster.set(0);
         rightMaster.set(0);
     }
 
-    public Rotation2d getDriveHeading() {
-//        return navX == null ? new Rotation2d() : Rotation2d.fromDegrees(-navX.getYaw());
-        return new Rotation2d(0);
+    private Rotation2d getDriveHeading() {
+        return Rotation2d.fromDegrees(imu.getFusedHeading());
     }
 
     @Override
     public void updateDashboardData() {
-        FalconDashboard.updateRobotPose2d(pose);
+        FalconDashboard.updateRobotPose2d(robotPose);
+        imu.getYawPitchRoll(ypr);
+        dashboard_pigeonIMU_pitch.setDouble(ypr[1]);
+        dashboard_pigeonIMU_roll.setDouble(ypr[2]);
+        dashboard_pigeonIMU_fusedHeading.setDouble(imu.getFusedHeading());
+        dashboard_poseX.setDouble(robotPose.getTranslation().getX());
+        dashboard_poseY.setDouble(robotPose.getTranslation().getY());
+        dashboard_poseRotation.setDouble(robotPose.getRotation().getDegrees());
     }
 
-    public double getRightDistanceMeters() {
-        return Constants.DrivetrainValues.DrivePowerTrain.calculateWheelDistanceMeters(-rightMaster.getSensorPosition());
+    private double getRightDistanceMeters() {
+        return DrivetrainValues.DrivePowerTrain.calculateWheelDistanceMeters(-rightMaster.getSensorPosition());
     }
 
-    public double getLeftDistanceMeters() {
-        return Constants.DrivetrainValues.DrivePowerTrain.calculateWheelDistanceMeters(leftMaster.getSensorPosition());
+    private double getLeftDistanceMeters() {
+        return DrivetrainValues.DrivePowerTrain.calculateWheelDistanceMeters(leftMaster.getSensorPosition());
     }
 
-    public double getRightVelocityMetersPerSec() {
-        return Constants.DrivetrainValues.DrivePowerTrain.calculateMetersPerSec(rightMaster.getSensorVelocity());
+    private double getRightVelocityMetersPerSec() {
+        return DrivetrainValues.DrivePowerTrain.calculateMetersPerSec(rightMaster.getSensorVelocity());
     }
 
-    public double getLeftVelocityMetersPerSec() {
-        return Constants.DrivetrainValues.DrivePowerTrain.calculateMetersPerSec(leftMaster.getSensorVelocity());
+    private double getLeftVelocityMetersPerSec() {
+        return DrivetrainValues.DrivePowerTrain.calculateMetersPerSec(leftMaster.getSensorVelocity());
     }
 
     public DifferentialDriveWheelSpeeds getWheelSpeeds() {
@@ -156,29 +203,41 @@ public class Drivetrain extends SubsystemBase implements DashboardUpdatable {
 
     public Pose2d getLatestPose() {
         updatePose();
-        return pose;
+        return robotPose;
     }
 
     private void updatePose() {
-        pose = driveOdometry.update(getDriveHeading(), getLeftDistanceMeters(), getRightDistanceMeters());
+        robotPose = driveOdometry.update(getDriveHeading(), getLeftDistanceMeters(), getRightDistanceMeters());
     }
 
-    public void resetPose(Pose2d pose) {
+    public void resetPose(double x, double y) {
+        resetPose(new Pose2d(x, y, getDriveHeading()));
+    }
+
+    private void resetPose(Pose2d pose) {
         resetEncoders();
-        this.pose = pose;
-//        if (navX != null) {
-//            navX.zero();
-//        }
-        driveOdometry.resetPosition(this.pose, getDriveHeading());
+        zeroYaw();
+        robotPose = pose;
+        driveOdometry.resetPosition(robotPose, getDriveHeading());
     }
 
-    public void resetPose() {
+    private void resetPoseFromDashboard() {
+        System.out.println("fugg");
+        Pose2d pose = new Pose2d(ui_poseX.getDouble(startingPose.getTranslation().getX()), ui_poseY.getDouble(startingPose.getTranslation().getY()), getDriveHeading());
+        resetPose(pose);
+    }
+
+    private void resetPose() {
         resetPose(startingPose);
     }
 
-    public void resetEncoders() {
+    private void resetEncoders() {
         leftMaster.rezeroSensor();
         rightMaster.rezeroSensor();
+    }
+
+    private void zeroYaw() {
+        imu.setFusedHeading(0);
     }
 
     public void setNeutralMode(NeutralMode mode) {
@@ -188,7 +247,7 @@ public class Drivetrain extends SubsystemBase implements DashboardUpdatable {
         rightSlave.setNeutralMode(mode);
     }
 
-    public void setCurrentLimit(int amps) {
+    private void setCurrentLimit(int amps) {
         leftMaster.limitInputCurrent(amps);
         leftSlave.limitInputCurrent(amps);
         rightMaster.limitInputCurrent(amps);
@@ -198,7 +257,4 @@ public class Drivetrain extends SubsystemBase implements DashboardUpdatable {
     @Override
     public String getDashboardTabName() { return "Drivetrain"; }
 
-    public static void propUp() { propUpRobot.set(true); }
-
-    public static void retractProp() { propUpRobot.set(false); }
 }

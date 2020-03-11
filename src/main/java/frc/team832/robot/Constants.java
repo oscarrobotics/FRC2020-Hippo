@@ -159,7 +159,7 @@ public class Constants {
     }
 
     public static class IntakeValues {
-        public static final int INTAKE_MOTOR_CAN_ID = 1;
+        public static final int INTAKE_MOTOR_CAN_ID = 5;
 
         public static final PDPPortNumber INTAKE_MOTOR_PDP_SLOT = PDPPortNumber.Port11;
 
