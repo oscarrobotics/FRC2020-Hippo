@@ -5,13 +5,11 @@ import frc.team832.robot.subsystems.Climber;
 
 public class ClimbGroup extends SequentialCommandGroup {
 
-    Climber climber;
-
     public ClimbGroup(Climber climber, boolean climbUp){
         addCommands(
                 new InstantCommand(climber::unlockClimb, climber),
                 new WaitCommand(0.2),
-                new RunEndCommand(climbUp ? climber::windWinch : climber::unwindWinch, climber::stopClimb)
+                new StartEndCommand(climbUp ? climber::windWinch : climber::unwindWinch, climber::stopClimb)
         );
     }
 }

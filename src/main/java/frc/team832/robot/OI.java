@@ -8,9 +8,10 @@ import frc.team832.lib.driverinput.controllers.*;
 import frc.team832.lib.driverinput.oi.DriverOI;
 import frc.team832.lib.driverinput.oi.SticksDriverOI;
 import frc.team832.lib.driverinput.oi.XboxDriverOI;
-import frc.team832.lib.util.OscarMath;
-import frc.team832.robot.commands.ClimbGroup;
+import frc.team832.robot.commands.climb.StartClimbGroup;
+import frc.team832.robot.commands.climb.StopClimbGroup;
 import frc.team832.robot.subsystems.SuperStructure;
+import javafx.scene.paint.Stop;
 
 import static frc.team832.robot.Robot.*;
 
@@ -35,7 +36,7 @@ public class OI {
 
 		this.superStructure = superStructure;
 
-		configureBrandonLayout();
+		configTestingCommands();
 	}
 
 	private void configureBrandonLayout() {
@@ -58,10 +59,10 @@ public class OI {
 		stratComInterface.getSingleToggle().whenHeld(new RunEndCommand(() -> climber.adjustHook(stratComInterface.getLeftSlider()), climber::stopExtend));
 		stratComInterface.getSingleToggle().whenReleased(new InstantCommand(climber::retractHook));
 
-		stratComInterface.getSCPlus().whileHeld(new ClimbGroup(climber, true));
+		stratComInterface.getSCPlus().whileHeld(new StartClimbGroup(climber, true));
 		stratComInterface.getSCPlus().whenReleased(new InstantCommand(climber::lockClimb));
 
-		stratComInterface.getSCMinus().whileHeld(new ClimbGroup(climber, false));
+		stratComInterface.getSCMinus().whileHeld(new StartClimbGroup(climber, false));
 		stratComInterface.getSCMinus().whenReleased(new InstantCommand(climber::lockClimb));
 
 //		stratComInterface.getSCSideTop().whenHeld(new StartEndCommand(wheelOfFortune::extendWOFManipulator, wheelOfFortune::retractWOFManipulator));
@@ -71,7 +72,18 @@ public class OI {
 	}
 
 	private void configTestingCommands() {
+		stratComInterface.getArcadeBlackRight().whenPressed(new InstantCommand(intake::extendIntake));
+		stratComInterface.getArcadeBlackRight().whenReleased(new InstantCommand(intake::retractIntake));
 
+//		stratComInterface.getSingleToggle().whenHeld(new RunEndCommand(() -> climber.adjustHook(stratComInterface.getLeftSlider()), climber::stopExtend));
+//		stratComInterface.getSingleToggle().whenReleased(new InstantCommand(climber::retractHook));
+
+		stratComInterface.getSCPlus().whileHeld(new StartClimbGroup(climber, true));
+		stratComInterface.getSCPlus().whenReleased(new StopClimbGroup(climber));
+
+		stratComInterface.getSCMinus().whileHeld(new StartClimbGroup(climber, false));
+		stratComInterface.getSCMinus().whenReleased(new StopClimbGroup(climber));
+
+		stratComInterface.getDoubleToggleUp().whenHeld(new RunEndCommand(() -> turret.setHeadingSlider(stratComInterface.getRightSlider()), () -> turret.setHeadingSlider(0)));
 	}
 }
-
