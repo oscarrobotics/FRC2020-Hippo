@@ -17,8 +17,8 @@ import frc.team832.lib.power.PDPPortNumber;
 import frc.team832.lib.util.ClosedLoopConfig;
 import frc.team832.lib.util.OscarMath;
 
-import javax.swing.plaf.synth.SynthTextAreaUI;
 
+@SuppressWarnings({"WeakerAccess", "unused"})
 public class Constants {
     public static class DrivetrainValues {
         public static final int LEFT_MASTER_CAN_ID = 1;
@@ -35,35 +35,36 @@ public class Constants {
         public static final double StickRotateOnCenterMultiplier = 0.6;
         public static final double StickRotateMultiplier = 0.8;
 
-        public static final double DriveWheelDiameter = Units.inchesToMeters(6);
+        public static final double DriveWheelDiameter = 6 * 0.0254;
         public static final float DriveGearReduction = 1f / (8f/84f);
 
         public static final int MaxRpm = (int)Motor.kFalcon500.freeSpeed;
 
         private static final Gearbox DriveGearbox = new Gearbox(DriveGearReduction);
         public static final WheeledPowerTrain DrivePowerTrain = new WheeledPowerTrain(DriveGearbox, Motor.kFalcon500, 2, DriveWheelDiameter);
-        public static DifferentialDriveKinematics DriveKinematics = new DifferentialDriveKinematics(Units.inchesToMeters(29.0));
+        public static DifferentialDriveKinematics DriveKinematics = new DifferentialDriveKinematics(0.6763419203747071);
 
-        public static final SimpleMotorFeedforward LeftFF = new SimpleMotorFeedforward(0, 0, 0);
-        public static final SimpleMotorFeedforward RightFF = new SimpleMotorFeedforward(0, 0, 0);
+        public static final SimpleMotorFeedforward CombinedFF = new SimpleMotorFeedforward(0.115, 2.33, 0.165);
+        public static final SimpleMotorFeedforward LeftFF = new SimpleMotorFeedforward(0.109, 2.34, 0.165);
+        public static final SimpleMotorFeedforward RightFF = new SimpleMotorFeedforward(0.121, 2.31, 0.165);
 
         public static final ClosedLoopConfig LeftConfig = new ClosedLoopConfig(0.01, 0, 0.001, 0);
         public static final ClosedLoopConfig RightConfig = new ClosedLoopConfig(0.01, 0, 0.001, 0);
 
         public static final ClosedLoopDT ClosedLoopDT = new ClosedLoopDT(LeftFF, RightFF, LeftConfig, RightConfig, DrivePowerTrain);
 
-        public static final double LeftkP = 0.1;
-        public static final double LeftkD = 0.01;
+        public static final double LeftkP = 0.0001;
+        public static final double LeftkD = 0.0;
 
-        public static final double RightkP = 0.1;
-        public static final double RightkD = 0.01;
+        public static final double RightkP = 0.0001;
+        public static final double RightkD = 0.0;
 
         public static final DifferentialDriveVoltageConstraint LeftAutoVoltageConstraint =
                 new DifferentialDriveVoltageConstraint(LeftFF, DriveKinematics, 10);
         public static final DifferentialDriveVoltageConstraint RightAutoVoltageConstraint =
                 new DifferentialDriveVoltageConstraint(RightFF, DriveKinematics, 10);
 
-        private static double Velocity = 2, Acceleration = 4;
+        private static double Velocity = 1, Acceleration = 1;
         public static final TrajectoryConfig LeftTrajectoryConfig =
                 new TrajectoryConfig(Velocity, Acceleration)
                         .setKinematics(DriveKinematics)
@@ -228,7 +229,7 @@ public class Constants {
         public static final double kF = 0.0;
     }
 
-    public class PneumaticsValues {
+    public static class PneumaticsValues {
         public static final int PCM_MODULE_NUM = 0;
 
         public static final int INTAKE_SOLENOID_ID = 0;
@@ -237,15 +238,23 @@ public class Constants {
         public static final int CLIMB_LOCK_SOLENOID_ID = 3;
     }
 
-    public static class FieldPositions {
+    public enum FieldPosition {
         // positions are relative to driver station
-        public static final Pose2d StartCenter = new Pose2d(11.875, 3.05, Rotation2d.fromDegrees(0));
-        public static final Pose2d CloseSideTrench = new Pose2d(5.245, 7.505, Rotation2d.fromDegrees(0));
-        public static final Pose2d FarSideTrench = new Pose2d(10.735, 7.505, Rotation2d.fromDegrees(0));
-        public static final Pose2d ShieldGenCloseToTrench = new Pose2d(10.735-.5, 5.748, Rotation2d.fromDegrees(270)); // Needs to be changed
+        ZeroZero(0, 0, 0),
+        InitLine_CenteredOnPort(Units.feetToMeters(10.75), Units.feetToMeters(19), 180),
+        StartCenter(11.875, 3.05, 180),
+        CloseSideTrench(5.245, 7.505, 180),
+        FarSideTrench(10.735, 7.505, 0),
+        ShieldGenCloseToTrench(10.235, 5.748, 270); // Needs to be changed
+
+        public final Pose2d poseMeters;
+
+        FieldPosition(double xMeters, double yMeters, double degrees) {
+            poseMeters = new Pose2d(xMeters, yMeters, Rotation2d.fromDegrees(degrees));
+        }
     }
 
-    public class LEDValues {
+    public static class LEDValues {
         public static final int LED_PWM_PORT = 9;
     }
 }

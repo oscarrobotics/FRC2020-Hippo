@@ -53,7 +53,7 @@ public class TankDriveProfile {
 		DriveAxesSupplier axes = oi.driverOI.getGreenbergDriveAxes();
 		double power;
 
-		power = getNormalPower(axes.getLeftY());
+		power = getNormalPower(-axes.getLeftY());
 
 		return new StoreDriveSpeeds(power, power);
 	}
@@ -62,8 +62,8 @@ public class TankDriveProfile {
 		DriveAxesSupplier axes = oi.driverOI.getGreenbergDriveAxes();
 		double rightPow, leftPow;
 
-		rightPow = getNormalPower(axes.getRightY());
-		leftPow = getNormalPower(axes.getLeftY());
+		rightPow = getNormalPower(-axes.getRightY());
+		leftPow = getNormalPower(-axes.getLeftY());
 
 		return new StoreDriveSpeeds(leftPow, rightPow);
 	}

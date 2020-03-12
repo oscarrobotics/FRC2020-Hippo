@@ -2,11 +2,13 @@ package frc.team832.robot.subsystems;
 
 import com.ctre.phoenix.sensors.PigeonIMU;
 import edu.wpi.first.networktables.NetworkTableEntry;
-import edu.wpi.first.wpilibj.Solenoid;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveWheelSpeeds;
+import edu.wpi.first.wpilibj.shuffleboard.WidgetType;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.*;
 import frc.team832.lib.drive.SmartDiffDrive;
 import frc.team832.lib.driverstation.dashboard.DashboardManager;
@@ -17,6 +19,7 @@ import frc.team832.lib.motorcontrol2.vendor.CANTalonFX;
 import frc.team832.lib.power.GrouchPDP;
 import frc.team832.lib.power.impl.SmartMCAttachedPDPSlot;
 import frc.team832.lib.util.MusicBox;
+import frc.team832.lib.util.OscarMath;
 import frc.team832.robot.Constants;
 
 import frc.team832.robot.Constants.DrivetrainValues;
@@ -35,8 +38,9 @@ public class Drivetrain extends SubsystemBase implements DashboardUpdatable {
 
     private final SmartDiffDrive diffDrive;
     private final DifferentialDriveOdometry driveOdometry;
+    private final SendableChooser<Pose2d> startPoseChooser = new SendableChooser<>();
 
-    private Pose2d startingPose = Constants.FieldPositions.StartCenter;
+    private Pose2d startingPose = new Pose2d();
     private Pose2d robotPose = startingPose;
 
     @SuppressWarnings("FieldCanBeLocal")
@@ -48,8 +52,8 @@ public class Drivetrain extends SubsystemBase implements DashboardUpdatable {
     @SuppressWarnings("FieldCanBeLocal")
     private final SmartMCAttachedPDPSlot leftMasterSlot, leftSlaveSlot, rightMasterSlot, rightSlaveSlot;
 
-    private final NetworkTableEntry dashboard_pigeonIMU_pitch, dashboard_pigeonIMU_roll, dashboard_pigeonIMU_fusedHeading,
-            dashboard_poseX, dashboard_poseY, dashboard_poseRotation, ui_poseX, ui_poseY;
+    private final NetworkTableEntry dashboard_rightVolts, dashboard_leftVolts,dashboard_pigeonIMU_pitch, dashboard_pigeonIMU_roll, dashboard_pigeonIMU_fusedHeading,
+            dashboard_poseX, dashboard_poseY, dashboard_poseRotation, dashboard_rawLeftPos, ui_poseX, ui_poseY;
 
     private final CommandBase dashboardResetPoseCommand = new CommandBase() {
         @Override
@@ -87,10 +91,10 @@ public class Drivetrain extends SubsystemBase implements DashboardUpdatable {
         leftSlave.follow(leftMaster);
         rightSlave.follow(rightMaster);
 
-        leftMaster.setInverted(false);
-        leftSlave.setInverted(false);
-        rightMaster.setInverted(false);
-        leftSlave.setInverted(false);
+        leftMaster.setInverted(true);
+        leftSlave.setInverted(true);
+        rightMaster.setInverted(true);
+        rightSlave.setInverted(true);
 
         leftMasterSlot = pdp.addDevice(DrivetrainValues.LEFT_MASTER_PDP_PORT, leftMaster);
         leftSlaveSlot = pdp.addDevice(DrivetrainValues.LEFT_SLAVE_PDP_PORT, leftSlave);
@@ -103,23 +107,33 @@ public class Drivetrain extends SubsystemBase implements DashboardUpdatable {
 
         imu = new PigeonIMU(0);
 
-        diffDrive = new SmartDiffDrive(leftMaster, rightMaster, DrivetrainValues.ClosedLoopDT, DrivetrainValues.MaxRpm);
-        driveOdometry = new DifferentialDriveOdometry(getDriveHeading(), startingPose);
-        resetPose();
+        var defaultStartPose = Constants.FieldPosition.InitLine_CenteredOnPort;
+
+        // startPoseChooser
+        startPoseChooser.addOption(defaultStartPose.toString(), defaultStartPose.poseMeters);
+        startPoseChooser.setDefaultOption(defaultStartPose.toString(), defaultStartPose.poseMeters);
+
+        startPoseChooser.addOption(Constants.FieldPosition.ZeroZero.toString(), Constants.FieldPosition.ZeroZero.poseMeters);
 
         DashboardManager.addTab(this, this);
+        dashboard_rightVolts = DashboardManager.addTabItem(this, "Raw/RightVolts", 0.0);
+        dashboard_leftVolts = DashboardManager.addTabItem(this, "Raw/LeftVolts", 0.0);
         dashboard_pigeonIMU_pitch = DashboardManager.addTabItem(this, "IMU/Pitch", 0.0);
         dashboard_pigeonIMU_roll = DashboardManager.addTabItem(this, "IMU/Roll", 0.0);
         dashboard_pigeonIMU_fusedHeading = DashboardManager.addTabItem(this, "IMU/FusedHeading", 0.0);
         dashboard_poseX = DashboardManager.addTabItem(this, "Pose/X", 0.0);
         dashboard_poseY = DashboardManager.addTabItem(this, "Pose/Y", 0.0);
         dashboard_poseRotation = DashboardManager.addTabItem(this, "Pose/Rotation", 0.0);
+        dashboard_rawLeftPos = DashboardManager.addTabItem(this, "Raw/LeftPos", 0.0);
         ui_poseX = DashboardManager.addTabItem(this, "Starting Pose X", startingPose.getTranslation().getX());
         ui_poseY = DashboardManager.addTabItem(this, "Starting Pose Y", startingPose.getTranslation().getY());
+        DashboardManager.getTab(this).add("StartPose", startPoseChooser);
+        DashboardManager.getTab(this).add("ResetPose", dashboardResetPoseCommand);
 
-        DashboardManager.getTab(this).add("Pose", dashboardResetPoseCommand);
-
-//        DashboardManager.addTabButton(this, "Reset Pose", this::resetPoseFromDashboard);
+        startingPose = defaultStartPose.poseMeters;
+        diffDrive = new SmartDiffDrive(leftMaster, rightMaster, DrivetrainValues.ClosedLoopDT, DrivetrainValues.MaxRpm);
+        driveOdometry = new DifferentialDriveOdometry(getDriveHeading(), startingPose);
+        resetPose();
 
         setDefaultCommand(new RunEndCommand(this::tankDrive, this::stopDrive, this));
 
@@ -130,6 +144,7 @@ public class Drivetrain extends SubsystemBase implements DashboardUpdatable {
     @Override
     public void periodic() {
         updatePose();
+        startingPose = startPoseChooser.getSelected();
     }
 
     private void tankDrive() {
@@ -155,27 +170,33 @@ public class Drivetrain extends SubsystemBase implements DashboardUpdatable {
     }
 
     private Rotation2d getDriveHeading() {
-        return Rotation2d.fromDegrees(imu.getFusedHeading());
+        double trimmedHeading = OscarMath.round(imu.getFusedHeading(), 3);
+        return Rotation2d.fromDegrees(trimmedHeading);
     }
 
     @Override
     public void updateDashboardData() {
         FalconDashboard.updateRobotPose2d(robotPose);
         imu.getYawPitchRoll(ypr);
+        dashboard_leftVolts.setDouble(leftMaster.getOutputVoltage());
+        dashboard_rightVolts.setDouble(rightMaster.getOutputVoltage());
         dashboard_pigeonIMU_pitch.setDouble(ypr[1]);
         dashboard_pigeonIMU_roll.setDouble(ypr[2]);
         dashboard_pigeonIMU_fusedHeading.setDouble(imu.getFusedHeading());
         dashboard_poseX.setDouble(robotPose.getTranslation().getX());
         dashboard_poseY.setDouble(robotPose.getTranslation().getY());
         dashboard_poseRotation.setDouble(robotPose.getRotation().getDegrees());
+        dashboard_rawLeftPos.setDouble(leftMaster.getSensorPosition());
+        ui_poseX.setDouble(startingPose.getTranslation().getX());
+        ui_poseY.setDouble(startingPose.getTranslation().getY());
     }
 
     private double getRightDistanceMeters() {
-        return DrivetrainValues.DrivePowerTrain.calculateWheelDistanceMeters(-rightMaster.getSensorPosition());
+        return DrivetrainValues.DrivePowerTrain.calculateWheelDistanceMeters(rightMaster.getSensorPosition());
     }
 
     private double getLeftDistanceMeters() {
-        return DrivetrainValues.DrivePowerTrain.calculateWheelDistanceMeters(leftMaster.getSensorPosition());
+        return DrivetrainValues.DrivePowerTrain.calculateWheelDistanceMeters(-leftMaster.getSensorPosition());
     }
 
     private double getRightVelocityMetersPerSec() {
@@ -191,14 +212,14 @@ public class Drivetrain extends SubsystemBase implements DashboardUpdatable {
     }
 
     public void setWheelVolts(Double leftVolts, Double rightVolts) {
-        double leftBusVoltage = leftMaster.getInputVoltage();
-        double rightBusVoltage = rightMaster.getInputVoltage();
+//        double leftBusVoltage = leftMaster.getInputVoltage();
+//        double rightBusVoltage = rightMaster.getInputVoltage();
+//
+//        latestLeftWheelVolts = Math.abs(leftVolts / leftBusVoltage) * Math.signum(leftVolts);
+//        latestRightWheelVolts = -Math.abs(rightVolts / rightBusVoltage) * Math.signum(rightVolts);
 
-        latestLeftWheelVolts = Math.abs(leftVolts / leftBusVoltage) * Math.signum(leftVolts);
-        latestRightWheelVolts = -Math.abs(rightVolts / rightBusVoltage) * Math.signum(rightVolts);
-
-        leftMaster.set(latestLeftWheelVolts);
-        rightMaster.set(latestRightWheelVolts);
+        leftMaster.set(leftVolts);
+        rightMaster.set(rightVolts);
     }
 
     public Pose2d getLatestPose() {
@@ -237,7 +258,7 @@ public class Drivetrain extends SubsystemBase implements DashboardUpdatable {
     }
 
     private void zeroYaw() {
-        imu.setFusedHeading(0);
+        imu.setFusedHeading(startingPose.getRotation().getDegrees());
     }
 
     public void setNeutralMode(NeutralMode mode) {
