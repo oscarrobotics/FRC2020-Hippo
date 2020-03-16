@@ -23,6 +23,7 @@ import frc.team832.robot.utilities.state.SpindexerStatus;
 
 public class Spindexer extends SubsystemBase implements DashboardUpdatable {
 	public final boolean initSuccessful;
+	private int vibrateCount;
 
 	private final CANSparkMax spinMotor;
 	private final HallEffect hallEffect;
@@ -50,7 +51,7 @@ public class Spindexer extends SubsystemBase implements DashboardUpdatable {
 
 		zeroSpindexer();
 
-		spindexerStatus = new SpindexerStatus(pdp, this, spinMotor);
+		spindexerStatus = new SpindexerStatus(pdp, this);
 
 		hallEffect = new HallEffect(SpindexerValues.HALL_EFFECT_DIO_CHANNEL);
 //		shark = new DigitalInput(2);
@@ -61,6 +62,8 @@ public class Spindexer extends SubsystemBase implements DashboardUpdatable {
 		hallEffect.setupInterrupts(() -> {
 			System.out.println("HALL");
 		});
+
+		vibrateCount = 0;
 
 		DashboardManager.addTab(this, this);
 		ballSlot0 = DashboardManager.addTabItem(this, "Spindexer/Slot 0", false, DashboardWidget.BooleanBox);
@@ -141,6 +144,13 @@ public class Spindexer extends SubsystemBase implements DashboardUpdatable {
 		spinMode = SpinMode.Velocity;
 		spindexerTargetVelocity = rpm;
 	}
+
+	public void vibrate() {
+		vibrateCount++;
+		double pos = Math.sin(vibrateCount / 5.0) / 20.0;
+		setTargetRotation(pos);
+	}
+
 
 	public boolean getHallEffect() {
 		return !hallEffect.get();

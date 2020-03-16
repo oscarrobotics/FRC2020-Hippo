@@ -20,10 +20,10 @@ public class SpindexerStatus {
     public SpindexerState state = SpindexerState.EMPTY;
     private Spindexer.SpinnerDirection spinDirection;
 
-    public SpindexerStatus(GrouchPDP pdp, Spindexer spindexer, CANSparkMax spinMotor) {
+    public SpindexerStatus(GrouchPDP pdp, Spindexer spindexer) {
 
         this.spindexer = spindexer;
-        this.spinMotor = spinMotor;
+        this.spinMotor = spindexer.getSpinMotor();
         this.pdp = pdp;
 
         spinSlot = pdp.addDevice(Constants.SpindexerValues.SPIN_MOTOR_PDP_SLOT, spinMotor);
