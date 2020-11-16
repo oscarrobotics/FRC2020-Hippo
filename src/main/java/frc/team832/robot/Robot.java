@@ -27,7 +27,7 @@ public class Robot extends OscarTimedRobot {
     static final Spindexer spindexer = new Spindexer(pdp);
     static final Turret turret = new Turret(pdp);
     static final Climber climber = new Climber(pdp);
-    static final WheelOfFortune wheelOfFortune = new WheelOfFortune();
+//    static final WheelOfFortune wheelOfFortune = new WheelOfFortune();
     static final SuperStructure superStructure = new SuperStructure(intake, shooter, spindexer, turret, vision);
 
     public static final OI oi = new OI(superStructure);
@@ -96,11 +96,11 @@ public class Robot extends OscarTimedRobot {
         }
         climberTelemetryNotifier.startPeriodic(0.02);
 
-        if (wheelOfFortune.initSuccessful) {
-            System.out.println("WheelOfFortune - init OK");
-        } else {
-            System.out.println("WheelOfFortune - init FAILED");
-        }
+//        if (wheelOfFortune.initSuccessful) {
+//            System.out.println("WheelOfFortune - init OK");
+//        } else {
+//            System.out.println("WheelOfFortune - init FAILED");
+//        }
 
         superStructureTelemetryNotifier.startPeriodic(0.02);
 
@@ -156,7 +156,7 @@ public class Robot extends OscarTimedRobot {
         drivetrain.setNeutralMode(mode);
         shooter.setFlyheelNeutralMode(mode);
         shooter.setFeederNeutralMode(mode);
-        turret.holdTurretPosition();
+//        turret.holdTurretPosition();
         spindexer.setNeutralMode(mode);
         turret.setNeutralMode(mode);
         shooter.setHood(2.7);

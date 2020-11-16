@@ -9,27 +9,23 @@ import frc.team832.lib.driverstation.dashboard.DashboardWidget;
 import frc.team832.lib.vision.ChameleonVisionSubsystem;
 import frc.team832.lib.vision.VisionTarget;
 import frc.team832.robot.utilities.state.ShooterCalculations;
+import org.photonvision.PhotonCamera;
+import org.photonvision.PhotonPipelineResult;
+import org.photonvision.PhotonTrackedTarget;
 
-public class Vision extends ChameleonVisionSubsystem implements DashboardUpdatable {
+public class Vision extends SubsystemBase implements DashboardUpdatable {
 	public final boolean initSuccessful;
 
 	private final Drivetrain drivetrain;
-	private final NetworkTableEntry dashboard_pitch, dashboard_yaw, dashboard_area, dashboard_isValid;
-	private VisionTarget target = new VisionTarget();
-//	private ShooterCalculations calculations = new ShooterCalculations();
+
+	private final PhotonCamera gloworm = new PhotonCamera("gloworm");
+
+	private PhotonTrackedTarget target;
+	private boolean hasTargets;
 
 	public Vision(Drivetrain drivetrain) {
-		super("USB Camera-B4.09.24.1", 0.05);//TODO: fix this
-
 		DashboardManager.addTab(this, this);
-
-		dashboard_area = DashboardManager.addTabItem(this, "Area", 0.0);
-		dashboard_pitch = DashboardManager.addTabItem(this, "Pitch", 0.0);
-		dashboard_yaw = DashboardManager.addTabItem(this, "Yaw", 0.0);
-		dashboard_isValid = DashboardManager.addTabItem(this, "Is Target Valid", false, DashboardWidget.BooleanBox);
-
 		this.drivetrain = drivetrain;
-
 		initSuccessful = true;
 	}
 
@@ -40,23 +36,20 @@ public class Vision extends ChameleonVisionSubsystem implements DashboardUpdatab
 	}
 
 	private void updateVision() {
-		target.isValid = getIsValidEntry().getBoolean(false);
-		target.pitch = getPitchEntry().getDouble(0);
-		target.yaw = getYawEntry().getDouble(0);
-		ShooterCalculations.update(target.pitch, target.yaw);
+		PhotonPipelineResult latestResult = gloworm.getLatestResult();
+		hasTargets = latestResult.hasTargets();
+		if (hasTargets) {
+			target = latestResult.getBestTarget();
+			ShooterCalculations.update(target.getPitch(), target.getYaw());
+		}
 	}
 
-	public VisionTarget getTarget() {
+	public PhotonTrackedTarget getTarget() {
 		return target;
 	}
 
 	public void driverMode(boolean enable) {
-		getDriverModeEntry().setBoolean(enable);
-	}
-
-	@Override
-	public void consumeTarget (VisionTarget target) {
-
+		gloworm.setDriverMode(enable);
 	}
 
 	@Override
@@ -65,11 +58,11 @@ public class Vision extends ChameleonVisionSubsystem implements DashboardUpdatab
 	}
 
 	@Override
-	public void updateDashboardData () {
-		dashboard_area.setDouble(getAreaEntry().getDouble(0.0));
-		dashboard_pitch.setDouble(getPitchEntry().getDouble(0.0));
-		dashboard_yaw.setDouble(getYawEntry().getDouble(0.0));
-		dashboard_isValid.setBoolean(getIsValidEntry().getBoolean(false));
+	public void updateDashboardData () {}
+
+	public boolean hasTarget() {
+		return hasTargets;
 	}
 }
+
 

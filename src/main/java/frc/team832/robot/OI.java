@@ -11,8 +11,9 @@ import frc.team832.lib.driverinput.oi.SticksDriverOI;
 import frc.team832.lib.driverinput.oi.XboxDriverOI;
 import frc.team832.robot.commands.climb.StartClimbGroup;
 import frc.team832.robot.commands.climb.StopClimbGroup;
+import frc.team832.robot.subsystems.Spindexer;
 import frc.team832.robot.subsystems.SuperStructure;
-import javafx.scene.paint.Stop;
+
 
 import static frc.team832.robot.Robot.*;
 
@@ -75,18 +76,29 @@ public class OI {
 	}
 
 	private void configTestingCommands() {
-		stratComInterface.getArcadeBlackRight().whenPressed(new InstantCommand(intake::extendIntake));
-		stratComInterface.getArcadeBlackRight().whenReleased(new InstantCommand(intake::retractIntake));
+//		stratComInterface.getArcadeBlackRight().whenPressed(new InstantCommand(intake::extendIntake));
+//		stratComInterface.getArcadeBlackRight().whenReleased(new InstantCommand(intake::retractIntake));
 
 //		stratComInterface.getSingleToggle().whenHeld(new RunEndCommand(() -> climber.adjustHook(stratComInterface.getLeftSlider()), climber::stopExtend));
 //		stratComInterface.getSingleToggle().whenReleased(new InstantCommand(climber::retractHook));
 
-		stratComInterface.getSCPlus().whileHeld(new StartClimbGroup(climber, true));
-		stratComInterface.getSCPlus().whenReleased(new StopClimbGroup(climber));
+//		stratComInterface.getSCPlus().whileHeld(new StartClimbGroup(climber, true));
+//		stratComInterface.getSCPlus().whenReleased(new StopClimbGroup(climber));
 
-		stratComInterface.getSCMinus().whileHeld(new StartClimbGroup(climber, false));
-		stratComInterface.getSCMinus().whenReleased(new StopClimbGroup(climber));
+//		stratComInterface.getSCMinus().whileHeld(new StartClimbGroup(climber, false));
+//		stratComInterface.getSCMinus().whenReleased(new StopClimbGroup(climber));
 
-		stratComInterface.getDoubleToggleUp().whenHeld(new RunEndCommand(() -> turret.setHeadingSlider(stratComInterface.getRightSlider()), () -> turret.setHeadingSlider(0)));
+//		stratComInterface.getDoubleToggleUp().whenHeld(new RunEndCommand(() -> turret.setHeadingSlider(stratComInterface.getRightSlider()), () -> turret.setHeadingSlider(0)));
+
+		stratComInterface.getDoubleToggleUp().whenPressed(new InstantCommand(() -> shooter.setFlywheelRPM(2000)));
+		stratComInterface.getDoubleToggleUp().whenPressed(new InstantCommand(() -> shooter.setFeedRPM(1000)));
+		stratComInterface.getDoubleToggleUp().whenReleased(new InstantCommand(() -> shooter.setFlywheelRPM(0)));
+		stratComInterface.getDoubleToggleUp().whenReleased(new InstantCommand(() -> shooter.setFeedRPM(0)));
+
+
+		stratComInterface.getArcadeBlackLeft().whenPressed(new InstantCommand(() -> spindexer.setSpinRPM(60 , Spindexer.SpinnerDirection.Clockwise)));
+		stratComInterface.getArcadeBlackRight().whenPressed(new InstantCommand(() -> spindexer.setSpinRPM(60, Spindexer.SpinnerDirection.CounterClockwise)));
+		stratComInterface.getArcadeBlackLeft().whenReleased(new InstantCommand(spindexer::stopSpin));
+		stratComInterface.getArcadeBlackRight().whenReleased(new InstantCommand(spindexer::stopSpin));
 	}
 }

@@ -6,6 +6,9 @@ plugins {
 sourceCompatibility = JavaVersion.VERSION_11
 targetCompatibility = JavaVersion.VERSION_11
 
+wpi.wpilibVersion = '2021.+'
+wpi.maven.useDevelopment = true
+
 def ROBOT_MAIN_CLASS = "frc.team832.robot.Main"
 
 // Define my targets (RoboRIO) and artifacts (deployable files)

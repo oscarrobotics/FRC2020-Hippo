@@ -176,7 +176,10 @@ public class Spindexer extends SubsystemBase implements DashboardUpdatable {
 
 	public double getVelocity() { return spinMotor.getSensorVelocity() * SpindexerValues.SpinReduction; }
 
-	public void stopSpin() { setTargetVelocity(0); }
+	public void stopSpin() {
+		setTargetVelocity(0);
+		spinMotor.stop();
+	}
 
 	public void spinCounterclockwise(double pow) {
 		spinMotor.set(-OscarMath.clip(pow, 0, 1));

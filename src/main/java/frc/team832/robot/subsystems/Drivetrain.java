@@ -149,7 +149,7 @@ public class Drivetrain extends SubsystemBase implements DashboardUpdatable {
 
     private void tankDrive() {
         tankProfile.calculateTankSpeeds();
-        diffDrive.tankDrive(tankProfile.leftPower, tankProfile.rightPower, tankProfile.loopMode);
+        diffDrive.tankDrive(tankProfile.leftPower / 5.0, tankProfile.rightPower / 5.0, tankProfile.loopMode);
     }
 
     @SuppressWarnings("unused")

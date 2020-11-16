@@ -100,7 +100,7 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
         dashboard_hoodAngle.setDouble(getHoodAngle());
     }
 
-    private void setFlywheelRPM(double wheelTargetRPM) {
+    public void setFlywheelRPM(double wheelTargetRPM) {
         double motorTargetRpm = wheelTargetRPM / ShooterValues.FlywheelReduction;
 
         double batteryVoltage = primaryMotor.getInputVoltage();
