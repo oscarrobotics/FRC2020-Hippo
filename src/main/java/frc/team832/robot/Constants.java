@@ -141,7 +141,7 @@ public class Constants {
         public static final int TurretCenterVisionPosition = 0;
 
         //oscilation period is 0.2785 with kp of 0.07
-        public static final double kP = 0.04;
+        public static final double kP = 0.02;
         public static final double kI = 0.15;
         public static final double kD = 0.002;
         public static final double FFMultiplier = 0.002;

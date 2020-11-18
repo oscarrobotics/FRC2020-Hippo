@@ -39,7 +39,7 @@ public class OI {
 		this.superStructure = superStructure;
 
 		if (OperatorInterface.getConnectedControllerCount() > 1) {
-			configTestingCommands();
+			configureBrandonLayout();
 		}
 	}
 

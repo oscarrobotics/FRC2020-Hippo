@@ -68,7 +68,7 @@ public class SuperStructure extends SubsystemBase implements DashboardUpdatable 
     public void trackTarget(boolean isFiring) {
 	    if (vision.hasTarget()) {
             turret.trackTarget(spindexer.getVelocity());
-            shooter.trackTarget(isFiring);
+//            shooter.trackTarget(isFiring);
         } else {
 	    	turret.setTurretTargetDegrees(0.0, true);
 		}

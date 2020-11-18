@@ -30,7 +30,7 @@ public class Turret extends SubsystemBase implements DashboardUpdatable {
 
     private NetworkTableEntry dashboard_turretPos, dashboard_turretPow, dashboard_turretTarget;
 
-    private final PIDController PID = new PIDController(TurretValues.kP, TurretValues.kI, TurretValues.kD);
+    private final PIDController PID = new PIDController(TurretValues.kP, 0, TurretValues.kD);
 
     public Turret(GrouchPDP pdp) {
         DashboardManager.addTab(this, this);
@@ -73,6 +73,7 @@ public class Turret extends SubsystemBase implements DashboardUpdatable {
     public void trackTarget(double spindexerRPM) {
         updateFF(spindexerRPM);
         setTurretTargetDegrees(ShooterCalculations.visionYaw + getDegrees(), true);
+
     }
 
     protected double calculateSafePosition(boolean isVision, double degrees) {

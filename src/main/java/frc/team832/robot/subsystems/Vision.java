@@ -20,6 +20,8 @@ public class Vision extends SubsystemBase implements DashboardUpdatable {
 
 	private final PhotonCamera gloworm = new PhotonCamera("gloworm");
 
+	private NetworkTableEntry yaw;
+
 	private PhotonTrackedTarget target;
 	private boolean hasTargets;
 
@@ -58,7 +60,7 @@ public class Vision extends SubsystemBase implements DashboardUpdatable {
 	}
 
 	@Override
-	public void updateDashboardData () {}
+	public void updateDashboardData () {	}
 
 	public boolean hasTarget() {
 		return hasTargets;
