@@ -3,12 +3,9 @@ package frc.team832.robot.subsystems;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.SlewRateLimiter;
 import edu.wpi.first.wpilibj.Solenoid;
-import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.controller.ProfiledPIDController;
-import edu.wpi.first.wpilibj.util.Units;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.team832.lib.driverstation.dashboard.DashboardManager;
-import frc.team832.lib.driverstation.dashboard.DashboardUpdatable;
 import frc.team832.lib.driverstation.dashboard.DashboardWidget;
 import frc.team832.lib.motorcontrol.NeutralMode;
 import frc.team832.lib.motorcontrol2.vendor.CANSparkMax;
@@ -18,7 +15,7 @@ import frc.team832.lib.power.impl.SmartMCAttachedPDPSlot;
 import frc.team832.lib.util.OscarMath;
 import frc.team832.robot.Constants;
 
-public class Climber extends SubsystemBase implements DashboardUpdatable {
+public class Climber extends SubsystemBase {
     public final boolean initSuccessful;
     private final CANSparkMax winchMotor, deployMotor;
 
@@ -29,14 +26,15 @@ public class Climber extends SubsystemBase implements DashboardUpdatable {
 
     private SmartMCAttachedPDPSlot winchSlot, deploySlot;
 
-    private final NetworkTableEntry dashboard_isSafe;
+    private final NetworkTableEntry dashboard_isSafe, dashboard_deployTarget, dashboard_deployPosition;
 
     private ProfiledPIDController extendPID = new ProfiledPIDController(Constants.ClimberValues.ExtendkP, 0, 0, Constants.ClimberValues.ExtendConstraints);
 
     private SlewRateLimiter climbRamp = new SlewRateLimiter(1);
 
     public Climber(GrouchPDP pdp) {
-        DashboardManager.addTab(this, this);
+        setName("Climber");
+        DashboardManager.addTab(this);
 
         climbLock = new Solenoid(Constants.PneumaticsValues.PCM_MODULE_NUM, Constants.PneumaticsValues.CLIMB_LOCK_SOLENOID_ID);
 
@@ -64,14 +62,17 @@ public class Climber extends SubsystemBase implements DashboardUpdatable {
         deployMotor.limitInputCurrent(30);
 
         dashboard_isSafe = DashboardManager.addTabItem(this, "Is Safe", false, DashboardWidget.BooleanBox);
+        dashboard_deployTarget = DashboardManager.addTabItem(this, "Deploy Target Pos", 0);
+        dashboard_deployPosition = DashboardManager.addTabItem(this, "Deploy Actual Pos", 0);
 
         initSuccessful = winchMotor.getCANConnection() && deployMotor.getCANConnection();
     }
 
     @Override
     public void periodic() {
-        runExtendPID();
+//        runExtendPID();
         runClimbRamp();
+        dashboard_isSafe.setBoolean(isWinchSafe());
     }
 
     public void unwindWinch() { climbPower = -0.25; }
@@ -121,15 +122,5 @@ public class Climber extends SubsystemBase implements DashboardUpdatable {
 
     public void zeroDeploy() {
         deployMotor.rezeroSensor();
-    }
-
-    @Override
-    public String getDashboardTabName() {
-        return "Climber";
-    }
-
-    @Override
-    public void updateDashboardData() {
-        dashboard_isSafe.setBoolean(isWinchSafe());
     }
 }

@@ -4,8 +4,6 @@ import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.team832.lib.driverstation.dashboard.DashboardManager;
-import frc.team832.lib.driverstation.dashboard.DashboardUpdatable;
-import frc.team832.lib.driverstation.dashboard.DashboardWidget;
 import frc.team832.lib.vision.ChameleonVisionSubsystem;
 import frc.team832.lib.vision.VisionTarget;
 import frc.team832.robot.utilities.state.ShooterCalculations;
@@ -13,7 +11,7 @@ import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPipelineResult;
 import org.photonvision.PhotonTrackedTarget;
 
-public class Vision extends SubsystemBase implements DashboardUpdatable {
+public class Vision extends SubsystemBase {
 	public final boolean initSuccessful;
 
 	private final Drivetrain drivetrain;
@@ -26,14 +24,14 @@ public class Vision extends SubsystemBase implements DashboardUpdatable {
 	private boolean hasTargets;
 
 	public Vision(Drivetrain drivetrain) {
-		DashboardManager.addTab(this, this);
+		setName("Vision");
+		DashboardManager.addTab(this);
 		this.drivetrain = drivetrain;
 		initSuccessful = true;
 	}
 
 	@Override
 	public void periodic(){
-		updateDashboardData();
 		updateVision();
 	}
 
@@ -53,14 +51,6 @@ public class Vision extends SubsystemBase implements DashboardUpdatable {
 	public void driverMode(boolean enable) {
 		gloworm.setDriverMode(enable);
 	}
-
-	@Override
-	public String getDashboardTabName () {
-		return "Vision";
-	}
-
-	@Override
-	public void updateDashboardData () {	}
 
 	public boolean hasTarget() {
 		return hasTargets;

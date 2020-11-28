@@ -4,8 +4,6 @@ import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.team832.lib.driverstation.dashboard.DashboardManager;
-import frc.team832.lib.driverstation.dashboard.DashboardUpdatable;
-import frc.team832.lib.motorcontrol2.vendor.CANSparkMax;
 import frc.team832.lib.motorcontrol2.vendor.CANTalonFX;
 import frc.team832.lib.motors.Motor;
 import frc.team832.lib.power.GrouchPDP;
@@ -13,7 +11,7 @@ import frc.team832.lib.power.impl.SmartMCAttachedPDPSlot;
 import frc.team832.lib.util.OscarMath;
 import frc.team832.robot.Constants;
 
-public class Intake extends SubsystemBase implements DashboardUpdatable {
+public class Intake extends SubsystemBase {
 	private final CANTalonFX intakeMotor;
 	private Solenoid moveIntake;
 	SmartMCAttachedPDPSlot intakeSlot;
@@ -23,6 +21,7 @@ public class Intake extends SubsystemBase implements DashboardUpdatable {
 	public final boolean initSuccessful;
 
 	public Intake(GrouchPDP pdp) {
+		setName("Intake");
 		//Change Can ID
 		intakeMotor = new CANTalonFX(Constants.IntakeValues.INTAKE_MOTOR_CAN_ID);
 
@@ -32,7 +31,7 @@ public class Intake extends SubsystemBase implements DashboardUpdatable {
 
 		moveIntake = new Solenoid(Constants.PneumaticsValues.PCM_MODULE_NUM, Constants.PneumaticsValues.INTAKE_SOLENOID_ID);
 
-		DashboardManager.addTab(this, this);
+		DashboardManager.addTab(this);
 
 		dashboard_intakeRPM = DashboardManager.addTabItem(this, "Roller RPM", 0.0);
 		dashboard_intakePow = DashboardManager.addTabItem(this, "Power", 0.0);
@@ -48,7 +47,7 @@ public class Intake extends SubsystemBase implements DashboardUpdatable {
 	}
 
 	@Override
-	public void updateDashboardData() {
+	public void periodic() {
 		dashboard_intakeRPM.setDouble(intakeMotor.getSensorVelocity() * Constants.IntakeValues.IntakeReduction);
 	}
 
@@ -92,11 +91,6 @@ public class Intake extends SubsystemBase implements DashboardUpdatable {
 
 	public void setCurrentLimit(int amps) {
 		intakeMotor.limitInputCurrent(amps);
-	}
-
-	@Override
-	public String getDashboardTabName() {
-		return "Intake";
 	}
 
 	public void setDumbPower(double leftSlider) {

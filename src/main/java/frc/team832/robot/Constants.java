@@ -106,10 +106,10 @@ public class Constants {
         public static final double HoodkP = 8.0;
 
         public static final double HoodMaxAngle = 90;
-        public static final double HoodMinAngle = 10;
+        public static final double HoodMinAngle = 5;
 
-        public static final double HoodBottom = 4.554;
-        public static final double HoodTop = 2.092;
+        public static final double HoodBottom = 4.5;
+        public static final double HoodTop = 2;
 
 
         //Feeder
@@ -140,11 +140,10 @@ public class Constants {
         public static final int PracticeTurretRightVisionPosition = VisionTargetingRange / 2;
         public static final int TurretCenterVisionPosition = 0;
 
-        //oscilation period is 0.2785 with kp of 0.07
-        public static final double kP = 0.02;
-        public static final double kI = 0.15;
-        public static final double kD = 0.002;
-        public static final double FFMultiplier = 0.002;
+        public static final double kP = 0.0125;
+        public static final double kI = 0.09;
+        public static final double kD = 0.000;
+        public static final double FFMultiplier = 0.001;
 
         public static final double IntakeOrientationDegrees = -90;
 

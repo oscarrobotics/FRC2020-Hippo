@@ -3,13 +3,10 @@ package frc.team832.robot.subsystems;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj2.command.*;
 import frc.team832.lib.driverstation.dashboard.DashboardManager;
-import frc.team832.lib.driverstation.dashboard.DashboardUpdatable;
-import frc.team832.lib.motors.Motor;
 import frc.team832.lib.util.OscarMath;
-import frc.team832.robot.Constants;
 import frc.team832.robot.utilities.positions.BallPosition;
 
-public class SuperStructure extends SubsystemBase implements DashboardUpdatable {
+public class SuperStructure extends SubsystemBase {
 
 	private final Intake intake;
 	private final Shooter shooter;
@@ -40,7 +37,7 @@ public class SuperStructure extends SubsystemBase implements DashboardUpdatable 
 		shootCommand = new ShootCommand();
 		intakeCommand = new IntakeCommand();
 
-		DashboardManager.addTab(this, this);
+		DashboardManager.addTab(this);
 		dashboard_mode = DashboardManager.addTabItem(this, "State", SuperstructureState.INVALID.toString());
 		dashboard_hoodTargetVolts = DashboardManager.addTabItem(this, "Target Volts", 0.0);
 		dashboard_hoodVolts = DashboardManager.addTabItem(this, "Current Volts", 0.0);
@@ -50,7 +47,9 @@ public class SuperStructure extends SubsystemBase implements DashboardUpdatable 
 
 	@Override
 	public void periodic() {
-
+		dashboard_mode.setString(_state.toString());
+		dashboard_hoodTargetVolts.setDouble(hoodVoltage);
+		dashboard_hoodVolts.setDouble(shooter.getPotentiometer());
 	}
 
 	public void intake(double power, double spinRPM, Spindexer.SpinnerDirection direction) {
@@ -68,7 +67,7 @@ public class SuperStructure extends SubsystemBase implements DashboardUpdatable 
     public void trackTarget(boolean isFiring) {
 	    if (vision.hasTarget()) {
             turret.trackTarget(spindexer.getVelocity());
-//            shooter.trackTarget(isFiring);
+            shooter.trackTarget(isFiring);
         } else {
 	    	turret.setTurretTargetDegrees(0.0, true);
 		}
@@ -121,18 +120,6 @@ public class SuperStructure extends SubsystemBase implements DashboardUpdatable 
 	public boolean isShooterPrepared() {
 		return shooter.readyToShoot() && isSpindexerReadyShoot(getNearestSafeRotationRelativeToFeeder(), spindexer.getRelativeRotations());
 	}
-
-	@Override
-    public String getDashboardTabName() {
-        return "Superstructure";
-    }
-
-    @Override
-    public void updateDashboardData() {
-		dashboard_mode.setString(_state.toString());
-		dashboard_hoodTargetVolts.setDouble(hoodVoltage);
-		dashboard_hoodVolts.setDouble(shooter.getPotentiometer());
-    }
 
 	private class IdleCommand extends InstantCommand {
 		IdleCommand() {

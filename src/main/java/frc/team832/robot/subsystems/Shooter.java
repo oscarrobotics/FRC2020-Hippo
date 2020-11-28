@@ -7,7 +7,6 @@ import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.team832.lib.control.REVSmartServo_Continuous;
 import frc.team832.lib.driverstation.dashboard.DashboardManager;
-import frc.team832.lib.driverstation.dashboard.DashboardUpdatable;
 import frc.team832.lib.motorcontrol.NeutralMode;
 import frc.team832.lib.motorcontrol2.vendor.CANSparkMax;
 import frc.team832.lib.motors.Motor;
@@ -17,7 +16,7 @@ import frc.team832.lib.util.OscarMath;
 import frc.team832.robot.Constants.ShooterValues;
 import frc.team832.robot.utilities.state.ShooterCalculations;
 
-public class Shooter extends SubsystemBase implements DashboardUpdatable {
+public class Shooter extends SubsystemBase {
 
     public final boolean initSuccessful;
 
@@ -27,7 +26,7 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
     private final REVSmartServo_Continuous hoodServo;
 
     private final NetworkTableEntry dashboard_wheelRPM, dashboard_flywheelFF, dashboard_hoodPos, dashboard_hoodAngle, dashboard_wheelTargetRPM,
-            dashboard_feedWheelRPM, dashboard_feedWheelTargetRPM, dashboard_feedFF, dashboard_potRotations;
+            dashboard_feedWheelRPM, dashboard_feedWheelTargetRPM, dashboard_feedFF, dashboard_shootMode;
 
     private ShootMode mode = ShootMode.Shooting, lastMode = ShootMode.Shooting;
 
@@ -41,7 +40,8 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
     private double feedTarget, hoodTarget;
 
     public Shooter(GrouchPDP pdp) {
-        DashboardManager.addTab(this, this);
+        setName("Shooter");
+        DashboardManager.addTab(this);
 
         primaryMotor = new CANSparkMax(ShooterValues.PRIMARY_CAN_ID, Motor.kNEO);
         secondaryMotor = new CANSparkMax(ShooterValues.SECONDARY_CAN_ID, Motor.kNEO);
@@ -79,8 +79,8 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
         dashboard_feedWheelTargetRPM = DashboardManager.addTabItem(this, "Feeder/Target RPM", 0.0);
         dashboard_feedFF = DashboardManager.addTabItem(this, "Feeder/FF", 0.0);
         dashboard_hoodPos = DashboardManager.addTabItem(this, "Hood/Position", 0.0);
-        dashboard_potRotations = DashboardManager.addTabItem(this, "Hood/Rotations", 0.0);
         dashboard_hoodAngle = DashboardManager.addTabItem(this, "Hood/Angle", 0.0);
+        dashboard_shootMode = DashboardManager.addTabItem(this, "Mode", "Unknown");
 
         initSuccessful = primaryMotor.getCANConnection() && secondaryMotor.getCANConnection() && feederMotor.getCANConnection();
     }
@@ -88,16 +88,11 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
     @Override
     public void periodic() {
         handlePID();
-    }
-
-    @Override
-    public void updateDashboardData() {
         dashboard_wheelRPM.setDouble(primaryMotor.getSensorVelocity() * ShooterValues.FlywheelReduction);
         dashboard_feedWheelRPM.setDouble(feederMotor.getSensorVelocity());
         dashboard_hoodPos.setDouble(potentiometer.getVoltage());
-        var potRotations = OscarMath.map(potentiometer.getVoltage(), 0, 5, 0, 3);
-        dashboard_potRotations.setDouble(potRotations);
         dashboard_hoodAngle.setDouble(getHoodAngle());
+        dashboard_shootMode.setString(this.mode.toString());
     }
 
     public void setFlywheelRPM(double wheelTargetRPM) {
@@ -115,12 +110,13 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
     public void idle() {
         setMode(ShootMode.Idle);
         setFeedRPM(0);
+        setFlywheelRPM(0);
     }
 
     public void prepareShoot() {
         setMode(ShootMode.SpinUp);
         setFeedRPM(0);
-        setFlywheelRPM(ShooterCalculations.flywheelRPM);
+        setFlywheelRPM(ShooterCalculations.flywheelRPM);//ShooterCalculations.flywheelRPM
         setHoodAngle(ShooterCalculations.exitAngle);
     }
 
@@ -199,6 +195,7 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
                 break;
             case Idle:
                 primaryMotor.setPIDF(ShooterValues.IdleConfig);
+                break;
         }
     }
 
@@ -228,11 +225,6 @@ public class Shooter extends SubsystemBase implements DashboardUpdatable {
         dashboard_wheelTargetRPM.setDouble(rpm);
 
         feederMotor.set(pid);
-    }
-
-    @Override
-    public String getDashboardTabName() {
-        return "Shooter";
     }
 
     public double getPotentiometer() {

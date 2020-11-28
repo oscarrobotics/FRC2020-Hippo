@@ -4,7 +4,6 @@ import edu.wpi.first.wpilibj.I2C;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.controller.ProfiledPIDController;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.team832.lib.driverstation.dashboard.DashboardUpdatable;
 import frc.team832.lib.motorcontrol.NeutralMode;
 import frc.team832.lib.motorcontrol2.vendor.CANSparkMax;
 import frc.team832.lib.motors.Motor;
@@ -14,7 +13,7 @@ import frc.team832.robot.utilities.positions.ColorWheelPath;
 
 import java.awt.dnd.DropTarget;
 
-public class WheelOfFortune extends SubsystemBase implements DashboardUpdatable {
+public class WheelOfFortune extends SubsystemBase {
     public final boolean initSuccessful;
     private final CANSparkMax spinner;
 
@@ -30,6 +29,7 @@ public class WheelOfFortune extends SubsystemBase implements DashboardUpdatable 
     private ColorWheelPath path;
 
     public WheelOfFortune() {
+
         spinner = new CANSparkMax(Constants.WOFValues.SPINNER_CAN_ID, Motor.kNEO550);
         wheelOfFortunePneumatics = new Solenoid(Constants.PneumaticsValues.PCM_MODULE_NUM, Constants.PneumaticsValues.WHEEL_O_FORTUNE_SOLENOID_ID);
 
@@ -95,15 +95,5 @@ public class WheelOfFortune extends SubsystemBase implements DashboardUpdatable 
 
     public void setCurrentLimit(int limit) {
         spinner.limitInputCurrent(limit);
-    }
-
-    @Override
-    public String getDashboardTabName () {
-        return "Color Sensor";
-    }
-
-    @Override
-    public void updateDashboardData () {
-
     }
 }
