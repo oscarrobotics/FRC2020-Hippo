@@ -22,7 +22,7 @@ public class Turret extends SubsystemBase {
     private double turretFF = 0;
 
     private final CANSparkMax motor;
-    private final REVThroughBorePWM encoder;
+    private final REVThroughBorePWM turretEncoder;
     private final PDPSlot pdpSlot;
 
     private boolean isVision = false;
@@ -35,7 +35,7 @@ public class Turret extends SubsystemBase {
         setName("Turret");
         DashboardManager.addTab(this);
         motor = new CANSparkMax(TurretValues.TURRET_MOTOR_CAN_ID, Motor.kNEO550);
-        encoder = new REVThroughBorePWM(TurretValues.TURRET_ENCODER_DIO_CHANNEL);
+        turretEncoder = new REVThroughBorePWM(TurretValues.TURRET_ENCODER_DIO_CHANNEL);
         pdpSlot = pdp.addDevice(TurretValues.TURRET_PDP_SLOT, motor);
 
         motor.wipeSettings();
@@ -61,7 +61,7 @@ public class Turret extends SubsystemBase {
 
     @Override
     public void periodic() {
-        runPID();
+//        runPID();
         dashboard_turretPos.setDouble(getDegrees());
         dashboard_turretPow.setDouble(motor.getOutputVoltage());
         dashboard_turretTarget.setDouble(turretTargetDeg);
@@ -133,7 +133,7 @@ public class Turret extends SubsystemBase {
     }
 
     double getRotations() {
-        return OscarMath.round(encoder.get(), 3);
+        return OscarMath.round(turretEncoder.get(), 3);
     }
 
     double getDegrees() {

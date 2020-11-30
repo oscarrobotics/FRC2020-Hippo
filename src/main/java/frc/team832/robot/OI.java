@@ -9,9 +9,9 @@ import frc.team832.lib.driverinput.oi.DriverOI;
 import frc.team832.lib.driverinput.oi.OperatorInterface;
 import frc.team832.lib.driverinput.oi.SticksDriverOI;
 import frc.team832.lib.driverinput.oi.XboxDriverOI;
+import frc.team832.lib.util.OscarMath;
 import frc.team832.robot.commands.climb.StartClimbGroup;
 import frc.team832.robot.commands.climb.StopClimbGroup;
-import frc.team832.robot.subsystems.Spindexer;
 import frc.team832.robot.subsystems.SuperStructure;
 
 
@@ -77,16 +77,18 @@ public class OI {
 
 	private void configTestingCommands() {
 
-		stratComInterface.getArcadeBlackRight().whenHeld(new StartEndCommand(() -> superStructure.setState(SuperStructure.SuperstructureState.IDLE),
-				() -> superStructure.setState(SuperStructure.SuperstructureState.IDLE)));
+//		stratComInterface.getArcadeBlackRight().whenHeld(new StartEndCommand(() -> superStructure.setState(SuperStructure.SuperstructureState.IDLE),
+//				() -> superStructure.setState(SuperStructure.SuperstructureState.IDLE)));
 
-		stratComInterface.getArcadeWhiteLeft().whileHeld(new StartEndCommand(() -> superStructure.setState(SuperStructure.SuperstructureState.TARGETING),
-				() -> superStructure.setState(SuperStructure.SuperstructureState.IDLE)));
+//		stratComInterface.getArcadeWhiteLeft().whileHeld(new StartEndCommand(() -> superStructure.setState(SuperStructure.SuperstructureState.TARGETING),
+//				() -> superStructure.setState(SuperStructure.SuperstructureState.IDLE)));
 
-		stratComInterface.getArcadeWhiteRight().whenHeld(new StartEndCommand(() -> superStructure.setState(SuperStructure.SuperstructureState.SHOOTING),
-				() -> superStructure.setState(SuperStructure.SuperstructureState.IDLE)));
+//		stratComInterface.getArcadeWhiteRight().whenHeld(new StartEndCommand(() -> superStructure.setState(SuperStructure.SuperstructureState.SHOOTING),
+//				() -> superStructure.setState(SuperStructure.SuperstructureState.IDLE)));
 
+		stratComInterface.getArcadeBlackRight().whenHeld(new StartEndCommand(() -> intake.intake(1), intake::stopAll));
 
-
+		stratComInterface.getSingleToggle().whileHeld(new RunEndCommand(() -> shooter.setFlywheelRPM(OscarMath.map(stratComInterface.getRightSlider(), -1, 1, 0, 6000)),
+				() -> shooter.setFlywheelRPM(0), shooter));
 	}
 }

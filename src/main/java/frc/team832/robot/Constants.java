@@ -88,15 +88,17 @@ public class Constants {
         public static final int HOOD_SERVO_PWM_CHANNEL = 0;
         public static final int HOOD_POTENTIOMETER_ANALOG_CHANNEL = 0;
 
+        public static final int FLYWHEEL_ENCODER_DIO_CHANNEL_A = 3;
+        public static final int FLYWHEEL_ENCODER_DIO_CHANNEL_B = 4;
+
+
         public static final float FlywheelReduction = 50f / 26f;
 
         private static final double FlywheelkS = 0.0437;
         private static final double FlywheelkV = 0.00217;
         private static final double FlywheelkA = 0.00103;
 
-        public static final ClosedLoopConfig ShootingConfig = new ClosedLoopConfig(0.0005, 0, 0, 0.0);
-        public static final ClosedLoopConfig IdleConfig = new ClosedLoopConfig(0.0, 0, 0, 0.0);
-        public static final ClosedLoopConfig SpinupConfig = new ClosedLoopConfig(0.0007, 0, 0, 0.0);
+        public static final ClosedLoopConfig ShootingConfig = new ClosedLoopConfig(0.0005, 0.0, 0.0, 0.0);
 
         public static final SimpleMotorFeedforward FlywheelFF = new SimpleMotorFeedforward(FlywheelkS, FlywheelkV, FlywheelkA);
 
@@ -140,7 +142,7 @@ public class Constants {
         public static final int PracticeTurretRightVisionPosition = VisionTargetingRange / 2;
         public static final int TurretCenterVisionPosition = 0;
 
-        public static final double kP = 0.0125;
+        public static final double kP = 0.0125;//pp
         public static final double kI = 0.09;
         public static final double kD = 0.000;
         public static final double FFMultiplier = 0.001;

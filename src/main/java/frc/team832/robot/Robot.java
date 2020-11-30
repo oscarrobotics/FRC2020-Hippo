@@ -136,8 +136,8 @@ public class Robot extends OscarTimedRobot {
         autoCommand.cancel();
         NeutralMode mode = NeutralMode.kBrake;
         drivetrain.setNeutralMode(mode);
-        shooter.setFlyheelNeutralMode(mode);
         shooter.setFeederNeutralMode(mode);
+        shooter.setFlyheelNeutralMode(NeutralMode.kCoast);
 //        turret.holdTurretPosition();
         spindexer.setNeutralMode(mode);
         turret.setNeutralMode(mode);

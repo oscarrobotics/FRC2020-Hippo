@@ -2,6 +2,7 @@ package frc.team832.robot.subsystems;
 
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.Solenoid;
+import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.team832.lib.driverstation.dashboard.DashboardManager;
 import frc.team832.lib.motorcontrol2.vendor.CANTalonFX;
@@ -52,11 +53,13 @@ public class Intake extends SubsystemBase {
 	}
 
 	public void intake(double power) {
+		extendIntake();
 		OscarMath.clip(power, 0, 1);
 		intakeMotor.set(power);
 	}
 
 	public void outtake(double power) {
+		extendIntake();
 		OscarMath.clip(power, 0, 1);
 		intakeMotor.set(-power);
 	}
@@ -78,6 +81,11 @@ public class Intake extends SubsystemBase {
 	}
 
 	public void stop() {
+		intakeMotor.set(0);
+	}
+
+	public void stopAll() {
+		retractIntake();
 		intakeMotor.set(0);
 	}
 
