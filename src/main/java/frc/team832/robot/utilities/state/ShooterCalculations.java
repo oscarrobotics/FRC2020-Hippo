@@ -32,8 +32,8 @@ public class ShooterCalculations {
     }
 
     public static void update(double pitch, double yaw) {
-        double angle = (Math.log((0.5 * distance) + 1) * 25) + 45;
-        double rpm = (18 * Math.pow(distance + 2, 2)) + (10 * distance) + 5250;
+        double angle = (Math.log(0.4 * distance) * 30) + 65;
+        double rpm = (20 * Math.pow(distance - 2, 2)) + (175 * distance) + 5000;
 
         distance = PhotonUtils.calculateDistanceToTargetMeters(CameraHeight, PowerPortHeightMeters, Math.toRadians(CameraAngle), Math.toRadians(pitch)) * 1/0.45;
         flywheelRPM = OscarMath.clip(rpm, 0, 7000);
@@ -48,6 +48,6 @@ public class ShooterCalculations {
     }
 
     public static double getSpindexerRpm(){
-        return Math.pow(0.5, (0.4 * distance) - 5) + 90;
+        return (350 * (distance / Math.pow(distance, 2)) + 30);
     }
 }
