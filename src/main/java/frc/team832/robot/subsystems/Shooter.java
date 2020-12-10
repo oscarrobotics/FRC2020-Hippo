@@ -130,7 +130,7 @@ public class Shooter extends SubsystemBase {
     }
 
     public void dumbShoot() {
-        setFlywheelRPM(6000);
+        setFlywheelRPM(5500);
         setHoodAngle(15);
     }
 

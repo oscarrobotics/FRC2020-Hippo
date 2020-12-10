@@ -1,6 +1,7 @@
 package frc.team832.robot.subsystems;
 
 import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.wpilibj.SlewRateLimiter;
 import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.controller.ProfiledPIDController;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -30,6 +31,8 @@ public class Spindexer extends SubsystemBase {
 
 	private final SpindexerStatus spindexerStatus;
 	private SpinMode spinMode;
+
+	private final SlewRateLimiter rateLimiter = new SlewRateLimiter(1);
 
 	private final NetworkTableEntry ballSlot0, ballSlot1, ballSlot2, ballSlot3, ballSlot4, dashboard_state, dashboard_hallEffect, dashboard_laserShark;
 
@@ -230,6 +233,7 @@ public class Spindexer extends SubsystemBase {
 		} else {
 			power = spinPID.calculate(getVelocity(), spindexerTargetVelocity);
 		}
+		power = rateLimiter.calculate(power);
 		spinMotor.set(power);
 	}
 

@@ -205,7 +205,7 @@ public class SuperStructure extends SubsystemBase {
 							new FunctionalCommand(
 									() -> spindexer.setSpinRPM(ShooterCalculations.getSpindexerRpm(), Spindexer.SpinnerDirection.Clockwise),
 									SuperStructure.this::shootAtTarget,
-									(interrupted) -> { idleSpindexer(); idleShooter(); },
+									(interrupted) -> { idleShooterGroup();},
 									() -> false
 							)
 					)
@@ -218,15 +218,16 @@ public class SuperStructure extends SubsystemBase {
 			addRequirements(shooter, intake, spindexer, turret, SuperStructure.this);
 			addCommands(
 					new InstantCommand(SuperStructure.this::dumbShoot),
+
 					// wait then shoot
 					new SequentialCommandGroup(
-							new WaitCommand(1),
-							new FunctionalCommand(
-									() -> spindexer.setSpinRPM(90, Spindexer.SpinnerDirection.Clockwise),
-									() -> shooter.setFeedRPM(3000),
-									(interrupted) -> { idleSpindexer(); idleShooter(); },
-									() -> false
-							)
+							new WaitCommand(0.5),
+							new InstantCommand(() -> shooter.setFeedRPM(3000))
+					),
+
+					new SequentialCommandGroup(
+							new WaitCommand(0.75),
+							new StartEndCommand(() -> spindexer.setSpinRPM(120, Spindexer.SpinnerDirection.Clockwise), SuperStructure.this::idleShooterGroup)
 					)
 			);
 		}
@@ -243,6 +244,11 @@ public class SuperStructure extends SubsystemBase {
 	public void idleIntake() {
 		intake.stop();
 		intake.retractIntake();
+	}
+
+	public void idleShooterGroup(){
+		idleShooter();
+		idleSpindexer();
 	}
 
 	public void idleSpindexer() {
