@@ -44,8 +44,7 @@ public class Turret extends SubsystemBase {
         motor.limitInputCurrent(25);
         motor.setNeutralMode(NeutralMode.kBrake);
 
-        PID.setIntegratorRange(-0.07, 0.07);
-        PID.setTolerance(3);
+        PID.setIntegratorRange(-0.05, 0.05);
 
 
         // keep turret at init position
@@ -61,7 +60,7 @@ public class Turret extends SubsystemBase {
 
     @Override
     public void periodic() {
-//        runPID();
+        runPID();
         dashboard_turretPos.setDouble(getDegrees());
         dashboard_turretPow.setDouble(motor.getOutputVoltage());
         dashboard_turretTarget.setDouble(turretTargetDeg);
@@ -70,7 +69,7 @@ public class Turret extends SubsystemBase {
 
     public void trackTarget(double spindexerRPM) {
         updateFF(spindexerRPM);
-        setTurretTargetDegrees(ShooterCalculations.visionYaw + (5 * Math.signum(spindexerRPM)) + getDegrees(), true);
+        setTurretTargetDegrees(ShooterCalculations.visionYaw + ((spindexerRPM / 30.0) * Math.signum(spindexerRPM)) + getDegrees(), true);
     }
 
     protected double calculateSafePosition(boolean isVision, double degrees) {

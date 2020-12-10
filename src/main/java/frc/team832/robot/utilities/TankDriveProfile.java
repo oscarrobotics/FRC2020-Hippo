@@ -95,8 +95,7 @@ public class TankDriveProfile {
 	}
 
 	private double getNormalPower(double stick) {
-		double exponent = -9.5 * (Math.abs(stick) - 0.7);
-		double power = 1.05 / (1 + (Math.pow(2.718281828459045, exponent))) + 0.005;
+		double power = Math.pow(Math.abs(stick), 2.1) + 0.01;
 		return power * Math.signum(stick) * Constants.DrivetrainValues.StickDriveMultiplier;
 	}
 

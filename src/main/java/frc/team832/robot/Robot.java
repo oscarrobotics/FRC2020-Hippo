@@ -107,7 +107,6 @@ public class Robot extends OscarTimedRobot {
         turret.setNeutralMode(mode);
         shooter.setHood(2.7);
         climber.zeroDeploy();
-
         autoCommand.schedule();
     }
 

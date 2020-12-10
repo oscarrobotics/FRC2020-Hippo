@@ -1,14 +1,10 @@
 package frc.team832.robot.subsystems;
 
-import com.revrobotics.CANPIDController;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.CounterBase;
-import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.controller.PIDController;
-import edu.wpi.first.wpilibj.util.Units;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpiutil.math.MathUtil;
 import frc.team832.lib.control.REVSmartServo_Continuous;
 import frc.team832.lib.driverstation.dashboard.DashboardManager;
 import frc.team832.lib.motorcontrol.NeutralMode;
@@ -18,7 +14,6 @@ import frc.team832.lib.power.GrouchPDP;
 import frc.team832.lib.power.impl.SmartMCAttachedPDPSlot;
 import frc.team832.lib.sensors.REVThroughBoreRelative;
 import frc.team832.lib.util.OscarMath;
-import frc.team832.robot.Constants;
 import frc.team832.robot.Constants.ShooterValues;
 import frc.team832.robot.utilities.state.ShooterCalculations;
 
@@ -30,13 +25,15 @@ public class Shooter extends SubsystemBase {
 
     public boolean isVision = false;
 
-    private final CANSparkMax primaryMotor, secondaryMotor, feederMotor;
+    public final CANSparkMax primaryMotor;
+    private final CANSparkMax secondaryMotor;
+    private final CANSparkMax feederMotor;
     private final REVSmartServo_Continuous hoodServo;
 
     private final REVThroughBoreRelative flywheelEncoder;
 
-    private final NetworkTableEntry dashboard_wheelRPM, dashboard_motorRPM, dashboard_flywheelFF, dashboard_hoodPos, dashboard_hoodAngle, dashboard_wheelTargetRPM,
-            dashboard_feedWheelRPM, dashboard_feedWheelTargetRPM, dashboard_feedFF, dashboard_shootMode, dashboard_flywheelPID;
+    private final NetworkTableEntry dashboard_wheelRPM, dashboard_motorRPM, dashboard_flywheelFFEffort, dashboard_hoodPos, dashboard_hoodAngle, dashboard_flywheelTargetRPM,
+            dashboard_feedWheelRPM, dashboard_feedWheelTargetRPM, dashboard_feedFF, dashboard_feedWheelPIDEffort, dashboard_shootMode, dashboard_flywheelPIDEffort;
 
     private final AnalogInput potentiometer = new AnalogInput(ShooterValues.HOOD_POTENTIOMETER_ANALOG_CHANNEL);
 
@@ -91,12 +88,13 @@ public class Shooter extends SubsystemBase {
         // dashboard
         dashboard_wheelRPM = DashboardManager.addTabItem(this, "Flywheel/WheelRPM", 0.0);
         dashboard_motorRPM = DashboardManager.addTabItem(this, "Flywheel/MotorRPM", 0.0);
-        dashboard_wheelTargetRPM = DashboardManager.addTabItem(this, "Flywheel/Target RPM", 0.0);
-        dashboard_flywheelFF = DashboardManager.addTabItem(this, "Flywheel/FF", 0.0);
-        dashboard_flywheelPID = DashboardManager.addTabItem(this, "Flywheel/PID", 0.0);
+        dashboard_flywheelTargetRPM = DashboardManager.addTabItem(this, "Flywheel/Target RPM", 0.0);
+        dashboard_flywheelFFEffort = DashboardManager.addTabItem(this, "Flywheel/FFEffort", 0.0);
+        dashboard_flywheelPIDEffort = DashboardManager.addTabItem(this, "Flywheel/PIDEffort", 0.0);
         dashboard_feedWheelRPM = DashboardManager.addTabItem(this, "Feeder/RPM", 0.0);
         dashboard_feedWheelTargetRPM = DashboardManager.addTabItem(this, "Feeder/Target RPM", 0.0);
-        dashboard_feedFF = DashboardManager.addTabItem(this, "Feeder/FF", 0.0);
+        dashboard_feedFF = DashboardManager.addTabItem(this, "Feeder/FFEffort", 0.0);
+        dashboard_feedWheelPIDEffort = DashboardManager.addTabItem(this, "Feeder/PIDEffort", 0.0);
         dashboard_hoodPos = DashboardManager.addTabItem(this, "Hood/Position", 0.0);
         dashboard_hoodAngle = DashboardManager.addTabItem(this, "Hood/Angle", 0.0);
         dashboard_shootMode = DashboardManager.addTabItem(this, "Mode", "Unknown");
@@ -112,7 +110,6 @@ public class Shooter extends SubsystemBase {
         handlePID();
         dashboard_wheelRPM.setDouble(getFlywheelRPM_Encoder());
         dashboard_motorRPM.setDouble(primaryMotor.getSensorVelocity());
-        dashboard_wheelTargetRPM.setDouble(flywheelTarget);
         dashboard_feedWheelRPM.setDouble(feederMotor.getSensorVelocity());
         dashboard_hoodPos.setDouble(potentiometer.getVoltage());
         dashboard_hoodAngle.setDouble(getHoodAngle());
@@ -127,24 +124,14 @@ public class Shooter extends SubsystemBase {
         setFlywheelRPM(0);
     }
 
-    public void prepareShoot() {
-        setFeedRPM(0);
+    public void trackTarget() {
         setFlywheelRPM(ShooterCalculations.flywheelRPM);//ShooterCalculations.flywheelRPM
         setHoodAngle(ShooterCalculations.exitAngle);
     }
 
-    public void shoot() {
-        setFeedRPM(ShooterValues.FeedRpm);
-        setFlywheelRPM(ShooterCalculations.flywheelRPM);
-        setHoodAngle(ShooterCalculations.exitAngle);
-    }
-
-    public void trackTarget(boolean isFiring) {
-        if (isFiring) {
-            shoot();
-        } else {
-            prepareShoot();
-        }
+    public void dumbShoot() {
+        setFlywheelRPM(6000);
+        setHoodAngle(15);
     }
 
     public void setFeedRPM(double rpm) {
@@ -206,16 +193,19 @@ public class Shooter extends SubsystemBase {
     private void runFlywheelPID() {
         if (flywheelTarget == 0) {
             primaryMotor.set(0);
+            dashboard_flywheelTargetRPM.setDouble(0);
             return;
         }
+
+        dashboard_flywheelTargetRPM.setDouble(flywheelTarget);
 
         double batteryVoltage = primaryMotor.getInputVoltage();
         double ff = (ShooterValues.FlywheelFF.calculate(flywheelTarget) / batteryVoltage) / 2;
 
         double power = flywheelPID.calculate(getFlywheelRPM_Encoder(), flywheelTarget);
 
-        dashboard_flywheelFF.setDouble(ff);
-        dashboard_flywheelPID.setDouble(power);
+        dashboard_flywheelFFEffort.setDouble(ff);
+        dashboard_flywheelPIDEffort.setDouble(power);
 
         primaryMotor.set(power + ff);
     }
@@ -226,13 +216,21 @@ public class Shooter extends SubsystemBase {
     }
 
     private void runFeederPID() {
-        double rpm = feedTarget;
-//        double ff = (rpm / ShooterValues.FeedReduction * (Motor.kNEO.freeSpeed / Motor.kNEO.kv)) / 1.8;//Constants.ShooterValues.FEEDER_FF.calculate(rpm)
-        double pid = feedPID.calculate(feederMotor.getSensorVelocity(), rpm);
+        if(feedTarget == 0) {
+            feederMotor.set(0);
+            dashboard_feedFF.setDouble(0);
+            dashboard_feedWheelTargetRPM.setDouble(0);
+            return;
+        }
+        
+        double ffEffort = ((1.0/473.0) * feedTarget) / 12.0;
+        dashboard_feedFF.setDouble(ffEffort);
 
-        dashboard_wheelTargetRPM.setDouble(rpm);
+        double pidEffort = feedPID.calculate(feederMotor.getSensorVelocity(), feedTarget);
+        dashboard_feedWheelTargetRPM.setDouble(feedTarget);
+        dashboard_feedWheelPIDEffort.setDouble(pidEffort);
 
-        feederMotor.set(pid);
+        feederMotor.set(ffEffort + pidEffort);
     }
 
     public double getPotentiometer() {

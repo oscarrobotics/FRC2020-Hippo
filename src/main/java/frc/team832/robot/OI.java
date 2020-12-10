@@ -45,29 +45,29 @@ public class OI {
 
 	private void configureBrandonLayout() {
 
-		stratComInterface.getArcadeBlackRight().whenHeld(new StartEndCommand(() -> superStructure.setState(SuperStructure.SuperstructureState.IDLE),
-				() -> superStructure.setState(SuperStructure.SuperstructureState.IDLE)));
+//		stratComInterface.getArcadeBlackRight().whenHeld(new StartEndCommand(() -> superStructure.setState(SuperStructure.SuperstructureState.IDLE),
+//				() -> superStructure.setState(SuperStructure.SuperstructureState.IDLE)));
 
-		stratComInterface.getArcadeBlackLeft().whenHeld(new StartEndCommand(() -> superStructure.setState(SuperStructure.SuperstructureState.INTAKE),
-				() -> superStructure.setState(SuperStructure.SuperstructureState.IDLE)));
-		stratComInterface.getArcadeBlackLeft().whenHeld(new RunEndCommand(() -> superStructure.configureSpindexerRPMSlider(stratComInterface.getRightSlider()),
-				superStructure::setSpindexerIntakeRpmDefault));
+//		stratComInterface.getArcadeBlackLeft().whenHeld(new StartEndCommand(() -> superStructure.setState(SuperStructure.SuperstructureState.INTAKE),
+//				() -> superStructure.setState(SuperStructure.SuperstructureState.IDLE)));
+//		stratComInterface.getArcadeBlackLeft().whenHeld(new RunEndCommand(() -> superStructure.configureSpindexerRPMSlider(stratComInterface.getRightSlider()),
+//				superStructure::setSpindexerIntakeRpmDefault));
 
-		stratComInterface.getArcadeWhiteLeft().whenHeld(new StartEndCommand(() -> superStructure.setState(SuperStructure.SuperstructureState.TARGETING),
-				() -> superStructure.setState(SuperStructure.SuperstructureState.IDLE)));
+//		stratComInterface.getArcadeWhiteLeft().whenHeld(new StartEndCommand(() -> superStructure.setState(SuperStructure.SuperstructureState.TARGETING),
+//				() -> superStructure.setState(SuperStructure.SuperstructureState.IDLE)));
 
-		stratComInterface.getArcadeWhiteRight().whenHeld(new StartEndCommand(() -> superStructure.setState(SuperStructure.SuperstructureState.SHOOTING),
-				() -> superStructure.setState(SuperStructure.SuperstructureState.IDLE)));
+//		stratComInterface.getArcadeWhiteRight().whenHeld(new StartEndCommand(() -> superStructure.setState(SuperStructure.SuperstructureState.SHOOTING),
+//				() -> superStructure.setState(SuperStructure.SuperstructureState.IDLE)));
 
 
-		stratComInterface.getSingleToggle().whenHeld(new RunEndCommand(() -> climber.adjustHook(stratComInterface.getLeftSlider()), climber::stopExtend));
-		stratComInterface.getSingleToggle().whenReleased(new InstantCommand(climber::retractHook));
-
-		stratComInterface.getSCPlus().whileHeld(new StartClimbGroup(climber, true));
-		stratComInterface.getSCPlus().whenReleased(new InstantCommand(climber::lockClimb));
-
-		stratComInterface.getSCMinus().whileHeld(new StartClimbGroup(climber, false));
-		stratComInterface.getSCMinus().whenReleased(new InstantCommand(climber::lockClimb));
+//		stratComInterface.getSingleToggle().whenHeld(new RunEndCommand(() -> climber.adjustHook(stratComInterface.getLeftSlider()), climber::stopExtend));
+//		stratComInterface.getSingleToggle().whenReleased(new InstantCommand(climber::retractHook));
+//
+//		stratComInterface.getSCPlus().whileHeld(new StartClimbGroup(climber, true));
+//		stratComInterface.getSCPlus().whenReleased(new InstantCommand(climber::lockClimb));
+//
+//		stratComInterface.getSCMinus().whileHeld(new StartClimbGroup(climber, false));
+//		stratComInterface.getSCMinus().whenReleased(new InstantCommand(climber::lockClimb));
 
 //		stratComInterface.getSCSideTop().whenHeld(new StartEndCommand(wheelOfFortune::extendWOFManipulator, wheelOfFortune::retractWOFManipulator));
 //		stratComInterface.getSC1().whenHeld(new StartEndCommand(wheelOfFortune::spinCounterclockwise, wheelOfFortune::stopSpin, wheelOfFortune));//torque vector up
@@ -76,19 +76,15 @@ public class OI {
 	}
 
 	private void configTestingCommands() {
+		stratComInterface.getArcadeBlackRight().whenHeld(superStructure.idleCommand);
+		stratComInterface.getArcadeWhiteLeft().whenHeld(superStructure.targetingCommand);
+		stratComInterface.getArcadeWhiteRight().whenHeld(superStructure.shootOnTarget);
+		stratComInterface.getArcadeBlackLeft().whenHeld(superStructure.closeShoot);
 
-//		stratComInterface.getArcadeBlackRight().whenHeld(new StartEndCommand(() -> superStructure.setState(SuperStructure.SuperstructureState.IDLE),
-//				() -> superStructure.setState(SuperStructure.SuperstructureState.IDLE)));
 
-//		stratComInterface.getArcadeWhiteLeft().whileHeld(new StartEndCommand(() -> superStructure.setState(SuperStructure.SuperstructureState.TARGETING),
-//				() -> superStructure.setState(SuperStructure.SuperstructureState.IDLE)));
+//		stratComInterface.getArcadeBlackRight().whenHeld(new StartEndCommand(() -> intake.intake(1), intake::stopAll));
 
-//		stratComInterface.getArcadeWhiteRight().whenHeld(new StartEndCommand(() -> superStructure.setState(SuperStructure.SuperstructureState.SHOOTING),
-//				() -> superStructure.setState(SuperStructure.SuperstructureState.IDLE)));
-
-		stratComInterface.getArcadeBlackRight().whenHeld(new StartEndCommand(() -> intake.intake(1), intake::stopAll));
-
-		stratComInterface.getSingleToggle().whileHeld(new RunEndCommand(() -> shooter.setFlywheelRPM(OscarMath.map(stratComInterface.getRightSlider(), -1, 1, 0, 6000)),
-				() -> shooter.setFlywheelRPM(0), shooter));
+//		stratComInterface.getSingleToggle().whileHeld(new RunEndCommand(() -> shooter.setFlywheelRPM(OscarMath.map(stratComInterface.getRightSlider(), -1, 1, 0, 6000)),
+//				() -> shooter.setFlywheelRPM(0), shooter));
 	}
 }

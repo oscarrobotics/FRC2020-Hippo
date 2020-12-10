@@ -98,7 +98,7 @@ public class Constants {
         private static final double FlywheelkV = 0.00217;
         private static final double FlywheelkA = 0.00103;
 
-        public static final ClosedLoopConfig ShootingConfig = new ClosedLoopConfig(0.0005, 0.0, 0.0, 0.0);
+        public static final ClosedLoopConfig ShootingConfig = new ClosedLoopConfig(0.0006, 0.0, 0.0, 0.0);
 
         public static final SimpleMotorFeedforward FlywheelFF = new SimpleMotorFeedforward(FlywheelkS, FlywheelkV, FlywheelkA);
 
@@ -117,7 +117,7 @@ public class Constants {
         //Feeder
         public static final double FeedRpm = 3000;
 
-        public static final double FeedkP = 0.0003;
+        public static final double FeedkP = 0.00015;
         public static final double FeedkF = 0;
 
         private static final double FeederkS = 0.0;
@@ -142,8 +142,8 @@ public class Constants {
         public static final int PracticeTurretRightVisionPosition = VisionTargetingRange / 2;
         public static final int TurretCenterVisionPosition = 0;
 
-        public static final double kP = 0.0125;//pp
-        public static final double kI = 0.09;
+        public static final double kP = 0.011;//pp
+        public static final double kI = 0.7;
         public static final double kD = 0.000;
         public static final double FFMultiplier = 0.001;
 

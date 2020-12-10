@@ -2,20 +2,23 @@ package frc.team832.robot.utilities.state;
 
 import edu.wpi.first.networktables.NetworkTableEntry;
 import frc.team832.lib.driverstation.dashboard.DashboardManager;
+import frc.team832.lib.util.OscarMath;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonUtils;
 
 public class ShooterCalculations {
-    public static double flywheelRPM, exitAngle, visionYaw;
+    public static double flywheelRPM, exitAngle, visionYaw, distance;
     public static double areaToMeters = 0.0001;
 
-    private static final double CameraAngle = 56.53;
+    private static final double CameraAngle = 56.53;//-33.47
     private static final double CameraHeight = 0.43;
-    private static final double PowerPortHeightMeters = 2.44;
+    private static final double PowerPortHeightMeters = 2.11;
+
+    private static final double DumbDistance = 3.6;
 
     private PhotonCamera Camera;
 
-    private static NetworkTableEntry dashboard_distance, dashboard_rotation, dashboard_flywheelRPM, dashboard_exitAngle, dashboard_turretYaw;
+    private static NetworkTableEntry dashboard_distance, dashboard_rotation, dashboard_flywheelRPM, dashboard_exitAngle, dashboard_turretYaw, dashboard_spindexerRpm;
 
     static {
         ShooterCalculations me = new ShooterCalculations();
@@ -25,19 +28,26 @@ public class ShooterCalculations {
         dashboard_flywheelRPM = DashboardManager.addTabItem("ShooterCalc", "Flywheel RPM", 0.0);
         dashboard_exitAngle = DashboardManager.addTabItem("ShooterCalc", "Hood Exit Angle", 0.0);
         dashboard_turretYaw = DashboardManager.addTabItem("ShooterCalc", "Turret Rotation", 0.0);
+        dashboard_spindexerRpm = DashboardManager.addTabItem("ShooterCalc", "Spindexer RPM", 0.0);
     }
 
     public static void update(double pitch, double yaw) {
-        double distance = PhotonUtils.calculateDistanceToTargetMeters(CameraHeight, PowerPortHeightMeters, Math.toRadians(CameraAngle), Math.toRadians(pitch));
-        double angle = Math.log((0.5 * distance) + 1) * 40;
+        double angle = (Math.log((0.5 * distance) + 1) * 25) + 45;
+        double rpm = (18 * Math.pow(distance + 2, 2)) + (10 * distance) + 5250;
 
-        flywheelRPM = 7000;
-        exitAngle = angle + 52;
+        distance = PhotonUtils.calculateDistanceToTargetMeters(CameraHeight, PowerPortHeightMeters, Math.toRadians(CameraAngle), Math.toRadians(pitch)) * 1/0.45;
+        flywheelRPM = OscarMath.clip(rpm, 0, 7000);
+        exitAngle = angle;
         visionYaw = yaw;
 
         dashboard_distance.setDouble(distance);
         dashboard_flywheelRPM.setDouble(flywheelRPM);
         dashboard_turretYaw.setDouble(visionYaw);
         dashboard_exitAngle.setDouble(exitAngle);
+        dashboard_spindexerRpm.setDouble(getSpindexerRpm());
+    }
+
+    public static double getSpindexerRpm(){
+        return Math.pow(0.5, (0.4 * distance) - 5) + 90;
     }
 }
