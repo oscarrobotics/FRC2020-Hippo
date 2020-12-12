@@ -1,6 +1,8 @@
 package frc.team832.robot.subsystems;
 
+import edu.wpi.first.hal.HAL;
 import frc.team832.lib.util.OscarMath;
+import org.junit.After;
 import org.junit.Test;
 import org.photonvision.PhotonUtils;
 
@@ -9,16 +11,14 @@ import java.util.stream.Collectors;
 
 public class DistanceTest {
 
-    static final double[] pitchValues = {18.12, 9.2, 2.19, -1.57, -5.27, -8.19, -11.14};
-    static final double[] actualMeters = {1.2954, 1.752, 2.286, 2.5908, 2.9718, 3.2512, 3.6576};
-    static final double cameraAngleTwo = 90 - 33.47; // 33.47
-    static final double cameraHeightMeters = 0.43;
-    static final double powerPortHeightMeters = 2.11;
-
-
+    final double[] pitchValues = {18.12, 9.2, 2.19, -1.57, -5.27, -8.19, -11.14};
+    final double[] actualMeters = {1.2954, 1.752, 2.286, 2.5908, 2.9718, 3.2512, 3.6576};
+    final double cameraAngleTwo = 90 - 33.47; // 33.47
+    final double cameraHeightMeters = 0.43;
+    final double powerPortHeightMeters = 2.11;
 
     @Test
-    public static void checkDistance() {
+    public void checkDistance() {
         double[] reportedMetersTwo = new double[pitchValues.length];
         for (int i = 0; i < pitchValues.length; i++) {
             reportedMetersTwo[i] = PhotonUtils.calculateDistanceToTargetMeters(cameraHeightMeters, powerPortHeightMeters, Math.toRadians(cameraAngleTwo), Math.toRadians(pitchValues[i]));
@@ -31,7 +31,8 @@ public class DistanceTest {
         System.out.println("Reported: " + reported);
     }
 
-    public static void main(String[] args) {
-        checkDistance();
+    @After
+    public void end() {
+        HAL.shutdown();
     }
 }

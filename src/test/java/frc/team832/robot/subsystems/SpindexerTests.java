@@ -1,7 +1,9 @@
 package frc.team832.robot.subsystems;
 
+import edu.wpi.first.hal.HAL;
 import frc.team832.lib.power.GrouchPDP;
 import frc.team832.robot.Constants;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -22,7 +24,7 @@ public class SpindexerTests {
         intake = new Intake(new GrouchPDP(0));
         spindexer = new Spindexer(new GrouchPDP(0));
         turret = new Turret(new GrouchPDP(0));
-        vision = new Vision(new Drivetrain(new GrouchPDP(0)));
+        vision = new Vision();
         superStructure = new SuperStructure(intake, shooter, spindexer, turret, vision);
 
     }
@@ -34,7 +36,11 @@ public class SpindexerTests {
 
         assertTrue("InRange \"double\" failed on valid!", valid);
         assertFalse("InRange \"double\" failed on invalid!", invalid);
+    }
 
+    @After
+    public void end() {
+        HAL.shutdown();
     }
 
 }

@@ -1,7 +1,9 @@
 package frc.team832.robot.subsystems;
 
+import edu.wpi.first.hal.HAL;
 import frc.team832.lib.power.GrouchPDP;
 import frc.team832.robot.Constants;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -37,5 +39,11 @@ public class TurretTest {
                 assertFalse("Safety unexpectedly passed! TargetDeg:" + i + ", SafeDeg: " + safeTargetPosition, wasSafe);
             }
         }
+    }
+
+    @After
+    public void end() {
+        turret = null;
+        HAL.shutdown();
     }
 }

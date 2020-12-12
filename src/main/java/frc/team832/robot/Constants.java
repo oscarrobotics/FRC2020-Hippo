@@ -9,7 +9,6 @@ import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.wpilibj.trajectory.constraint.DifferentialDriveVoltageConstraint;
 import edu.wpi.first.wpilibj.util.Units;
 import frc.team832.lib.drive.ClosedLoopDT;
-import frc.team832.lib.motors.GearReduction;
 import frc.team832.lib.motors.WheeledPowerTrain;
 import frc.team832.lib.motors.Gearbox;
 import frc.team832.lib.motors.Motor;
@@ -103,7 +102,7 @@ public class Constants {
         public static final SimpleMotorFeedforward FlywheelFF = new SimpleMotorFeedforward(FlywheelkS, FlywheelkV, FlywheelkA);
 
         //Hood
-        static final GearReduction HoodReduction = new GearReduction(34, 340);
+        public static final double HoodReduction = 34.0 / 340.0;
 
         public static final double HoodkP = 8.0;
 

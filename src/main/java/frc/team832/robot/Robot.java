@@ -2,6 +2,7 @@ package frc.team832.robot;
 
 import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.Notifier;
+import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -15,13 +16,13 @@ import frc.team832.robot.commands.auto.DumbPathAuto;
 import frc.team832.robot.subsystems.*;
 
 @SuppressWarnings("WeakerAccess")
-public class Robot extends OscarTimedRobot {
+public class Robot extends TimedRobot {
     public static final GrouchPDP pdp = new GrouchPDP(0);
     private static final Compressor pcm = new Compressor(0);
 
     // Subsystems
     static final Drivetrain drivetrain = new Drivetrain(pdp);
-    static final Vision vision = new Vision(drivetrain);
+    static final Vision vision = new Vision();
     static final Intake intake = new Intake(pdp);
     static final Shooter shooter = new Shooter(pdp);
     static final Spindexer spindexer = new Spindexer(pdp);
