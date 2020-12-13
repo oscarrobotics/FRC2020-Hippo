@@ -3,8 +3,15 @@ package frc.team832.robot.subsystems;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.CounterBase;
+import edu.wpi.first.wpilibj.controller.LinearQuadraticRegulator;
 import edu.wpi.first.wpilibj.controller.PIDController;
+import edu.wpi.first.wpilibj.estimator.KalmanFilter;
+import edu.wpi.first.wpilibj.system.LinearSystemLoop;
+import edu.wpi.first.wpilibj.util.Units;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpiutil.math.Nat;
+import edu.wpi.first.wpiutil.math.VecBuilder;
+import edu.wpi.first.wpiutil.math.numbers.N1;
 import frc.team832.lib.control.REVSmartServo_Continuous;
 import frc.team832.lib.driverstation.dashboard.DashboardManager;
 import frc.team832.lib.motorcontrol.NeutralMode;
@@ -14,6 +21,7 @@ import frc.team832.lib.power.GrouchPDP;
 import frc.team832.lib.power.impl.SmartMCAttachedPDPSlot;
 import frc.team832.lib.sensors.REVThroughBoreRelative;
 import frc.team832.lib.util.OscarMath;
+import frc.team832.robot.Constants;
 import frc.team832.robot.Constants.ShooterValues;
 import frc.team832.robot.utilities.state.ShooterCalculations;
 
@@ -23,8 +31,6 @@ public class Shooter extends SubsystemBase {
 
     public final boolean initSuccessful;
 
-    public boolean isVision = false;
-
     public final CANSparkMax primaryMotor;
     private final CANSparkMax secondaryMotor;
     private final CANSparkMax feederMotor;
@@ -33,7 +39,8 @@ public class Shooter extends SubsystemBase {
     private final REVThroughBoreRelative flywheelEncoder;
 
     private final NetworkTableEntry dashboard_wheelRPM, dashboard_motorRPM, dashboard_flywheelFFEffort, dashboard_hoodPos, dashboard_hoodAngle, dashboard_flywheelTargetRPM,
-            dashboard_feedWheelRPM, dashboard_feedWheelTargetRPM, dashboard_feedFF, dashboard_feedWheelPIDEffort, dashboard_shootMode, dashboard_flywheelPIDEffort;
+            dashboard_feedWheelRPM, dashboard_feedWheelTargetRPM, dashboard_feedFF, dashboard_feedWheelPIDEffort, dashboard_flywheelPIDEffort, dashboard_flywheelStateSpaceEffort,
+            dashboard_flywheelAtTarget, dashboard_feederAtTarget, dashboard_hoodAtTarget;
 
     private final AnalogInput potentiometer = new AnalogInput(ShooterValues.HOOD_POTENTIOMETER_ANALOG_CHANNEL);
 
@@ -41,9 +48,33 @@ public class Shooter extends SubsystemBase {
     private final PIDController feedPID = new PIDController(ShooterValues.FeedkP, 0, 0);
     private final PIDController flywheelPID = new PIDController(ShootingConfig.getkP(), 0, 0);
 
+    private final KalmanFilter<N1, N1, N1> m_observer = new KalmanFilter<>(
+            Nat.N1(), Nat.N1(),
+            Constants.ShooterValues.m_flywheelPlant,
+            VecBuilder.fill(3), // How accurate we think our model is
+            VecBuilder.fill(0.008), // How accurate we think our encoder data is
+            ShooterValues.ControlLoopPeriod);
+
+    private final LinearQuadraticRegulator<N1, N1, N1> m_controller
+            = new LinearQuadraticRegulator<>(Constants.ShooterValues.m_flywheelPlant,
+            VecBuilder.fill(85.0), // qelms. Velocity error tolerance, in radians per second. Decrease
+            // this to more heavily penalize state excursion, or make the controller behave more aggressively.
+            VecBuilder.fill(12), // relms. Control effort (voltage) tolerance. Decrease this to more
+            // heavily penalize control effort, or make the controller less aggressive. 12 is a good
+            // starting point because that is the (approximate) maximum voltage of a battery.
+            ShooterValues.ControlLoopPeriod); // Nominal time between loops. 0.020 for TimedRobot, but can be lower if using notifiers.
+
+    private final LinearSystemLoop<N1, N1, N1> flywheelLoop = new LinearSystemLoop<>(
+            Constants.ShooterValues.m_flywheelPlant,
+            m_controller,
+            m_observer,
+            12.0,
+            ShooterValues.ControlLoopPeriod);
+
+    @SuppressWarnings({"FieldCanBeLocal", "unused"})
     private final SmartMCAttachedPDPSlot primaryFlywheelSlot, secondaryFlywheelSlot, feederSlot;
 
-    private double feedTarget, hoodTarget, flywheelTarget;
+    private double feedTarget, hoodTarget, flywheelTargetRPM;
 
     public Shooter(GrouchPDP pdp) {
         setName("Shooter");
@@ -65,6 +96,7 @@ public class Shooter extends SubsystemBase {
                 true,
                 CounterBase.EncodingType.k1X
         );
+        flywheelEncoder.setDistancePerPulse(Units.rotationsPerMinuteToRadiansPerSecond(1.0 / 2048 * 60));
 
         primaryMotor.wipeSettings();
         secondaryMotor.wipeSettings();
@@ -85,19 +117,25 @@ public class Shooter extends SubsystemBase {
         feedPID.reset();
         flywheelPID.reset();
 
+        flywheelPID.setTolerance(100, 100);
+        feedPID.setTolerance(100, 100);
+
         // dashboard
         dashboard_wheelRPM = DashboardManager.addTabItem(this, "Flywheel/WheelRPM", 0.0);
         dashboard_motorRPM = DashboardManager.addTabItem(this, "Flywheel/MotorRPM", 0.0);
         dashboard_flywheelTargetRPM = DashboardManager.addTabItem(this, "Flywheel/Target RPM", 0.0);
         dashboard_flywheelFFEffort = DashboardManager.addTabItem(this, "Flywheel/FFEffort", 0.0);
         dashboard_flywheelPIDEffort = DashboardManager.addTabItem(this, "Flywheel/PIDEffort", 0.0);
+        dashboard_flywheelStateSpaceEffort = DashboardManager.addTabItem(this, "Flywheel/StateSpaceEffort", 0.0);
+        dashboard_flywheelAtTarget = DashboardManager.addTabItem(this, "Flywheel/AtTarget", false);
         dashboard_feedWheelRPM = DashboardManager.addTabItem(this, "Feeder/RPM", 0.0);
         dashboard_feedWheelTargetRPM = DashboardManager.addTabItem(this, "Feeder/Target RPM", 0.0);
         dashboard_feedFF = DashboardManager.addTabItem(this, "Feeder/FFEffort", 0.0);
         dashboard_feedWheelPIDEffort = DashboardManager.addTabItem(this, "Feeder/PIDEffort", 0.0);
+        dashboard_feederAtTarget = DashboardManager.addTabItem(this, "Feeder/AtTarget", false);
         dashboard_hoodPos = DashboardManager.addTabItem(this, "Hood/Position", 0.0);
         dashboard_hoodAngle = DashboardManager.addTabItem(this, "Hood/Angle", 0.0);
-        dashboard_shootMode = DashboardManager.addTabItem(this, "Mode", "Unknown");
+        dashboard_hoodAtTarget = DashboardManager.addTabItem(this, "Hood/AtTarget", false);
 
         DashboardManager.getTab(this).add("FlywheelPID", flywheelPID);
         DashboardManager.getTab(this).add("FeederPID", feedPID);
@@ -107,21 +145,50 @@ public class Shooter extends SubsystemBase {
 
     @Override
     public void periodic() {
-        handlePID();
+        dashboard_flywheelTargetRPM.setDouble(flywheelTargetRPM);
         dashboard_wheelRPM.setDouble(getFlywheelRPM_Encoder());
         dashboard_motorRPM.setDouble(primaryMotor.getSensorVelocity());
         dashboard_feedWheelRPM.setDouble(feederMotor.getSensorVelocity());
         dashboard_hoodPos.setDouble(potentiometer.getVoltage());
         dashboard_hoodAngle.setDouble(getHoodAngle());
+        dashboard_flywheelAtTarget.setBoolean(atShootingRpm());
+        dashboard_feederAtTarget.setBoolean(atFeedRpm());
+        dashboard_hoodAtTarget.setBoolean(atHoodAngle());
     }
 
-    public void setFlywheelRPM(double wheelTargetRPM) {
-        flywheelTarget = wheelTargetRPM;
+    public void updateControlLoops() {
+        double flywheelTargetRadiansPerSecond = Units.rotationsPerMinuteToRadiansPerSecond(flywheelTargetRPM);
+        double flywheelStateSpaceEffortVolts = calculateFlywheelStateSpace(flywheelTargetRadiansPerSecond);
+
+        dashboard_flywheelStateSpaceEffort.setDouble(flywheelStateSpaceEffortVolts);
+        setFlywheelVoltage(flywheelStateSpaceEffortVolts);
+
+        runFeederPID();
+        runHoodPID();
     }
 
-    public void idle() {
-        setFeedRPM(0);
-        setFlywheelRPM(0);
+    private double calculateFlywheelStateSpace(double radsPerSec) {
+        if (radsPerSec == 0) {
+            return 0;
+        }
+
+        flywheelLoop.setNextR(VecBuilder.fill(radsPerSec));
+
+        // Correct our Kalman filter's state vector estimate with encoder data.
+        flywheelLoop.correct(VecBuilder.fill(flywheelEncoder.getRate()));
+
+        // Update our LQR to generate new voltage commands and use the voltages to predict the next
+        // state with out Kalman filter.
+        flywheelLoop.predict(ShooterValues.ControlLoopPeriod);
+
+        // Send the new calculated voltage to the motors.
+        // voltage = duty cycle * battery voltage, so
+        // duty cycle = voltage / battery voltage
+        return flywheelLoop.getU(0);
+    }
+
+    public void setFlywheelRPM(double rpm) {
+        flywheelTargetRPM = rpm;
     }
 
     public void trackTarget() {
@@ -129,22 +196,20 @@ public class Shooter extends SubsystemBase {
         setHoodAngle(ShooterCalculations.exitAngle);
     }
 
+    public void setHoodToVisionDistance() {
+        setHoodAngle(ShooterCalculations.exitAngle);
+    }
+
     public void dumbShoot() {
-        setFlywheelRPM(5500);
-        setHoodAngle(15);
+
     }
 
     public void setFeedRPM(double rpm) {
         feedTarget = rpm;
     }
 
-
-    public void setHood(double potVoltage) {
+    private void setHood(double potVoltage) {
         hoodTarget = potVoltage;
-    }
-
-    public void idleHood() {
-        hoodServo.setSpeed(0);
     }
 
     public void setHoodAngle(double degrees) {
@@ -159,20 +224,16 @@ public class Shooter extends SubsystemBase {
         return OscarMath.map(potentiometer.getVoltage(), ShooterValues.HoodBottom, ShooterValues.HoodTop, ShooterValues.HoodMinAngle, ShooterValues.HoodMaxAngle);
     }
 
-    public boolean readyToShoot() {
-        return atShootingRpm() && atHoodTarget() && atFeedRpm();
+    public boolean atShootingRpm() {
+        return OscarMath.withinEpsilon(300, flywheelTargetRPM, getFlywheelRPM_Encoder());
     }
 
-    private boolean atShootingRpm() {
-        return Math.abs(primaryMotor.getSensorVelocity() - ShooterCalculations.flywheelRPM) < 100;
+    public boolean atFeedRpm() {
+        return OscarMath.withinEpsilon(500, feedTarget, feederMotor.getSensorVelocity());
     }
 
-    private boolean atFeedRpm() {
-        return Math.abs(feederMotor.getSensorVelocity() - ShooterValues.FeedRpm) < 100;
-    }
-
-    private boolean atHoodTarget() {
-        return Math.abs(getHoodAngle() - ShooterCalculations.exitAngle) < 2;
+    public boolean atHoodAngle() {
+        return OscarMath.withinEpsilon(1, ShooterCalculations.exitAngle, getHoodAngle());
     }
 
     public void setFlyheelNeutralMode(NeutralMode mode) {
@@ -184,25 +245,20 @@ public class Shooter extends SubsystemBase {
         feederMotor.setNeutralMode(mode);
     }
 
-    private void handlePID() {
-        runFeederPID();
-        runHoodPID();
-        runFlywheelPID();
-    }
-
     private void runFlywheelPID() {
-        if (flywheelTarget == 0) {
+        if (flywheelTargetRPM == 0) {
             primaryMotor.set(0);
-            dashboard_flywheelTargetRPM.setDouble(0);
+            dashboard_flywheelFFEffort.setDouble(0);
+            dashboard_flywheelPIDEffort.setDouble(0);
             return;
         }
 
-        dashboard_flywheelTargetRPM.setDouble(flywheelTarget);
+        dashboard_flywheelTargetRPM.setDouble(flywheelTargetRPM);
 
         double batteryVoltage = primaryMotor.getInputVoltage();
-        double ff = (ShooterValues.FlywheelFF.calculate(flywheelTarget) / batteryVoltage) / 2;
+        double ff = (ShooterValues.FlywheelFF.calculate(flywheelTargetRPM) / batteryVoltage) / 2;
 
-        double power = flywheelPID.calculate(getFlywheelRPM_Encoder(), flywheelTarget);
+        double power = flywheelPID.calculate(getFlywheelRPM_Encoder(), flywheelTargetRPM);
 
         dashboard_flywheelFFEffort.setDouble(ff);
         dashboard_flywheelPIDEffort.setDouble(power);
@@ -233,11 +289,15 @@ public class Shooter extends SubsystemBase {
         feederMotor.set(ffEffort + pidEffort);
     }
 
+    public void setFlywheelVoltage(double volts){
+        primaryMotor.set(volts / primaryMotor.getInputVoltage());
+    }
+
     public double getPotentiometer() {
         return potentiometer.getVoltage();
     }
 
     public double getFlywheelRPM_Encoder() {
-        return (flywheelEncoder.getRate() / 2048) * 60;
+        return Units.radiansPerSecondToRotationsPerMinute(flywheelEncoder.getRate());
     }
 }

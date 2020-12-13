@@ -23,7 +23,7 @@ public class SpindexerTests {
         shooter = new Shooter(new GrouchPDP(0));
         intake = new Intake(new GrouchPDP(0));
         spindexer = new Spindexer(new GrouchPDP(0));
-        turret = new Turret(new GrouchPDP(0));
+        turret = new Turret(new GrouchPDP(0), spindexer);
         vision = new Vision();
         superStructure = new SuperStructure(intake, shooter, spindexer, turret, vision);
 

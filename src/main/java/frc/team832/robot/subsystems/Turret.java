@@ -25,13 +25,15 @@ public class Turret extends SubsystemBase {
     private final REVThroughBorePWM turretEncoder;
     private final PDPSlot pdpSlot;
 
+    private final Spindexer spindexer;
+
     private boolean isVision = false;
 
     private NetworkTableEntry dashboard_turretPos, dashboard_turretPow, dashboard_turretTarget, dashboard_turretError;
 
     private final PIDController PID = new PIDController(TurretValues.kP, TurretValues.kI, TurretValues.kD);
 
-    public Turret(GrouchPDP pdp) {
+    public Turret(GrouchPDP pdp, Spindexer spindexer) {
         setName("Turret");
         DashboardManager.addTab(this);
         motor = new CANSparkMax(TurretValues.TURRET_MOTOR_CAN_ID, Motor.kNEO550);
@@ -45,7 +47,9 @@ public class Turret extends SubsystemBase {
         motor.setNeutralMode(NeutralMode.kBrake);
 
         PID.setIntegratorRange(-0.05, 0.05);
+        PID.setTolerance(2);
 
+        this.spindexer = spindexer;
 
         // keep turret at init position
         turretTargetDeg = getDegrees();
@@ -69,7 +73,7 @@ public class Turret extends SubsystemBase {
 
     public void trackTarget(double spindexerRPM) {
         updateFF(spindexerRPM);
-        setTurretTargetDegrees(ShooterCalculations.visionYaw + ((spindexerRPM / 30.0) * Math.signum(spindexerRPM)) + getDegrees(), true);
+        setTurretTargetDegrees(ShooterCalculations.visionYaw + getDegrees(), true);
     }
 
     protected double calculateSafePosition(boolean isVision, double degrees) {
@@ -110,13 +114,14 @@ public class Turret extends SubsystemBase {
     }
 
     private void updateFF(double spindexerRPM) {
-        turretFF =  spindexerRPM * TurretValues.FFMultiplier;
+        turretFF =  spindexerRPM * TurretValues.FFMultiplier * (spindexer.getSpinnerDirection() == Spindexer.SpinnerDirection.Clockwise ? 1 : -1);//positive power is clockwise
     }
 
     private void runPID() {
         handleSafety(isVision);
-        double power = PID.calculate(getDegrees(), turretTargetDeg);
-        motor.set(power); //+ (Math.signum(power) * turretFF)
+
+        double power = PID.calculate(getDegrees(), turretTargetDeg) + turretFF;
+        motor.set(power);
         if (PID.getPositionError() <= 1) PID.setI(0);
         else PID.setI(TurretValues.kI);
     }
@@ -139,8 +144,8 @@ public class Turret extends SubsystemBase {
         return TurretValues.convertRotationsToDegrees(getRotations());
     }
 
-    private boolean atTarget() {
-        return Math.abs(getDegrees() - ShooterCalculations.visionYaw) < 1;
+    public boolean atTargetAngle() {
+        return OscarMath.withinEpsilon(5, turretTargetDeg, getDegrees());
     }
 
     private void setVisionMode(boolean visionMode){

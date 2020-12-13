@@ -4,10 +4,14 @@ import edu.wpi.first.wpilibj.controller.SimpleMotorFeedforward;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveKinematics;
+import edu.wpi.first.wpilibj.system.LinearSystem;
+import edu.wpi.first.wpilibj.system.plant.DCMotor;
+import edu.wpi.first.wpilibj.system.plant.LinearSystemId;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryConfig;
 import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.wpilibj.trajectory.constraint.DifferentialDriveVoltageConstraint;
 import edu.wpi.first.wpilibj.util.Units;
+import edu.wpi.first.wpiutil.math.numbers.N1;
 import frc.team832.lib.drive.ClosedLoopDT;
 import frc.team832.lib.motors.WheeledPowerTrain;
 import frc.team832.lib.motors.Gearbox;
@@ -32,7 +36,6 @@ public class Constants {
 
         public static final double StickDriveMultiplier = 1;
         public static final double StickRotateOnCenterMultiplier = 0.6;
-        public static final double StickRotateMultiplier = 0.8;
 
         public static final double DriveWheelDiameter = 6 * 0.0254;
         public static final float DriveGearReduction = 1f / (8f/84f);
@@ -91,7 +94,7 @@ public class Constants {
         public static final int FLYWHEEL_ENCODER_DIO_CHANNEL_B = 4;
 
 
-        public static final float FlywheelReduction = 50f / 26f;
+        public static final float FlywheelReduction = 26f / 50f;
 
         private static final double FlywheelkS = 0.0437;
         private static final double FlywheelkV = 0.00217;
@@ -100,6 +103,16 @@ public class Constants {
         public static final ClosedLoopConfig ShootingConfig = new ClosedLoopConfig(0.0006, 0.0, 0.0, 0.0);
 
         public static final SimpleMotorFeedforward FlywheelFF = new SimpleMotorFeedforward(FlywheelkS, FlywheelkV, FlywheelkA);
+
+        public static final double FlywheelMOI = 0.00179;
+//        public static final double FlywheelMOI = 0.100895;
+
+        public static final LinearSystem<N1, N1, N1> m_flywheelPlant = LinearSystemId.createFlywheelSystem(
+                DCMotor.getNEO(2),
+                FlywheelMOI,
+                FlywheelReduction);
+
+        public static final double ControlLoopPeriod = 0.01;
 
         //Hood
         public static final double HoodReduction = 34.0 / 340.0;
@@ -141,7 +154,7 @@ public class Constants {
         public static final int PracticeTurretRightVisionPosition = VisionTargetingRange / 2;
         public static final int TurretCenterVisionPosition = 0;
 
-        public static final double kP = 0.011;//pp
+        public static final double kP = 0.015;//pp
         public static final double kI = 0.7;
         public static final double kD = 0.000;
         public static final double FFMultiplier = 0.001;
@@ -186,10 +199,10 @@ public class Constants {
         public static final WheeledPowerTrain SpinPowertrain = new WheeledPowerTrain(SpinGearbox, Motor.kNEO, 1, Units.inchesToMeters(20));
 
         public static final double SpinkP = 0.01;
+        public static Constraints VelocityConstraints  = new Constraints(SpinPowertrain.calculateMotorRpmFromWheelRpm(60), SpinPowertrain.calculateMotorRpmFromWheelRpm(10));
 
         public static final double PositionkP = 2.0;
-
-        public static Constraints Constraints = new Constraints(SpinPowertrain.calculateMotorRpmFromWheelRpm(90), SpinPowertrain.calculateMotorRpmFromWheelRpm(180));
+        public static Constraints PositionConstraints = new Constraints(SpinPowertrain.calculateMotorRpmFromWheelRpm(90), SpinPowertrain.calculateMotorRpmFromWheelRpm(180));
 
     }
 

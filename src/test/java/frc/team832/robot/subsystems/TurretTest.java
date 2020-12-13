@@ -15,7 +15,8 @@ public class TurretTest {
 
     @Before
     public void init() {
-        turret = new Turret(new GrouchPDP(0));
+        var pdp = new GrouchPDP(0);
+        turret = new Turret(new GrouchPDP(0), new Spindexer(pdp));
     }
 
     @Test

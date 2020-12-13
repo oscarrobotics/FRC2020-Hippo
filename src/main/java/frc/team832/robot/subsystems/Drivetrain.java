@@ -135,7 +135,9 @@ public class Drivetrain extends SubsystemBase {
         driveOdometry = new DifferentialDriveOdometry(getDriveHeading(), startingPose);
         resetPose();
 
-        setDefaultCommand(new RunEndCommand(this::tankDrive, this::stopDrive, this));
+        var driveDefaultCommand = new RunEndCommand(this::tankDrive, this::stopDrive, this);
+        driveDefaultCommand.setName("DefaultDriveCommand");
+        setDefaultCommand(driveDefaultCommand);
 
         initSuccessful = leftMaster.getCANConnection() && leftSlave.getCANConnection() &&
                 rightMaster.getCANConnection() && rightSlave.getCANConnection() && imu.getState() != PigeonIMU.PigeonState.NoComm;

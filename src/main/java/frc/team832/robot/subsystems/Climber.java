@@ -116,9 +116,7 @@ public class Climber extends SubsystemBase {
         climbLock.set(false);
     }
 
-    public void unlockClimb() {
-        climbLock.set(true);
-    }
+    public void unlockClimb() { climbLock.set(true); }
 
     public void zeroDeploy() {
         deployMotor.rezeroSensor();

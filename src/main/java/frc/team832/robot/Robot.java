@@ -26,7 +26,7 @@ public class Robot extends TimedRobot {
     static final Intake intake = new Intake(pdp);
     static final Shooter shooter = new Shooter(pdp);
     static final Spindexer spindexer = new Spindexer(pdp);
-    static final Turret turret = new Turret(pdp);
+    static final Turret turret = new Turret(pdp, spindexer);
     static final Climber climber = new Climber(pdp);
 //    static final WheelOfFortune wheelOfFortune = new WheelOfFortune();
     static final SuperStructure superStructure = new SuperStructure(intake, shooter, spindexer, turret, vision);
@@ -59,6 +59,7 @@ public class Robot extends TimedRobot {
 
         if (shooter.initSuccessful) {
             System.out.println("Shooter - init OK");
+            addPeriodic(shooter::updateControlLoops, Constants.ShooterValues.ControlLoopPeriod);
         } else {
             System.out.println("Shooter - init FAILED");
         }
@@ -106,7 +107,7 @@ public class Robot extends TimedRobot {
         turret.holdTurretPosition();
         spindexer.setNeutralMode(mode);
         turret.setNeutralMode(mode);
-        shooter.setHood(2.7);
+        shooter.setHoodAngle(70);
         climber.zeroDeploy();
         autoCommand.schedule();
     }
@@ -116,6 +117,7 @@ public class Robot extends TimedRobot {
         NeutralMode mode = NeutralMode.kCoast;
         drivetrain.setNeutralMode(mode);
         shooter.setFlyheelNeutralMode(mode);
+        shooter.setFlywheelRPM(0);
         shooter.setFeederNeutralMode(mode);
         spindexer.setNeutralMode(mode);
         turret.setNeutralMode(mode);
@@ -141,7 +143,7 @@ public class Robot extends TimedRobot {
 //        turret.holdTurretPosition();
         spindexer.setNeutralMode(mode);
         turret.setNeutralMode(mode);
-        shooter.setHood(2.7);
+        shooter.setHoodAngle(70);
         climber.zeroDeploy();
     }
 

@@ -23,6 +23,7 @@ public class SuperStructure extends SubsystemBase {
 	public final ShootCommandGroup shootOnTarget;
 	public final CloseRangeShootCommandGroup closeShoot;
 	public final IntakeCommand intakeCommand;
+	public final TargetingTestCommand testTargeting;
 
 	private double hoodVoltage = 2.72, spindexerRpm = 15;
 
@@ -39,6 +40,7 @@ public class SuperStructure extends SubsystemBase {
 		shootOnTarget = new ShootCommandGroup();
 		closeShoot = new CloseRangeShootCommandGroup();
 		intakeCommand = new IntakeCommand();
+		testTargeting = new TargetingTestCommand();
 
 		DashboardManager.addTab(this);
 		dashboard_hoodTargetVolts = DashboardManager.addTabItem(this, "Target Volts", 0.0);
@@ -73,6 +75,15 @@ public class SuperStructure extends SubsystemBase {
 	    	turret.setTurretTargetDegrees(0.0, true);
 		}
     }
+
+    public void testTrackTarget() {
+		if (vision.hasTarget()) {
+			turret.trackTarget(spindexer.getVelocity());
+			shooter.setHoodToVisionDistance();
+		} else {
+			turret.setTurretTargetDegrees(0.0, true);
+		}
+	}
 
     public void shootAtTarget() {
 		if (vision.hasTarget()) {
@@ -128,12 +139,13 @@ public class SuperStructure extends SubsystemBase {
 		return spindexer.isUnloaded();
 	}
 
-	public boolean isShooterPrepared() {
-		return shooter.readyToShoot() && isSpindexerReadyShoot(getNearestSafeRotationRelativeToFeeder(), spindexer.getRelativeRotations());
+	public boolean readyToShootOnTarget() {
+		return shooter.atShootingRpm() && /*shooter.atHoodAngle() &&*/ turret.atTargetAngle();
 	}
 
-	public void dumbShoot(){
-		shooter.dumbShoot();
+	public void dumbShoot() {
+		shooter.setFlywheelRPM(4700);
+		shooter.setHoodAngle(15);
 		turret.setForward(false);
 	}
 
@@ -201,11 +213,13 @@ public class SuperStructure extends SubsystemBase {
 					new FunctionalCommand(() -> turret.setForward(true), SuperStructure.this::trackTarget, (interrupted) -> {}, () -> false),
 					// wait then shoot
 					new SequentialCommandGroup(
-							new WaitCommand(0.5),
+							new WaitUntilCommand(SuperStructure.this::readyToShootOnTarget),
+							new InstantCommand(() -> shooter.setFeedRPM(4000)),
+							new WaitCommand(0.25),
 							new FunctionalCommand(
 									() -> spindexer.setSpinRPM(ShooterCalculations.getSpindexerRpm(), Spindexer.SpinnerDirection.Clockwise),
 									SuperStructure.this::shootAtTarget,
-									(interrupted) -> { idleShooterGroup();},
+									(interrupted) -> { idleShooterGroup(); turret.setForward(false); },
 									() -> false
 							)
 					)
@@ -226,10 +240,33 @@ public class SuperStructure extends SubsystemBase {
 					),
 
 					new SequentialCommandGroup(
-							new WaitCommand(0.75),
-							new StartEndCommand(() -> spindexer.setSpinRPM(120, Spindexer.SpinnerDirection.Clockwise), SuperStructure.this::idleShooterGroup)
+							new WaitUntilCommand(SuperStructure.this::readyToShootOnTarget),
+							new StartEndCommand(() -> spindexer.setSpinRPM(120, Spindexer.SpinnerDirection.CounterClockwise), SuperStructure.this::idleShooterGroup)
 					)
 			);
+		}
+	}
+
+	public class TargetingTestCommand extends CommandBase{
+		TargetingTestCommand() {
+			addRequirements(shooter, intake, spindexer, turret, SuperStructure.this);
+		}
+
+		@Override
+		public void initialize() {
+			spindexer.idle();
+			turret.setForward(true);
+		}
+
+		@Override
+		public void execute() {
+			testTrackTarget();
+			spindexer.setSpinRPM(ShooterCalculations.getSpindexerRpm(), Spindexer.SpinnerDirection.Clockwise);
+		}
+
+		@Override
+		public void end(boolean interrupted) {
+			idleShooterGroup();
 		}
 	}
 
@@ -256,7 +293,8 @@ public class SuperStructure extends SubsystemBase {
 	}
 
 	public void idleShooter() {
-		shooter.idle();
+		shooter.setFlywheelRPM(0);
+		shooter.setFeedRPM(0);
 	}
 
 	public void idleAll() {

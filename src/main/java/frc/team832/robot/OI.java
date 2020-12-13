@@ -76,11 +76,15 @@ public class OI {
 	}
 
 	private void configTestingCommands() {
-		stratComInterface.getArcadeBlackRight().whenHeld(superStructure.idleCommand);
+		stratComInterface.getArcadeBlackRight().whenHeld(superStructure.testTargeting);
 		stratComInterface.getArcadeWhiteLeft().whenHeld(superStructure.targetingCommand);
 		stratComInterface.getArcadeWhiteRight().whenHeld(superStructure.shootOnTarget);
 		stratComInterface.getArcadeBlackLeft().whenHeld(superStructure.closeShoot);
 
+//		stratComInterface.getArcadeBlackLeft().whileHeld(new RunEndCommand(() -> shooter.setFlywheelVoltage(3), () -> shooter.setFlywheelVoltage(0), shooter));
+
+//		var testFlywheelCommand = new RunEndCommand(() -> shooter.setFlywheelRPM(6000), () -> shooter.setFlywheelRPM(0), shooter).withName("TestFlywheelCommand");
+//		stratComInterface.getArcadeWhiteLeft().whileHeld(testFlywheelCommand);
 
 //		stratComInterface.getArcadeBlackRight().whenHeld(new StartEndCommand(() -> intake.intake(1), intake::stopAll));
 
