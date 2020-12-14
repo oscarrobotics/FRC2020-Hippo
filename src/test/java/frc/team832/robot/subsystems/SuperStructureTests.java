@@ -1,35 +1,32 @@
 package frc.team832.robot.subsystems;
 
-import edu.wpi.first.hal.HAL;
 import frc.team832.lib.power.GrouchPDP;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.*;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class SuperStructureTests {
-	static SuperStructure superStructure;
-	static Shooter shooter;
-	static Intake intake;
-	static Spindexer spindexer;
-	static Turret turret;
-	static Vision vision;
+	private static SuperStructure superStructure;
+	private static Shooter shooter;
+	private static Intake intake;
+	private static Spindexer spindexer;
+	private static Turret turret;
+	private static Vision vision;
 
-	@Before
-	public void init() {
-		shooter = new Shooter(new GrouchPDP(0));
-		intake = new Intake(new GrouchPDP(0));
-		spindexer = new Spindexer(new GrouchPDP(0));
-		turret = new Turret(new GrouchPDP(0), spindexer);
+	@BeforeAll
+	public static void init() {
+		var pdp = new GrouchPDP(0);
+		shooter = new Shooter(pdp);
+		intake = new Intake(pdp);
+		spindexer = new Spindexer(pdp);
+		turret = new Turret(pdp);
 		vision = new Vision();
 		superStructure = new SuperStructure(intake, shooter, spindexer, turret, vision);
 	}
 
 	@Test
 	public void isShooterReady(){
-		assertTrue("Everything at speed", shootReadyTest(1000.0, 997.7, 5000.0, 4978.3, .8));
+		assertTrue(shootReadyTest(1000.0, 997.7, 5000.0, 4978.3, .8), "Everything at speed");
 	}
 
 	public boolean shootReadyTest(double feederActual, double feederTarget, double shooterTarget, double shooterActual, double trackingOffset) {
@@ -42,8 +39,9 @@ public class SuperStructureTests {
 		return  feederReady && shooterReady && trackingReady;
 	}
 
-	@After
-	public void end() {
-		HAL.shutdown();
+	@AfterAll
+	public static void end() {
+		shooter.close();
+		turret.close();
 	}
 }

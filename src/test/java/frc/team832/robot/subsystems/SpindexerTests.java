@@ -1,32 +1,27 @@
 package frc.team832.robot.subsystems;
 
-import edu.wpi.first.hal.HAL;
 import frc.team832.lib.power.GrouchPDP;
-import frc.team832.robot.Constants;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.*;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
+
 
 public class SpindexerTests {
-    static SuperStructure superStructure;
-    static Shooter shooter;
-    static Intake intake;
-    static Spindexer spindexer;
-    static Turret turret;
-    static Vision vision;
+    private static SuperStructure superStructure;
+    private static Shooter shooter;
+    private static Intake intake;
+    private static Spindexer spindexer;
+    private static Turret turret;
+    private static Vision vision;
 
-    @Before
-    public void init() {
+    @BeforeAll
+    public static void init() {
         shooter = new Shooter(new GrouchPDP(0));
         intake = new Intake(new GrouchPDP(0));
         spindexer = new Spindexer(new GrouchPDP(0));
         turret = new Turret(new GrouchPDP(0), spindexer);
         vision = new Vision();
         superStructure = new SuperStructure(intake, shooter, spindexer, turret, vision);
-
     }
 
     @Test
@@ -34,13 +29,13 @@ public class SpindexerTests {
         boolean valid = superStructure.isSpindexerReadyShoot(.2, .23);
         boolean invalid = superStructure.isSpindexerReadyShoot(.2, .3);
 
-        assertTrue("InRange \"double\" failed on valid!", valid);
-        assertFalse("InRange \"double\" failed on invalid!", invalid);
+        assertTrue(valid, "InRange \"double\" failed on valid!");
+        assertFalse(invalid, "InRange \"double\" failed on invalid!");
     }
 
-    @After
-    public void end() {
-        HAL.shutdown();
+    @AfterAll
+    public static void end() {
+        turret.close();
+        shooter.close();
     }
-
 }

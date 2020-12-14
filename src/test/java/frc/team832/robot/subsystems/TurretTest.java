@@ -1,17 +1,14 @@
 package frc.team832.robot.subsystems;
 
-import edu.wpi.first.hal.HAL;
 import frc.team832.lib.power.GrouchPDP;
 import frc.team832.robot.Constants;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.*;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class TurretTest {
-    static Turret turret;
+    private static Turret turret;
 
     @Before
     public void init() {
@@ -26,7 +23,7 @@ public class TurretTest {
         for (int i = -safeTestingRange; i < safeTestingRange; i++) {
             var safeTargetPosition = turret.calculateSafePosition(true, i);
             boolean wasSafe = i == safeTargetPosition;
-            assertTrue("Safety failed! TargetDeg:" + i + ", SafeDeg: " + safeTargetPosition, wasSafe);
+            assertTrue(wasSafe, "Safety failed! TargetDeg:" + i + ", SafeDeg: " + safeTargetPosition);
         }
 
         int badTestingRangeStart = -(Constants.TurretValues.VisionTargetingRange + 1);
@@ -37,14 +34,13 @@ public class TurretTest {
                 var safeTargetPosition = turret.calculateSafePosition(true, i);
                 boolean wasSafe = i == safeTargetPosition;
 
-                assertFalse("Safety unexpectedly passed! TargetDeg:" + i + ", SafeDeg: " + safeTargetPosition, wasSafe);
+                assertFalse(wasSafe, "Safety unexpectedly passed! TargetDeg:" + i + ", SafeDeg: " + safeTargetPosition);
             }
         }
     }
 
-    @After
-    public void end() {
-        turret = null;
-        HAL.shutdown();
+    @AfterAll
+    public static void end() {
+        turret.close();
     }
 }

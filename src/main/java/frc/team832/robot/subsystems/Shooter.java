@@ -300,4 +300,10 @@ public class Shooter extends SubsystemBase {
     public double getFlywheelRPM_Encoder() {
         return Units.radiansPerSecondToRotationsPerMinute(flywheelEncoder.getRate());
     }
+
+    public void close() {
+        flywheelEncoder.close();
+        potentiometer.close();
+        hoodServo.close();
+    }
 }

@@ -1,9 +1,7 @@
 package frc.team832.robot.subsystems;
 
-import edu.wpi.first.hal.HAL;
 import frc.team832.lib.util.OscarMath;
-import org.junit.After;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.photonvision.PhotonUtils;
 
 import java.util.Arrays;
@@ -31,8 +29,4 @@ public class DistanceTest {
         System.out.println("Reported: " + reported);
     }
 
-    @After
-    public void end() {
-        HAL.shutdown();
-    }
 }

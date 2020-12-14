@@ -51,7 +51,7 @@ public class Drivetrain extends SubsystemBase {
     @SuppressWarnings("FieldCanBeLocal")
     private final SmartMCAttachedPDPSlot leftMasterSlot, leftSlaveSlot, rightMasterSlot, rightSlaveSlot;
 
-    private final NetworkTableEntry dashboard_rightVolts, dashboard_leftVolts,dashboard_pigeonIMU_pitch, dashboard_pigeonIMU_roll, dashboard_pigeonIMU_fusedHeading,
+    private final NetworkTableEntry dashboard_rightVolts, dashboard_leftVolts, dashboard_pigeonIMU_pitch, dashboard_pigeonIMU_roll, dashboard_pigeonIMU_fusedHeading,
             dashboard_poseX, dashboard_poseY, dashboard_poseRotation, dashboard_rawLeftPos, ui_poseX, ui_poseY;
 
     private final CommandBase dashboardResetPoseCommand = new CommandBase() {

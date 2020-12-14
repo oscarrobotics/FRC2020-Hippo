@@ -1,13 +1,13 @@
 plugins {
     id "java"
-    id "edu.wpi.first.GradleRIO" version "2021.1.1-beta-2"
+    id "edu.wpi.first.GradleRIO" version "2021.1.1-beta-3"
 }
 
 sourceCompatibility = JavaVersion.VERSION_11
 targetCompatibility = JavaVersion.VERSION_11
 
-wpi.wpilibVersion = '2021.+'
-wpi.maven.useDevelopment = true
+//wpi.wpilibVersion = '2021.+'
+//wpi.maven.useDevelopment = true
 
 def ROBOT_MAIN_CLASS = "frc.team832.robot.Main"
 
@@ -47,6 +47,8 @@ def includeDesktopSupport = true
 // Also defines JUnit 4.
 dependencies {
     implementation wpi.deps.wpilib()
+    implementation 'org.junit.jupiter:junit-jupiter:5.4.2'
+    implementation 'org.junit.jupiter:junit-jupiter:5.4.2'
     nativeZip wpi.deps.wpilibJni(wpi.platforms.roborio)
     nativeDesktopZip wpi.deps.wpilibJni(wpi.platforms.desktop)
 
@@ -57,7 +59,8 @@ dependencies {
     nativeZip wpi.deps.vendor.jni(wpi.platforms.roborio)
     nativeDesktopZip wpi.deps.vendor.jni(wpi.platforms.desktop)
 
-    testImplementation 'junit:junit:4.12'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.3.1'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.3.1'
 
     // Enable simulation gui support. Must check the box in vscode to enable support
     // upon debugging
@@ -70,4 +73,8 @@ dependencies {
 jar {
     from { configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) } }
     manifest edu.wpi.first.gradlerio.GradleRIOPlugin.javaManifest(ROBOT_MAIN_CLASS)
+}
+
+test {
+    useJUnitPlatform()
 }

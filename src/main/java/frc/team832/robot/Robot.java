@@ -1,17 +1,12 @@
 package frc.team832.robot;
 
 import edu.wpi.first.wpilibj.Compressor;
-import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.geometry.Pose2d;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.team832.lib.CANDevice;
-import frc.team832.lib.OscarTimedRobot;
 import frc.team832.lib.motorcontrol.NeutralMode;
 import frc.team832.lib.power.GrouchPDP;
-import frc.team832.robot.commands.auto.BasicAutonomous;
 import frc.team832.robot.commands.auto.DumbPathAuto;
 import frc.team832.robot.subsystems.*;
 
@@ -39,54 +34,14 @@ public class Robot extends TimedRobot {
     public void robotInit() {
         pcm.setClosedLoopControl(true);
 
-        if (drivetrain.initSuccessful) {
-            System.out.println("Drivetrain - init OK");
-        } else {
-            System.out.println("Drivetrain - init FAILED");
-        }
-
-        if (intake.initSuccessful) {
-            System.out.println("Intake - init OK");
-        } else {
-            System.out.println("Intake - init FAILED");
-        }
-
-        if (vision.initSuccessful) {
-            System.out.println("Vision - init OK");
-        } else {
-            System.out.println("Vision - init FAILED");
-        }
-
-        if (shooter.initSuccessful) {
-            System.out.println("Shooter - init OK");
-            addPeriodic(shooter::updateControlLoops, Constants.ShooterValues.ControlLoopPeriod);
-        } else {
-            System.out.println("Shooter - init FAILED");
-        }
-
-        if (turret.initSuccessful) {
-            System.out.println("Turret - init OK");
-        } else {
-            System.out.println("Turret - init FAILED");
-        }
-
-        if (spindexer.initSuccessful) {
-            System.out.println("Spindexer - init OK");
-        } else {
-            System.out.println("Spindexer - init FAILED");
-        }
-
-        if (climber.initSuccessful) {
-            System.out.println("Climber - init OK");
-        } else {
-            System.out.println("Climber - init FAILED");
-        }
-
-//        if (wheelOfFortune.initSuccessful) {
-//            System.out.println("WheelOfFortune - init OK");
-//        } else {
-//            System.out.println("WheelOfFortune - init FAILED");
-//        }
+        System.out.println("Drivetrain - init " + (drivetrain.initSuccessful ? "OK" : "FAILED"));
+        System.out.println("Intake - init " + (intake.initSuccessful ? "OK" : "FAILED"));
+        System.out.println("Vision - init " + (vision.initSuccessful ? "OK" : "FAILED"));
+        System.out.println("Shooter - init " + (shooter.initSuccessful ? "OK" : "FAILED"));
+        System.out.println("Turret - init " + (turret.initSuccessful ? "OK" : "FAILED"));
+        System.out.println("Spindexer - init " + (spindexer.initSuccessful ? "OK" : "FAILED"));
+        System.out.println("Climber - init " + (climber.initSuccessful ? "OK" : "FAILED"));
+//        System.out.println("WOF - init " + (wheelOfFortune.initSuccessful ? "OK" : "FAILED"));
 
         CANDevice.printMissingDevices();
 //        autoCommand = new BasicAutonomous(superStructure, drivetrain);

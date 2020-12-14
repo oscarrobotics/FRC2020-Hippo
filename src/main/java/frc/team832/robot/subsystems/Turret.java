@@ -163,6 +163,10 @@ public class Turret extends SubsystemBase {
     public void setHeadingSlider(double rightSlider) {
         setTurretTargetDegrees(OscarMath.clipMap(rightSlider,-1, 1, TurretValues.PracticeTurretLeftPosition, TurretValues.PracticeTurretRightPosition), false);
     }
+
+    public void close() {
+        turretEncoder.close();
+    }
 }
 
 
