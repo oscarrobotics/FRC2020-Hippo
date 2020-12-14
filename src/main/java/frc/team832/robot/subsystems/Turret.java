@@ -1,8 +1,15 @@
 package frc.team832.robot.subsystems;
 
 import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.wpilibj.controller.LinearQuadraticRegulator;
 import edu.wpi.first.wpilibj.controller.PIDController;
+import edu.wpi.first.wpilibj.estimator.KalmanFilter;
+import edu.wpi.first.wpilibj.system.LinearSystemLoop;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpiutil.math.Nat;
+import edu.wpi.first.wpiutil.math.VecBuilder;
+import edu.wpi.first.wpiutil.math.numbers.N1;
+import edu.wpi.first.wpiutil.math.numbers.N2;
 import frc.team832.lib.driverstation.dashboard.DashboardManager;
 import frc.team832.lib.motorcontrol.NeutralMode;
 import frc.team832.lib.motorcontrol2.vendor.CANSparkMax;
@@ -24,6 +31,30 @@ public class Turret extends SubsystemBase {
     private final CANSparkMax motor;
     private final REVThroughBorePWM turretEncoder;
     private final PDPSlot pdpSlot;
+
+    private final KalmanFilter<N2, N1, N1> m_observer = new KalmanFilter<N2, N1, N1>(
+            Nat.N2(), Nat.N1(),
+            TurretValues.m_turretPlant,
+            VecBuilder.fill(2.5, 2.5), // How accurate we think our model is
+            VecBuilder.fill(0.0069), // How nice we think our encoder data is
+            TurretValues.ControlLoopPeriod);
+
+    private final LinearQuadraticRegulator<N2, N1, N1> m_controller
+            = new LinearQuadraticRegulator<N2, N1, N1>(
+                    TurretValues.m_turretPlant,
+            VecBuilder.fill(120.0, 120.0), // qelms. Velocity error tolerance, in radians per second. Decrease
+            // this to more heavily penalize state excursion, or make the controller behave more aggressively.
+            VecBuilder.fill(12.0), // relms. Control effort (voltage) tolerance. Decrease this to more
+            // heavily penalize control effort, or make the controller less aggressive. 12 is a good
+            // starting point because that is the (approximate) maximum voltage of a battery.
+            TurretValues.ControlLoopPeriod); // Nominal time between loops. 0.020 for TimedRobot, but can be lower if using notifiers.
+
+    private final LinearSystemLoop<N2, N1, N1> turretLoop = new LinearSystemLoop<N2, N1, N1>(
+            TurretValues.m_turretPlant,
+            m_controller,
+            m_observer,
+            12.0,
+            Constants.TurretValues.ControlLoopPeriod);
 
     private final Spindexer spindexer;
 
@@ -109,12 +140,12 @@ public class Turret extends SubsystemBase {
     }
 
     public void setTurretTargetDegrees(double pos, boolean isVision) {
-        setVisionMode(isVision);
+        this.isVision = isVision;
         turretTargetDeg = pos;
     }
 
     private void updateFF(double spindexerRPM) {
-        turretFF =  spindexerRPM * TurretValues.FFMultiplier * (spindexer.getSpinnerDirection() == Spindexer.SpinnerDirection.Clockwise ? 1 : -1);//positive power is clockwise
+        turretFF =  spindexerRPM * TurretValues.FFMultiplier * (spindexer.getSpinnerDirection() == Spindexer.SpinnerDirection.Clockwise ? -1 : 1);
     }
 
     private void runPID() {
@@ -126,7 +157,7 @@ public class Turret extends SubsystemBase {
         else PID.setI(TurretValues.kI);
     }
 
-    public void setForward(boolean isVision) { setTurretTargetDegrees(TurretValues.TurretCenterVisionPosition, isVision); }
+    public void setForward() { setTurretTargetDegrees(TurretValues.TurretCenterVisionPosition, false); }
 
     public void setIntake() {
         setTurretTargetDegrees(Constants.TurretValues.IntakeOrientationDegrees, false);
@@ -146,10 +177,6 @@ public class Turret extends SubsystemBase {
 
     public boolean atTargetAngle() {
         return OscarMath.withinEpsilon(5, turretTargetDeg, getDegrees());
-    }
-
-    private void setVisionMode(boolean visionMode){
-        isVision = visionMode;
     }
 
     public void stop() {

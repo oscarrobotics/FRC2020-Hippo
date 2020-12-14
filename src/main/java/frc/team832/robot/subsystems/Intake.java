@@ -105,4 +105,9 @@ public class Intake extends SubsystemBase {
 		extendIntake();
 		intake(OscarMath.map(leftSlider,-1.0, 1.0, 0.0, 1.0));
 	}
+
+    public void idle() {
+		setIntakeRPM(0);
+		retractIntake();
+    }
 }

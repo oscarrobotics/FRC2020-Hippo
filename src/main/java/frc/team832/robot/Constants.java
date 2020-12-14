@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.wpilibj.trajectory.constraint.DifferentialDriveVoltageConstraint;
 import edu.wpi.first.wpilibj.util.Units;
 import edu.wpi.first.wpiutil.math.numbers.N1;
+import edu.wpi.first.wpiutil.math.numbers.N2;
 import frc.team832.lib.drive.ClosedLoopDT;
 import frc.team832.lib.motors.WheeledPowerTrain;
 import frc.team832.lib.motors.Gearbox;
@@ -100,7 +101,7 @@ public class Constants {
         private static final double FlywheelkV = 0.00217;
         private static final double FlywheelkA = 0.00103;
 
-        public static final ClosedLoopConfig ShootingConfig = new ClosedLoopConfig(0.0006, 0.0, 0.0, 0.0);
+        public static final ClosedLoopConfig ShootingConfig = new ClosedLoopConfig(0.0004, 0.0, 0.000001, 0.0);
 
         public static final SimpleMotorFeedforward FlywheelFF = new SimpleMotorFeedforward(FlywheelkS, FlywheelkV, FlywheelkA);
 
@@ -119,11 +120,11 @@ public class Constants {
 
         public static final double HoodkP = 8.0;
 
-        public static final double HoodMaxAngle = 90;
-        public static final double HoodMinAngle = 5;
+        public static final double HoodMaxAngle = 70;
+        public static final double HoodMinAngle = 10;
 
-        public static final double HoodBottom = 4.5;
-        public static final double HoodTop = 2;
+        public static final double HoodBottom = 4.57;
+        public static final double HoodTop = 1.86;
 
 
         //Feeder
@@ -154,12 +155,24 @@ public class Constants {
         public static final int PracticeTurretRightVisionPosition = VisionTargetingRange / 2;
         public static final int TurretCenterVisionPosition = 0;
 
-        public static final double kP = 0.015;//pp
-        public static final double kI = 0.7;
+        public static final double TurretMOI = 0.0;
+
+        public static final double TurretReduction = 200;//200:1
+
+        public static final LinearSystem<N2, N1, N1> m_turretPlant = LinearSystemId.createSingleJointedArmSystem(
+            DCMotor.getNeo550(1),
+            TurretMOI,
+            TurretReduction
+        );
+
+        public static final double kP = 0.015;
+        public static final double kI = 0.75;
         public static final double kD = 0.000;
         public static final double FFMultiplier = 0.001;
 
         public static final double IntakeOrientationDegrees = -90;
+
+        public static double ControlLoopPeriod = 0.005;
 
         public static double convertRotationsToDegrees(double rotations) {
             return OscarMath.map(rotations, 0, 1, -180, 180);
