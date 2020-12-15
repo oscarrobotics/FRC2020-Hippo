@@ -43,6 +43,10 @@ public class Robot extends TimedRobot {
         System.out.println("Climber - init " + (climber.initSuccessful ? "OK" : "FAILED"));
 //        System.out.println("WOF - init " + (wheelOfFortune.initSuccessful ? "OK" : "FAILED"));
 
+        if (shooter.initSuccessful) {
+            addPeriodic(shooter::updateControlLoops, Constants.ShooterValues.ControlLoopPeriod);
+        }
+
         CANDevice.printMissingDevices();
 //        autoCommand = new BasicAutonomous(superStructure, drivetrain);
         autoCommand = new DumbPathAuto(drivetrain);
@@ -57,7 +61,7 @@ public class Robot extends TimedRobot {
     public void autonomousInit() {
         NeutralMode mode = NeutralMode.kBrake;
         drivetrain.setNeutralMode(mode);
-        shooter.setFlyheelNeutralMode(mode);
+        shooter.setFlywheelNeutralMode(mode);
         shooter.setFeederNeutralMode(mode);
         turret.holdTurretPosition();
         spindexer.setNeutralMode(mode);
@@ -71,7 +75,7 @@ public class Robot extends TimedRobot {
     public void disabledInit() {
         NeutralMode mode = NeutralMode.kCoast;
         drivetrain.setNeutralMode(mode);
-        shooter.setFlyheelNeutralMode(mode);
+        shooter.setFlywheelNeutralMode(mode);
         shooter.setFlywheelRPM(0);
         shooter.setFeederNeutralMode(mode);
         spindexer.setNeutralMode(mode);
@@ -94,7 +98,7 @@ public class Robot extends TimedRobot {
         NeutralMode mode = NeutralMode.kBrake;
         drivetrain.setNeutralMode(mode);
         shooter.setFeederNeutralMode(mode);
-        shooter.setFlyheelNeutralMode(NeutralMode.kCoast);
+        shooter.setFlywheelNeutralMode(NeutralMode.kCoast);
 //        turret.holdTurretPosition();
         spindexer.setNeutralMode(mode);
         turret.setNeutralMode(mode);
