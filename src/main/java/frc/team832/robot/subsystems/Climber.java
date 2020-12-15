@@ -70,8 +70,8 @@ public class Climber extends SubsystemBase {
 
     @Override
     public void periodic() {
-//        runExtendPID();
-        runClimbRamp();
+        runExtendPID();
+        runClimbPID();
         dashboard_isSafe.setBoolean(isWinchSafe());
     }
 
@@ -104,9 +104,7 @@ public class Climber extends SubsystemBase {
         deployMotor.set(extendPID.calculate(deployMotor.getSensorPosition(), extendTarget));
     }
 
-    private void runClimbRamp() {
-        winchMotor.set(climbRamp.calculate(climbPower));
-    }
+    private void runClimbPID() { winchMotor.set(climbRamp.calculate(climbPower)); }
 
     public void stopClimb() {
         climbPower = 0;

@@ -1,5 +1,6 @@
 package frc.team832.robot.subsystems;
 
+import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.controller.ProfiledPIDController;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.team832.lib.driverstation.dashboard.DashboardManager;
@@ -12,7 +13,7 @@ import frc.team832.robot.Constants.SpindexerValues;
 
 public class Spindexer extends SubsystemBase {
 	public final boolean initSuccessful;
-	private int vibrateCount;
+	private int vibrateCount = 0;
 
 	private final CANSparkMax spinMotor;
 	private final ProfiledPIDController spinPID = new ProfiledPIDController(SpindexerValues.SpinkP, 0, 0, SpindexerValues.VelocityConstraints);
@@ -20,6 +21,8 @@ public class Spindexer extends SubsystemBase {
 
 	private SpinMode spinMode;
 	private SpinnerDirection spinDirection = SpinnerDirection.Clockwise;
+
+	public NetworkTableEntry dashboard_RPM, dashboard_targetRPM, dashboard_PIDEffort;
 
 	private double spindexerTargetVelocity = 0, spindexerTargetPosition = 0;
 
@@ -39,12 +42,18 @@ public class Spindexer extends SubsystemBase {
 
 		DashboardManager.addTab(this);
 
+		dashboard_RPM = DashboardManager.addTabItem(this, "RPM", 0.0);
+		dashboard_targetRPM = DashboardManager.addTabItem(this, "Target RPM", 0.0);
+		dashboard_PIDEffort = DashboardManager.addTabItem(this, "PID Effort", 0.0);
+
+
 		initSuccessful = spinMotor.getCANConnection();// && ballSensor.getDistanceMeters() != 0;
 	}
 
 	@Override
 	public void periodic() {
 	    runSpindexerPID();
+
 	}
 
 	public void setSpinRPM(double rpm, SpinnerDirection spinDirection) {
@@ -63,9 +72,12 @@ public class Spindexer extends SubsystemBase {
 	}
 
 	public void vibrate() {
+		if (vibrateCount > 10) {
+			setSpinRPM(30, spinDirection == SpinnerDirection.Clockwise ? SpinnerDirection.CounterClockwise : SpinnerDirection.Clockwise);
+			vibrateCount = 0;
+			return;
+		}
 		vibrateCount++;
-		double pos = Math.sin(vibrateCount / 5.0) / 20.0;
-		setTargetRotation(pos);
 	}
 
 	public void zeroSpindexer() {
