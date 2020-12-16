@@ -10,7 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class TurretTest {
     private static Turret turret;
 
-    @Before
+    @BeforeAll
     public void init() {
         var pdp = new GrouchPDP(0);
         turret = new Turret(new GrouchPDP(0), new Spindexer(pdp));

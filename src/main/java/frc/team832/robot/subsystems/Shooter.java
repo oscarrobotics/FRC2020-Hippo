@@ -13,7 +13,7 @@ import edu.wpi.first.wpiutil.math.VecBuilder;
 import edu.wpi.first.wpiutil.math.numbers.N1;
 import frc.team832.lib.control.REVSmartServo_Continuous;
 import frc.team832.lib.driverstation.dashboard.DashboardManager;
-import frc.team832.lib.logging.FlywheelStateSpaceLogger;
+import frc.team832.lib.logging.writers.FlywheelStateSpaceLogWriter;
 import frc.team832.lib.motorcontrol.NeutralMode;
 import frc.team832.lib.motorcontrol2.vendor.CANSparkMax;
 import frc.team832.lib.motors.Motor;
@@ -73,7 +73,7 @@ public class Shooter extends SubsystemBase {
             12.0,
             ShooterValues.ControlLoopPeriod);
 
-    private final FlywheelStateSpaceLogger flywheelSSLogger = new FlywheelStateSpaceLogger("ShooterFlywheel");
+    private final FlywheelStateSpaceLogWriter flywheelSSLogger = new FlywheelStateSpaceLogWriter("Shooter");
 
     private final SmartMCAttachedPDPSlot primaryFlywheelSlot, secondaryFlywheelSlot, feederSlot;
 
@@ -184,10 +184,6 @@ public class Shooter extends SubsystemBase {
             double flywheelStateSpaceEffortVolts = calculateFlywheelStateSpace(flywheelTargetRadiansPerSecond);
 
             dashboard_flywheelStateSpaceEffort.setDouble(flywheelStateSpaceEffortVolts);
-
-    private double calculateFlywheelStateSpace(double radsPerSec) {
-        if (radsPerSec == 0) {
-            return 0;
             setFlywheelVoltage(flywheelTargetRPM == 0 ? 0 : flywheelStateSpaceEffortVolts);
 
             // feeder and hood PID
@@ -213,7 +209,7 @@ public class Shooter extends SubsystemBase {
         var u = flywheelLoop.getU(0);
         // Log data to CSV
         flywheelSSLogger.logSystemState(radsPerSec, flywheelLoop.getXHat(0), u, flywheelEncoder.getRate());
-        return flywheelLoop.getU(0);
+        return u;
     }
 
     public void setFlywheelRPM(double rpm) {

@@ -19,7 +19,7 @@ public class SuperStructureTests {
 		shooter = new Shooter(pdp);
 		intake = new Intake(pdp);
 		spindexer = new Spindexer(pdp);
-		turret = new Turret(pdp);
+		turret = new Turret(pdp, spindexer);
 		vision = new Vision();
 		superStructure = new SuperStructure(intake, shooter, spindexer, turret, vision);
 	}
