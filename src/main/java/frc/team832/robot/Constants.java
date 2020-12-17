@@ -207,7 +207,7 @@ public class Constants {
         public static final int HALL_EFFECT_DIO_CHANNEL = 1;
         public static final int LASERSHARK_DIO_CHANNEL = 2;
 
-        public static final float SpinReduction = 1f / (56f/1f);
+        public static final float SpinReduction = 1f / 56f;
         private static final Gearbox SpinGearbox = new Gearbox(SpinReduction);
         public static final WheeledPowerTrain SpinPowertrain = new WheeledPowerTrain(SpinGearbox, Motor.kNEO, 1, Units.inchesToMeters(20));
 

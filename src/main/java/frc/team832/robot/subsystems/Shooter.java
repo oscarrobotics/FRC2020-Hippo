@@ -298,14 +298,14 @@ public class Shooter extends SubsystemBase {
     }
 
     private void runFeederPID() {
-        if(feedTarget == 0) {
+        if (feedTarget == 0) {
             feederMotor.set(0);
             dashboard_feedFF.setDouble(0);
             dashboard_feedWheelTargetRPM.setDouble(0);
             return;
         }
-        
-        double ffEffort = ((1.0/473.0) * feedTarget) / 12.0;
+
+        double ffEffort = ((1.0 / 473.0) * feedTarget) / 12.0;
         dashboard_feedFF.setDouble(ffEffort);
 
         double pidEffort = feedPID.calculate(feederMotor.getSensorVelocity(), feedTarget);
@@ -315,7 +315,7 @@ public class Shooter extends SubsystemBase {
         feederMotor.set(ffEffort + pidEffort);
     }
 
-    public void setFlywheelVoltage(double volts){
+    public void setFlywheelVoltage(double volts) {
         primaryMotor.set(volts / primaryMotor.getInputVoltage());
     }
 
@@ -339,3 +339,4 @@ public class Shooter extends SubsystemBase {
         hoodServo.close();
     }
 }
+
