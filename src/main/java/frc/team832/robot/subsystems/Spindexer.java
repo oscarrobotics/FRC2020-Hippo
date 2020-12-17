@@ -53,8 +53,7 @@ public class Spindexer extends SubsystemBase {
 	@Override
 	public void periodic() {
 	    runSpindexerPID();
-	    dashboard_targetRPM.setDouble(spindexerTargetVelocity);
-	    dashboard_RPM.setDouble(getVelocity());
+
 	}
 
 	public void setSpinRPM(double rpm, SpinnerDirection spinDirection) {
