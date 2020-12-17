@@ -67,13 +67,17 @@ public class SuperStructure extends SubsystemBase {
 
     public void shootAtTarget() {
         if (vision.hasTarget()) {
-            turret.trackTarget(spindexer.getVelocity());
+            turret.holdPosition();
             shooter.trackTarget();
             shooter.setFeedRPM(Constants.ShooterValues.FeedRpm);
             spindexer.setSpinRPM(ShooterCalculations.getSpindexerRpm(), Spindexer.SpinnerDirection.Clockwise);
         } else {
             turret.setTurretTargetDegrees(0.0, true);
         }
+    }
+
+    public boolean readyToShoot() {
+        return shooter.atShootingRpm() && shooter.atHoodAngle() && turret.atTargetAngle();
     }
 
 
@@ -105,7 +109,6 @@ public class SuperStructure extends SubsystemBase {
         @Override
         public void execute() {
             trackTarget();
-//			spindexer.setTargetRotation(getNearestSafeRotationRelativeToFeeder());might be unnecessary
         }
     }
 
@@ -113,18 +116,13 @@ public class SuperStructure extends SubsystemBase {
         public ShootCommandGroup() {
             addRequirements(shooter, intake, spindexer, turret, SuperStructure.this);
             addCommands(
-                    new RunEndCommand(
-                            SuperStructure.this::trackTarget,
-                            () -> {
-                                shooter.idleAll();
-                                spindexer.idle();
-                            }
-                    ),
-
                     new SequentialCommandGroup(
-                            new WaitUntilCommand(() -> shooter.atShootingRpm() && shooter.atHoodAngle() && turret.atTargetAngle()),
+                            new FunctionalCommand(() -> {}, SuperStructure.this::trackTarget, (interrupted) -> {turret.holdPosition();},
+                                    SuperStructure.this::readyToShoot),
                             new InstantCommand(() -> shooter.setFeedRPM(3000)),
                             new WaitUntilCommand(shooter::atFeedRpm),
+                            new FunctionalCommand(() -> {}, SuperStructure.this::trackTarget, (interrupted) -> {turret.setLastYaw();},
+                                    SuperStructure.this::readyToShoot),
                             new RunEndCommand(
                                     SuperStructure.this::shootAtTarget,
                                     () -> {
@@ -174,7 +172,7 @@ public class SuperStructure extends SubsystemBase {
                         new InstantCommand(() -> shooter.setFeedRPM(2500)),
                         new WaitUntilCommand(shooter::atFeedRpm),
                         new StartEndCommand(
-                                () -> spindexer.setSpinRPM(110, Spindexer.SpinnerDirection.Clockwise),
+                                () -> spindexer.setSpinRPM(100, Spindexer.SpinnerDirection.Clockwise),
                                 () -> {
                                     shooter.idleAll();
                                     spindexer.idle();
@@ -194,6 +192,7 @@ public class SuperStructure extends SubsystemBase {
         public void initialize() {
             spindexer.idle();
             turret.setForward();
+            spindexer.setSpinRPM(60, Spindexer.SpinnerDirection.Clockwise);
         }
 
         @Override
@@ -204,6 +203,7 @@ public class SuperStructure extends SubsystemBase {
         @Override
         public void end(boolean interrupted) {
             shooter.idleAll();
+            spindexer.idle();
         }
     }
 }

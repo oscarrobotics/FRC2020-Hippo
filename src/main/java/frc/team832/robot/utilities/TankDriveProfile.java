@@ -29,7 +29,6 @@ public class TankDriveProfile {
 			if (isPreciseRotate) {
 				StoreDriveSpeeds rotate;
 				rotate = getTankRotateProfile();
-
 				setSpeeds(straight.leftPow + rotate.leftPow, straight.rightPow + rotate.rightPow);
 			} else {
 				setSpeeds(straight.leftPow, straight.rightPow);

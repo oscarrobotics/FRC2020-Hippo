@@ -47,6 +47,10 @@ public class Robot extends TimedRobot {
             addPeriodic(shooter::updateControlLoops, Constants.ShooterValues.ControlLoopPeriod);
         }
 
+        if (turret.initSuccessful) {
+            addPeriodic(turret::updateControlLoops, Constants.TurretValues.ControlLoopPeriod);
+        }
+
         CANDevice.printMissingDevices();
 //        autoCommand = new BasicAutonomous(superStructure, drivetrain);
         autoCommand = new DumbPathAuto(drivetrain);
@@ -63,10 +67,10 @@ public class Robot extends TimedRobot {
         drivetrain.setNeutralMode(mode);
         shooter.setFlywheelNeutralMode(mode);
         shooter.setFeederNeutralMode(mode);
-        turret.holdTurretPosition();
+        turret.holdPosition();
         spindexer.setNeutralMode(mode);
         turret.setNeutralMode(mode);
-        shooter.setHoodAngle(70);
+        shooter.setHoodAngle(60);
         climber.zeroDeploy();
         autoCommand.schedule();
     }

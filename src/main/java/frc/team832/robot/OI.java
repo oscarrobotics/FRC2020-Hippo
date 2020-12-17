@@ -12,6 +12,7 @@ import frc.team832.lib.driverinput.oi.XboxDriverOI;
 import frc.team832.lib.util.OscarMath;
 import frc.team832.robot.commands.climb.StartClimbGroup;
 import frc.team832.robot.commands.climb.StopClimbGroup;
+import frc.team832.robot.subsystems.Spindexer;
 import frc.team832.robot.subsystems.SuperStructure;
 
 
@@ -83,7 +84,9 @@ public class OI {
 
 //		stratComInterface.getArcadeBlackLeft().whileHeld(new RunEndCommand(() -> shooter.setFlywheelVoltage(3), () -> shooter.setFlywheelVoltage(0), shooter));
 
-		var testFlywheelCommand = new RunEndCommand(() -> shooter.setFlywheelRPM(4000), () -> shooter.setFlywheelRPM(0), shooter).withName("TestFlywheelCommand");
-		stratComInterface.getSingleToggle().whenHeld(testFlywheelCommand);
+		var testSpin = new RunEndCommand(spindexer::vibrate, spindexer::idle).withName("TestSpindexerCommand");
+		stratComInterface.getSingleToggle().whenHeld(testSpin);
+
+		stratComInterface.getDoubleToggleUp().whenHeld(new RunEndCommand(() -> turret.setHeadingSlider(stratComInterface.getRightSlider()), turret::setForward));
 	}
 }

@@ -50,14 +50,14 @@ public class Shooter extends SubsystemBase {
     private final PIDController feedPID = new PIDController(ShooterValues.FeedkP, 0, 0);
     private final PIDController flywheelPID = new PIDController(ShootingConfig.getkP(), ShootingConfig.getkI(), ShootingConfig.getkD());
 
-    private final KalmanFilter<N1, N1, N1> m_observer = new KalmanFilter<>(
+    private final KalmanFilter<N1, N1, N1> flywheelObserver = new KalmanFilter<>(
             Nat.N1(), Nat.N1(),
             Constants.ShooterValues.m_flywheelPlant,
             VecBuilder.fill(2.5), // How accurate we think our model is
             VecBuilder.fill(0.0065), // How accurate we think our encoder data is
             ShooterValues.ControlLoopPeriod);
 
-    private final LinearQuadraticRegulator<N1, N1, N1> m_controller
+    private final LinearQuadraticRegulator<N1, N1, N1> flywheelController
             = new LinearQuadraticRegulator<>(Constants.ShooterValues.m_flywheelPlant,
             VecBuilder.fill(120.0), // qelms. Velocity error tolerance, in radians per second. Decrease
             // this to more heavily penalize state excursion, or make the controller behave more aggressively.
@@ -68,12 +68,12 @@ public class Shooter extends SubsystemBase {
 
     private final LinearSystemLoop<N1, N1, N1> flywheelLoop = new LinearSystemLoop<>(
             Constants.ShooterValues.m_flywheelPlant,
-            m_controller,
-            m_observer,
+            flywheelController,
+            flywheelObserver,
             12.0,
             ShooterValues.ControlLoopPeriod);
 
-    private final FlywheelStateSpaceLogWriter flywheelSSLogger = new FlywheelStateSpaceLogWriter("Shooter");
+//    private final FlywheelStateSpaceLogWriter flywheelSSLogger = new FlywheelStateSpaceLogWriter("Shooter");
 
     private final SmartMCAttachedPDPSlot primaryFlywheelSlot, secondaryFlywheelSlot, feederSlot;
 
@@ -208,7 +208,7 @@ public class Shooter extends SubsystemBase {
         // duty cycle = voltage / battery voltage
         var u = flywheelLoop.getU(0);
         // Log data to CSV
-        flywheelSSLogger.logSystemState(radsPerSec, flywheelLoop.getXHat(0), u, flywheelEncoder.getRate());
+//        flywheelSSLogger.logSystemState(radsPerSec, flywheelLoop.getXHat(0), u, flywheelEncoder.getRate());
         return u;
     }
 
@@ -298,14 +298,14 @@ public class Shooter extends SubsystemBase {
     }
 
     private void runFeederPID() {
-        if(feedTarget == 0) {
+        if (feedTarget == 0) {
             feederMotor.set(0);
             dashboard_feedFF.setDouble(0);
             dashboard_feedWheelTargetRPM.setDouble(0);
             return;
         }
-        
-        double ffEffort = ((1.0/473.0) * feedTarget) / 12.0;
+
+        double ffEffort = ((1.0 / 473.0) * feedTarget) / 12.0;
         dashboard_feedFF.setDouble(ffEffort);
 
         double pidEffort = feedPID.calculate(feederMotor.getSensorVelocity(), feedTarget);
@@ -315,7 +315,7 @@ public class Shooter extends SubsystemBase {
         feederMotor.set(ffEffort + pidEffort);
     }
 
-    public void setFlywheelVoltage(double volts){
+    public void setFlywheelVoltage(double volts) {
         primaryMotor.set(volts / primaryMotor.getInputVoltage());
     }
 
@@ -339,3 +339,4 @@ public class Shooter extends SubsystemBase {
         hoodServo.close();
     }
 }
+

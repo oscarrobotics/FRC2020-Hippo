@@ -8,7 +8,6 @@ import org.photonvision.PhotonUtils;
 
 public class ShooterCalculations {
     public static double flywheelRPM, exitAngle, visionYaw, distance;
-    public static double areaToMeters = 0.0001;
 
     private static final double CameraAngle = 56.53;//-33.47
     private static final double CameraHeight = 0.43;

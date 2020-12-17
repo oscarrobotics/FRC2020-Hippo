@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj.system.LinearSystem;
 import edu.wpi.first.wpilibj.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.system.plant.LinearSystemId;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryConfig;
+import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.wpilibj.trajectory.constraint.DifferentialDriveVoltageConstraint;
 import edu.wpi.first.wpilibj.util.Units;
@@ -155,7 +156,10 @@ public class Constants {
         public static final int PracticeTurretRightVisionPosition = VisionTargetingRange / 2;
         public static final int TurretCenterVisionPosition = 0;
 
-        public static final double TurretMOI = 0.0;
+        public static final TrapezoidProfile.Constraints SSConstraints = new TrapezoidProfile.Constraints(
+                Units.degreesToRadians(360), Units.degreesToRadians(1440)); // Max arm speed and acceleration.
+
+        public static final double TurretMOI = 0.068185353;
 
         public static final double TurretReduction = 200;//200:1
 
@@ -207,12 +211,13 @@ public class Constants {
         public static final int HALL_EFFECT_DIO_CHANNEL = 1;
         public static final int LASERSHARK_DIO_CHANNEL = 2;
 
-        public static final float SpinReduction = 1f / (56f/1f);
+        public static final float SpinReduction = 1f / 56f;
         private static final Gearbox SpinGearbox = new Gearbox(SpinReduction);
         public static final WheeledPowerTrain SpinPowertrain = new WheeledPowerTrain(SpinGearbox, Motor.kNEO, 1, Units.inchesToMeters(20));
 
         public static final double SpinkP = 0.01;
-        public static Constraints VelocityConstraints  = new Constraints(SpinPowertrain.calculateMotorRpmFromWheelRpm(60), SpinPowertrain.calculateMotorRpmFromWheelRpm(10));
+        public static final double SpinkD = 0.0;
+        public static Constraints   VelocityConstraints  = new Constraints(SpinPowertrain.calculateMotorRpmFromWheelRpm(500), SpinPowertrain.calculateMotorRpmFromWheelRpm(500));
 
         public static final double PositionkP = 2.0;
         public static Constraints PositionConstraints = new Constraints(SpinPowertrain.calculateMotorRpmFromWheelRpm(90), SpinPowertrain.calculateMotorRpmFromWheelRpm(180));
@@ -245,7 +250,7 @@ public class Constants {
     public static class WOFValues {
         public static final int SPINNER_CAN_ID = 9;
 
-        public static final float SpinReduction = 1f / (25f/1f);
+        public static final float SpinReduction = 1f / 25f;
         private static final Gearbox SpinGearbox = new Gearbox(SpinReduction);
         public static final WheeledPowerTrain SpinPowertrain = new WheeledPowerTrain(SpinGearbox, Motor.kNEO550, 1, Units.inchesToMeters(4));
 
