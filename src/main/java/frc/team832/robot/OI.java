@@ -82,11 +82,12 @@ public class OI {
 		stratComInterface.getArcadeWhiteRight().whenHeld(superStructure.shootOnTarget);
 		stratComInterface.getArcadeBlackLeft().whenHeld(superStructure.closeShoot);
 
-//		stratComInterface.getArcadeBlackLeft().whileHeld(new RunEndCommand(() -> shooter.setFlywheelVoltage(3), () -> shooter.setFlywheelVoltage(0), shooter));
+		stratComInterface.getSingleToggle().whenHeld(new RunEndCommand(() -> climber.adjustHook(stratComInterface.getLeftSlider()), climber::stopExtend));
+		stratComInterface.getSingleToggle().whenReleased(new InstantCommand(climber::retractHook));
 
-		var testSpin = new RunEndCommand(spindexer::vibrate, spindexer::idle).withName("TestSpindexerCommand");
-		stratComInterface.getSingleToggle().whenHeld(testSpin);
+//		var testSpin = new RunEndCommand(spindexer::vibrate, spindexer::idle).withName("TestSpindexerCommand");
+//		stratComInterface.getSingleToggle().whenHeld(testSpin);
 
-		stratComInterface.getDoubleToggleUp().whenHeld(new RunEndCommand(() -> turret.setHeadingSlider(stratComInterface.getRightSlider()), turret::setForward));
+//		stratComInterface.getDoubleToggleUp().whenHeld(new RunEndCommand(() -> shooter.setFlywheelRPM(OscarMath.map(stratComInterface.getRightSlider(), -1, 1, 0, 5000)), shooter::idleAll));
 	}
 }

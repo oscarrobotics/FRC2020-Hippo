@@ -14,6 +14,7 @@ import edu.wpi.first.wpiutil.math.VecBuilder;
 import edu.wpi.first.wpiutil.math.numbers.N1;
 import edu.wpi.first.wpiutil.math.numbers.N2;
 import frc.team832.lib.driverstation.dashboard.DashboardManager;
+import frc.team832.lib.logging.writers.ArmStateSpaceLogWriter;
 import frc.team832.lib.motorcontrol.NeutralMode;
 import frc.team832.lib.motorcontrol2.vendor.CANSparkMax;
 import frc.team832.lib.motors.Motor;
@@ -28,10 +29,8 @@ import frc.team832.robot.utilities.state.ShooterCalculations;
 public class Turret extends SubsystemBase {
 
     public final boolean initSuccessful;
-    private double turretTargetDeg;
+    private double turretTargetDeg = 0;
     private double turretFF = 0;
-
-    public double lastTarget = 0;
 
     private final CANSparkMax motor;
     private final REVThroughBorePWM turretEncoder;
@@ -62,6 +61,8 @@ public class Turret extends SubsystemBase {
             TurretObserver,
             12.0,
             Constants.TurretValues.ControlLoopPeriod);
+
+    private final ArmStateSpaceLogWriter turretSSLogger = new ArmStateSpaceLogWriter("Turret");
 
     private final Spindexer spindexer;
 
@@ -95,7 +96,6 @@ public class Turret extends SubsystemBase {
         m_lastProfiledReference = new TrapezoidProfile.State(getRotations() * 2 * Math.PI, Units.rotationsPerMinuteToRadiansPerSecond(motor.getSensorVelocity() / TurretValues.TurretReduction));
 
         // keep turret at init position
-        turretTargetDeg = 0;
 
         dashboard_turretPos = DashboardManager.addTabItem(this, "Position", 0.0);
         dashboard_turretPIDEffort = DashboardManager.addTabItem(this, "PID Effort", 0.0);
@@ -151,22 +151,25 @@ public class Turret extends SubsystemBase {
         // Send the new calculated voltage to the motors.
         // voltage = duty cycle * battery voltage, so
         // duty cycle = voltage / battery voltage
-        return turretLoop.getU(0);
+        var u = turretLoop.getU(0);
+        if (RobotState.isEnabled()) {
+            turretSSLogger.logSystemState(
+                    turretLoop,
+                    Units.rotationsPerMinuteToRadiansPerSecond(motor.getSensorVelocity() / TurretValues.TurretReduction),
+                    Units.degreesToRadians(getDegrees())
+            );
+        }
+        return u;
     }
 
     public void trackTarget(double spindexerRPM) {
         updateFF(spindexerRPM);
         double target = ShooterCalculations.visionYaw + getDegrees();
         setTurretTargetDegrees(target, true);
-        lastTarget = target;
     }
 
     public void holdPosition() {
         setTurretTargetDegrees(getDegrees(), true);
-    }
-
-    public void setLastYaw() {
-        setTurretTargetDegrees(lastTarget, true);
     }
 
     protected double calculateSafePosition(boolean isVision, double degrees) {

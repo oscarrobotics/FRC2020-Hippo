@@ -217,7 +217,7 @@ public class Constants {
 
         public static final double SpinkP = 0.01;
         public static final double SpinkD = 0.0;
-        public static Constraints   VelocityConstraints  = new Constraints(SpinPowertrain.calculateMotorRpmFromWheelRpm(500), SpinPowertrain.calculateMotorRpmFromWheelRpm(500));
+        public static Constraints VelocityConstraints  = new Constraints(SpinPowertrain.calculateMotorRpmFromWheelRpm(10), SpinPowertrain.calculateMotorRpmFromWheelRpm(30));
 
         public static final double PositionkP = 2.0;
         public static Constraints PositionConstraints = new Constraints(SpinPowertrain.calculateMotorRpmFromWheelRpm(90), SpinPowertrain.calculateMotorRpmFromWheelRpm(180));
@@ -235,16 +235,14 @@ public class Constants {
 
         public static final double MaxExtend = -62;
         public static final double MinExtend = -40;
-        public static final double Retract = -0.25;
+        public static final double Retract = 0;
 
-        public static final Constraints ExtendConstraints = new Constraints(120, 480);
+        public static final Constraints ExtendConstraints = new Constraints(120, 360);
         public static final Constraints ClimbConstraints = new Constraints(10, 20);
         //velocity might be acceleration and acceleration might be jerk because PID is running on velocity and not position
 
-        public static final double ExtendkP = 0.08;
+        public static final double ExtendkP = 0.1;
         public static final double ClimbkP = 0.01;
-
-        public static double ClimbVelocity = 10;
     }
 
     public static class WOFValues {

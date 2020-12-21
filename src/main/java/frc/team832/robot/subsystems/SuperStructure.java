@@ -67,7 +67,7 @@ public class SuperStructure extends SubsystemBase {
 
     public void shootAtTarget() {
         if (vision.hasTarget()) {
-            turret.holdPosition();
+            turret.trackTarget(spindexer.getVelocity());
             shooter.trackTarget();
             shooter.setFeedRPM(Constants.ShooterValues.FeedRpm);
             spindexer.setSpinRPM(ShooterCalculations.getSpindexerRpm(), Spindexer.SpinnerDirection.Clockwise);
@@ -116,19 +116,21 @@ public class SuperStructure extends SubsystemBase {
         public ShootCommandGroup() {
             addRequirements(shooter, intake, spindexer, turret, SuperStructure.this);
             addCommands(
+                    new RunEndCommand(
+                            SuperStructure.this::trackTarget,
+                            () -> {
+                                shooter.idleAll();
+                                spindexer.idle();
+                            }
+                    ),
                     new SequentialCommandGroup(
-                            new FunctionalCommand(() -> {}, SuperStructure.this::trackTarget, (interrupted) -> {turret.holdPosition();},
-                                    SuperStructure.this::readyToShoot),
+                            new WaitUntilCommand(SuperStructure.this::readyToShoot),
                             new InstantCommand(() -> shooter.setFeedRPM(3000)),
                             new WaitUntilCommand(shooter::atFeedRpm),
-                            new FunctionalCommand(() -> {}, SuperStructure.this::trackTarget, (interrupted) -> {turret.setLastYaw();},
-                                    SuperStructure.this::readyToShoot),
                             new RunEndCommand(
                                     SuperStructure.this::shootAtTarget,
                                     () -> {
-                                        shooter.setFlywheelRPM(0);
-                                        shooter.setFeedRPM(0);
-                                        shooter.setHoodAngle(45);
+                                        shooter.idleAll();
                                         spindexer.idle();
                                     }
                             )
