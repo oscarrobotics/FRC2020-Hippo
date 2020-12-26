@@ -3,6 +3,7 @@ package frc.team832.robot.subsystems;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.team832.lib.driverstation.dashboard.DashboardManager;
 import frc.team832.lib.motorcontrol2.vendor.CANTalonFX;
@@ -29,6 +30,7 @@ public class Intake extends SubsystemBase {
 		intakeSlot = pdp.addDevice(Constants.IntakeValues.INTAKE_MOTOR_PDP_SLOT, intakeMotor);
 
 		intakeMotor.wipeSettings();
+		intakeMotor.setInverted(true);
 
 		moveIntake = new Solenoid(Constants.PneumaticsValues.PCM_MODULE_NUM, Constants.PneumaticsValues.INTAKE_SOLENOID_ID);
 
@@ -53,31 +55,11 @@ public class Intake extends SubsystemBase {
 	}
 
 	public void intake(double power) {
-		extendIntake();
-		OscarMath.clip(power, 0, 1);
 		intakeMotor.set(power);
 	}
 
 	public void outtake(double power) {
-		extendIntake();
-		OscarMath.clip(power, 0, 1);
 		intakeMotor.set(-power);
-	}
-
-	public void setIntakeRPM(double rpm) {
-		double motorRPM = rpm * Constants.IntakeValues.IntakeReduction;
-		double pow = Constants.IntakeValues.FF.calculate(OscarMath.clip(motorRPM, 0, Motor.kNEO550.freeSpeed));
-		intakeMotor.set(pow);
-		dashboard_intakePow.setDouble(pow);
-		dashboard_intakeTargetRPM.setDouble(rpm);
-	}
-
-	public void setOuttakeRPM(double rpm) {
-		double motorRPM = -rpm * Constants.IntakeValues.IntakeReduction;
-		double pow = Constants.IntakeValues.FF.calculate(OscarMath.clip(motorRPM, -Motor.kNEO550.freeSpeed, 0));
-		intakeMotor.set(pow);
-		dashboard_intakePow.setDouble(pow);
-		dashboard_intakeTargetRPM.setDouble(motorRPM);
 	}
 
 	public void stop() {
@@ -100,14 +82,4 @@ public class Intake extends SubsystemBase {
 	public void setCurrentLimit(int amps) {
 		intakeMotor.limitInputCurrent(amps);
 	}
-
-	public void setDumbPower(double leftSlider) {
-		extendIntake();
-		intake(OscarMath.map(leftSlider,-1.0, 1.0, 0.0, 1.0));
-	}
-
-    public void idle() {
-		setIntakeRPM(0);
-		retractIntake();
-    }
 }

@@ -21,6 +21,9 @@ public class SuperStructure extends SubsystemBase {
     public final ShootCommandGroup shootOnTarget;
     public final CloseRangeShootCommandGroup closeShoot;
     public final TargetingTestCommand testTargeting;
+    public final ExtendIntakeCommand extendIntake;
+    public final ExtendOuttakeCommand extendOuttake;
+    public final RetractIntakeCommand retractIntake;
 
 
     public SuperStructure(Intake intake, Shooter shooter, Spindexer spindexer, Turret turret, Vision vision) {
@@ -35,6 +38,9 @@ public class SuperStructure extends SubsystemBase {
         shootOnTarget = new ShootCommandGroup();
         closeShoot = new CloseRangeShootCommandGroup();
         testTargeting = new TargetingTestCommand();
+        extendIntake = new ExtendIntakeCommand();
+        extendOuttake = new ExtendOuttakeCommand();
+        retractIntake = new RetractIntakeCommand();
 
         DashboardManager.addTab(this);
         dashboard_hoodVolts = DashboardManager.addTabItem(this, "Current Volts", 0.0);
@@ -49,7 +55,7 @@ public class SuperStructure extends SubsystemBase {
 
     public void trackTarget() {
         if (vision.hasTarget()) {
-            turret.trackTarget(spindexer.getVelocity());
+            turret.trackTarget(spindexer.getRPM());
             shooter.trackTarget();
         } else {
             turret.setTurretTargetDegrees(0.0, true);
@@ -58,7 +64,7 @@ public class SuperStructure extends SubsystemBase {
 
     public void testTrackTarget() {
         if (vision.hasTarget()) {
-            turret.trackTarget(spindexer.getVelocity());
+            turret.trackTarget(spindexer.getRPM());
             shooter.setHoodToVisionDistance();
         } else {
             turret.setTurretTargetDegrees(0.0, true);
@@ -67,7 +73,7 @@ public class SuperStructure extends SubsystemBase {
 
     public void shootAtTarget() {
         if (vision.hasTarget()) {
-            turret.trackTarget(spindexer.getVelocity());
+            turret.trackTarget(spindexer.getRPM());
             shooter.trackTarget();
             shooter.setFeedRPM(Constants.ShooterValues.FeedRpm);
             spindexer.setSpinRPM(ShooterCalculations.getSpindexerRpm(), Spindexer.SpinnerDirection.Clockwise);
@@ -88,7 +94,7 @@ public class SuperStructure extends SubsystemBase {
 
         @Override
         public void initialize() {
-            intake.idle();
+            intake.stopAll();
             shooter.idleAll();
             spindexer.idle();
             turret.setForward();
@@ -181,6 +187,43 @@ public class SuperStructure extends SubsystemBase {
                                 }
                         )
                 )
+            );
+        }
+    }
+
+    public class ExtendIntakeCommand extends SequentialCommandGroup {
+        public ExtendIntakeCommand() {
+            addRequirements(intake, shooter, spindexer, turret, SuperStructure.this);
+            addCommands(
+                    new InstantCommand(intake::extendIntake),
+                    new InstantCommand(() -> spindexer.setSpinRPM(30, Spindexer.SpinnerDirection.Clockwise)),
+                    new WaitCommand(0.5),
+                    new InstantCommand(() -> intake.intake(0.5)),
+                    spindexer.getAntiJamSpinCommand(10, 1.0)
+            );
+        }
+    }
+
+    public class ExtendOuttakeCommand extends SequentialCommandGroup {
+        public ExtendOuttakeCommand() {
+            addRequirements(intake, shooter, spindexer, turret, SuperStructure.this);
+            addCommands(
+                    new InstantCommand(intake::extendIntake),
+                    new InstantCommand(() -> spindexer.setSpinRPM(30, Spindexer.SpinnerDirection.CounterClockwise)),
+                    new WaitCommand(0.25),
+                    new InstantCommand(() -> intake.outtake(0.4))
+            );
+        }
+    }
+
+    public class RetractIntakeCommand extends SequentialCommandGroup {
+        public RetractIntakeCommand() {
+            addRequirements(intake, shooter, spindexer, turret, SuperStructure.this);
+            addCommands(
+                    new InstantCommand(intake::retractIntake),
+                    new WaitCommand(1.0),
+                    new InstantCommand(intake::stop),
+                    new InstantCommand(spindexer::idle)
             );
         }
     }
