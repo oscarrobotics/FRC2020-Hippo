@@ -199,7 +199,7 @@ public class SuperStructure extends SubsystemBase {
                     new InstantCommand(() -> spindexer.setSpinRPM(30, Spindexer.SpinnerDirection.Clockwise)),
                     new WaitCommand(0.5),
                     new InstantCommand(() -> intake.intake(0.5)),
-                    spindexer.getAntiJamSpinCommand(10, 1.0)
+                    spindexer.getAntiJamSpinCommand(15, 1.0)
             );
         }
     }
@@ -209,7 +209,7 @@ public class SuperStructure extends SubsystemBase {
             addRequirements(intake, shooter, spindexer, turret, SuperStructure.this);
             addCommands(
                     new InstantCommand(intake::extendIntake),
-                    new InstantCommand(() -> spindexer.setSpinRPM(30, Spindexer.SpinnerDirection.CounterClockwise)),
+                    new InstantCommand(() -> spindexer.setSpinRPM(25, Spindexer.SpinnerDirection.CounterClockwise)),
                     new WaitCommand(0.25),
                     new InstantCommand(() -> intake.outtake(0.4))
             );
@@ -220,6 +220,7 @@ public class SuperStructure extends SubsystemBase {
         public RetractIntakeCommand() {
             addRequirements(intake, shooter, spindexer, turret, SuperStructure.this);
             addCommands(
+                    new InstantCommand(() -> spindexer.setSpinRPM(20, Spindexer.SpinnerDirection.Clockwise)),
                     new InstantCommand(intake::retractIntake),
                     new WaitCommand(1.0),
                     new InstantCommand(intake::stop),

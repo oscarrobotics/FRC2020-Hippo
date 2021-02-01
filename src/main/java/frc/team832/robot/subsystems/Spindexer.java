@@ -61,7 +61,7 @@ public class Spindexer extends SubsystemBase {
         runSpindexerPID();
         dashboard_targetRPM.setDouble(spindexerTargetRPM);
         dashboard_RPM.setDouble(getRPM());
-        dashboard_isStall.setBoolean(isStalling(10));
+        dashboard_isStall.setBoolean(isStalling(15));
         dashboard_direction.setString(spinDirection.toString());
     }
 
@@ -80,9 +80,18 @@ public class Spindexer extends SubsystemBase {
         spindexerTargetRPM = rpm;
     }
 
-    public void vibrate(double frequency, double power) {
-        if (vibrateCount > frequency * 25) {
-            setSpinRPM(power * 100, spinDirection == SpinnerDirection.Clockwise ? SpinnerDirection.CounterClockwise : SpinnerDirection.Clockwise);
+    public void vibrate(double frequency, double rpm) {
+        if (vibrateCount > (1 / frequency) * 25) {
+            setSpinRPM(rpm, spinDirection == SpinnerDirection.Clockwise ? SpinnerDirection.CounterClockwise : SpinnerDirection.Clockwise);
+            vibrateCount = 0;
+            return;
+        }
+        vibrateCount++;
+    }
+
+    public void spinVibrate(double frequency, double rpm) {
+        if (vibrateCount > (spinDirection == SpinnerDirection.Clockwise ? (1 / frequency) * 50 : (1 / frequency) * 25)) {
+            setSpinRPM(rpm, spinDirection == SpinnerDirection.Clockwise ? SpinnerDirection.CounterClockwise : SpinnerDirection.Clockwise);
             vibrateCount = 0;
             return;
         }
@@ -125,7 +134,7 @@ public class Spindexer extends SubsystemBase {
     }
 
     public boolean isStalling(double rpmTolerance) {
-        return Math.abs(spindexerTargetRPM) > 1 && Math.abs(getRPM()) < rpmTolerance;
+        return Math.abs(spindexerTargetRPM) > 0 && Math.abs(getRPM() - spindexerTargetRPM) > rpmTolerance;
     }
 
     public void switchSpin() {
@@ -140,8 +149,8 @@ public class Spindexer extends SubsystemBase {
         return spinDirection;
     }
 
-    public Command getAntiJamSpinCommand(double rpm, double resetTime) {
-        return new AntiStall(rpm, resetTime);
+    public Command getAntiJamSpinCommand(double rpmTolerance, double resetTime) {
+        return new AntiStall(rpmTolerance, resetTime);
     }
 
     public enum SpinnerDirection {
@@ -158,6 +167,7 @@ public class Spindexer extends SubsystemBase {
         double lastSwitchSec = 0;
         double fpgaSecs;
         double vibrateStartTime;
+        boolean vibrate = false;
         final double tolerance;
         final double resetTime;
 
@@ -169,15 +179,18 @@ public class Spindexer extends SubsystemBase {
         @Override
         public void execute() {
             fpgaSecs = Timer.getFPGATimestamp();
-            if (isStalling(tolerance) && (fpgaSecs - lastSwitchSec >= resetTime)) {
+            if (isStalling(tolerance) && (fpgaSecs - lastSwitchSec >= resetTime) && !vibrate) {
+                vibrate = true;
                 vibrateStartTime = fpgaSecs;
-                if (fpgaSecs - vibrateStartTime < resetTime * 0.8) {
-                    vibrate(5, 0.25);
-                } else {
-                    switchSpin();
-                }
                 lastSwitchSec = fpgaSecs;
             }
+            if (vibrate && fpgaSecs - vibrateStartTime < resetTime * 0.75) {
+                vibrate(4, 20);
+            } else {
+                vibrate = false;
+                setSpinRPM(30, spinDirection);
+            }
+
         }
     }
 }
