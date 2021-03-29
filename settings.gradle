@@ -28,3 +28,5 @@ pluginManagement {
 
 rootProject.name='FRC2020-Robot'
 include 'GrouchLib'
+rootProject.children[0].buildFileName = 'GrouchLib.gradle'
+
