@@ -1,6 +1,9 @@
 package frc.team832.robot.subsystems;
 
 import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.DigitalSource;
+import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj.controller.LinearQuadraticRegulator;
 import edu.wpi.first.wpilibj.controller.PIDController;
@@ -36,6 +39,10 @@ public class Turret extends SubsystemBase {
     private final REVThroughBorePWM turretEncoder;
     private final PDPSlot pdpSlot;
 
+//    private final DigitalSource turretIndexSource = new DigitalSource();
+//    private DigitalInput turretIndex = new DigitalInput(5);
+    private Encoder turretVelocityEncoder = new Encoder(1, 2, 5);
+
     private TrapezoidProfile.State m_lastProfiledReference;
 
     private final KalmanFilter<N2, N1, N1> TurretObserver = new KalmanFilter<>(
@@ -48,9 +55,9 @@ public class Turret extends SubsystemBase {
     private final LinearQuadraticRegulator<N2, N1, N1> turretController
             = new LinearQuadraticRegulator<>(
             TurretValues.m_turretPlant,
-            VecBuilder.fill(Units.degreesToRadians(1), Units.degreesToRadians(10)), // qelms. Velocity error tolerance, in radians per second. Decrease
+            VecBuilder.fill(Units.degreesToRadians(2), Units.degreesToRadians(10)), // qelms. Velocity error tolerance, in radians per second. Decrease
             // this to more heavily penalize state excursion, or make the controller behave more aggressively.
-            VecBuilder.fill(12.0), // relms. Control effort (voltage) tolerance. Decrease this to more
+            VecBuilder.fill(10), // relms. Control effort (voltage) tolerance. Decrease this to more
             // heavily penalize control effort, or make the controller less aggressive. 12 is a good
             // starting point because that is the (approximate) maximum voltage of a battery.
             TurretValues.ControlLoopPeriod); // Nominal time between loops. 0.020 for TimedRobot, but can be lower if using notifiers.
@@ -68,7 +75,10 @@ public class Turret extends SubsystemBase {
 
     private boolean isVision = false;
 
-    private final NetworkTableEntry dashboard_turretPos, dashboard_turretPIDEffort, dashboard_turretTarget, dashboard_turretError, dashboard_turretSSEffort, dashboard_lastPos, dashboard_lastVel, dashboard_turretRPM;
+    private final NetworkTableEntry dashboard_turretPos, dashboard_turretPIDEffort,
+            dashboard_turretTarget, dashboard_turretError, dashboard_turretSSEffort,
+            dashboard_lastPos, dashboard_lastVel, dashboard_turretRPM,
+            dashboard_turretQuadraturePosition, getDashboard_turretQuadratureVelocity;
 
     private final PIDController PID = new PIDController(TurretValues.kP, TurretValues.kI, TurretValues.kD);
 
@@ -95,6 +105,8 @@ public class Turret extends SubsystemBase {
         // Reset our last reference to the current state.
         m_lastProfiledReference = new TrapezoidProfile.State(getRotations() * 2 * Math.PI, Units.rotationsPerMinuteToRadiansPerSecond(motor.getSensorVelocity() / TurretValues.TurretReduction));
 
+//        turretVelocityEncoder.setDistancePerPulse(1/8192.0);
+
         // keep turret at init position
 
         dashboard_turretPos = DashboardManager.addTabItem(this, "Position", 0.0);
@@ -105,6 +117,8 @@ public class Turret extends SubsystemBase {
         dashboard_lastPos = DashboardManager.addTabItem(this, "Last Position", 0.0);
         dashboard_lastVel = DashboardManager.addTabItem(this, "Last Velocity", 0.0);
         dashboard_turretRPM = DashboardManager.addTabItem(this, "RPM", 0.0);
+        dashboard_turretQuadraturePosition = DashboardManager.addTabItem(this, "QuadPos", 0.0);
+        getDashboard_turretQuadratureVelocity = DashboardManager.addTabItem(this, "QuadPVel", 0.0);
 
         initSuccessful = motor.getCANConnection();
     }
@@ -112,10 +126,13 @@ public class Turret extends SubsystemBase {
     @Override
     public void periodic() {
 //        runPID();
-        dashboard_turretPos.setDouble(Units.degreesToRadians(getDegrees()));
+        dashboard_turretPos.setDouble(getDegrees());
         dashboard_turretTarget.setDouble(turretTargetDeg);
 //        dashboard_turretError.setDouble(PID.getPositionError());
         dashboard_turretRPM.setDouble(motor.getSensorVelocity() / TurretValues.TurretReduction);
+        dashboard_turretQuadraturePosition.setDouble(turretVelocityEncoder.getDistance());
+        getDashboard_turretQuadratureVelocity.setDouble(turretVelocityEncoder.getRate());
+
     }
 
 
@@ -159,7 +176,7 @@ public class Turret extends SubsystemBase {
                     Units.degreesToRadians(getDegrees())
             );
         }
-        return u;
+        return u + (u > 0.025 ? (Math.signum(u) * 0.1) : 0);
     }
 
     public void trackTarget(double spindexerRPM) {
@@ -233,7 +250,7 @@ public class Turret extends SubsystemBase {
     }
 
     double getDegrees() {
-        return TurretValues.convertRotationsToDegrees(getRotations());
+        return TurretValues.convertRotationsToDegrees(getRotations()) + 40;
     }
 
     public boolean atTargetAngle() {

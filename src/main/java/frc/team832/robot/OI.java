@@ -44,7 +44,7 @@ public class OI {
 		this.superStructure = superStructure;
 
 		if (OperatorInterface.getConnectedControllerCount() > 1 && DriverStation.getInstance().isJoystickConnected(0)) {
-			configTestingCommands();
+			configureOperatorLayout();
 		}
 
 		if (DriverStation.getInstance().isJoystickConnected(3)) {
